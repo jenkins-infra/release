@@ -36,7 +36,6 @@ pipeline {
         daysToKeepStr: '',
         numToKeepStr: '10'
       )
-      checkoutToSubdirectory 'release'
       disableConcurrentBuilds()
     }
 
@@ -61,7 +60,10 @@ pipeline {
         steps {
           container('maven') {
             git branch: env.GIT_BRANCH, credentialsId: 'release-key', url: env.GIT_REPOSITORY
-            sh 'utils/release.sh --cleanRelease'
+            dir ('release'){
+              scm
+            }
+            sh 'release/utils/release.sh --cleanRelease'
           }
         }
       }
@@ -78,8 +80,8 @@ pipeline {
         steps {
           container('azure-cli') {
             sh '''
-              utils/release.sh --downloadAzureKeyvaultSecret
-              utils/release.sh --configureKeystore
+              release/utils/release.sh --downloadAzureKeyvaultSecret
+              release/utils/release.sh --configureKeystore
             '''
           }
         }
@@ -94,7 +96,7 @@ pipeline {
         steps {
           container('azure-cli') {
             sh '''
-              utils/release.sh --getGPGKeyFromAzure
+              release/utils/release.sh --getGPGKeyFromAzure
             '''
           }
         }
@@ -106,9 +108,9 @@ pipeline {
             sshagent(['release-key']) {
               // Maven Release requires gpg key with password password and a certificate key with password
               sh '''
-                utils/release.sh --configureGPG
-                utils/release.sh --configureGit
-                utils/release.sh --prepareRelease
+                release/utils/release.sh --configureGPG
+                release/utils/release.sh --configureGit
+                release/utils/release.sh --prepareRelease
               '''
 
               script {
@@ -127,7 +129,7 @@ pipeline {
               // We want to only commit to the repository used by the jenkins job
               // instead of jenkinsci/jenkins as defined in pom.xml
               sh '''
-                utils/release.sh --pushCommits
+                release/utils/release.sh --pushCommits
               '''
             }
           }
@@ -140,8 +142,8 @@ pipeline {
             // Maven required git push permission on https://github.com/jenkinsci/jenkins
             sshagent(['release-key']) {
               sh '''
-                utils/release.sh --stageRelease
-                utils/release.sh --verifyGPGSignature
+                release/utils/release.sh --stageRelease
+                release/utils/release.sh --verifyGPGSignature
               '''
             }
           }
@@ -162,11 +164,10 @@ Select Proceed or Abort to terminate the build pod'''
           // Maven required git push permission on https://github.com/jenkinsci/jenkins
           sshagent(['release-key']) {
             sh '''
-              utils/release.sh --rollback
+              release/utils/release.sh --rollback
             '''
           }
         }
       }
-
     }
 }

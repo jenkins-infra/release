@@ -2,7 +2,7 @@ pipeline {
   agent {
     kubernetes {
       label 'package-linux'
-      yamlFile 'PodTemplates/package-linux'
+      yamlFile 'PodTemplates.d/package-linux'
       inheritFrom 'jnlp-linux'
       workingDir '/home/jenkins/agent'
     }
@@ -69,6 +69,9 @@ pipeline {
       steps {
         container('azure-cli') {
           git branch: master, credentialsId: 'release-key', url: 'git@github.com:olblak/packaging.git'
+          dir ('release'){
+            scm
+          }
       
           sh '''
             az storage blob download \
