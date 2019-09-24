@@ -37,7 +37,6 @@ pipeline {
       daysToKeepStr: '30',
       numToKeepStr: '10'
     )
-    checkoutToSubdirectory 'release'
     disableConcurrentBuilds()
   }
 
