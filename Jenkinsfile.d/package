@@ -50,8 +50,7 @@ pipeline {
     BRANDING_DIR          = 'branding'
     BRAND                 = 'jenkins.mk'
     CREDENTIAL            = 'credentials/test.mk'
-    GPG_FILENAME          = 'gpg-test-jenkins-release.gpg'
-    GPG_FILE              = "$WORKSPACE/$GPG_FILENAME"
+    GPG_FILE              = 'gpg-test-jenkins-release.gpg'
     GPG_KEYNAME           = 'test-jenkins-release'
     GPG_PASSPHRASE        = credentials('release-gpg-passphrase')
     GPG_PASSPHRASE_FILE   = "$WORKSPACE/gpg.password.txt"
@@ -77,7 +76,7 @@ pipeline {
           sh '''
             release/utils/release.sh --getGPGKeyFromAzure
           '''
-          stash includes: GPG_FILENAME , name: 'GPG'
+          stash includes: GPG_FILE , name: 'GPG'
 
         }
         container('packaging'){
@@ -142,4 +141,4 @@ pipeline {
       }
     }
   }
-}
+i}
