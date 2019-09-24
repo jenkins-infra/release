@@ -75,17 +75,13 @@ pipeline {
           }
       
           sh '''
-            az storage blob download \
-            --account-name $AZURE_STORAGE_ACCOUNT \
-            --container-name $AZURE_STORAGE_CONTAINER_NAME \
-            --name "$GPG_FILENAME" \
-            --file "$GPG_FILE"
+            release/utils/release.sh --getGPGKeyFromAzure
           '''
           stash includes: GPG_FILENAME , name: 'GPG'
 
         }
         container('packaging'){
-          sh '/entrypoint'
+          sh 'release/utils/release.sh --configureGPG'
         }
       }
     }
