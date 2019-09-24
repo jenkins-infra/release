@@ -2,7 +2,7 @@ pipeline {
   agent {
     kubernetes {
       label 'package-linux'
-      yamlFile 'release/PodTemplates/package-linux'
+      yamlFile 'PodTemplates/package-linux'
       inheritFrom 'jnlp-linux'
       workingDir '/home/jenkins/agent'
     }

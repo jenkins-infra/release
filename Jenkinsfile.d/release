@@ -24,7 +24,7 @@ pipeline {
     agent {
       kubernetes {
         label 'release-linux'
-        yamlFile 'release/PodTemplates.d/release-linux.yaml'
+        yamlFile 'PodTemplates.d/release-linux.yaml'
         inheritFrom 'jnlp-linux'
       }
     }
