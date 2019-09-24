@@ -46,8 +46,8 @@ pipeline {
 //    <version>: where version represent any valid existing version like 2.176.2
 
   environment {
-    BUILDENV              = '/packaging/env/test.mk'
-    CREDENTIAL            = '/packaging/credentials/test.mk'
+    BUILDENV              = 'env/test.mk'
+    CREDENTIAL            = 'credentials/test.mk'
     GPG_FILENAME          = 'gpg-test-jenkins-release.gpg'
     GPG_FILE              = "$WORKSPACE/$GPG_FILENAME"
     GPG_KEYNAME           = 'test-jenkins-release'
@@ -91,7 +91,7 @@ pipeline {
     stage('Download WAR archive to package'){
       steps{
         container('packaging'){
-          sh '/packaging/utils/getJenkinsVersion.py'
+          sh 'release/utils/getJenkinsVersion.py'
           stash includes: WAR_FILENAME, name: "WAR"
           archiveArtifacts artifacts: "*.war"
         }
