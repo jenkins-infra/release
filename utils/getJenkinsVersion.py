@@ -66,23 +66,7 @@ def downloadJenkins(version):
 
 
 # URL = 'https://repo.jenkins-ci.org/releases/org/jenkins-ci/main/jenkins-war/'
-
-
-
 #URL = os.environ.get('JENKINS_DOWNLOAD_URL', 'https://release.repo.jenkins.io/repository/maven-releases/org/jenkins-ci/main/jenkins-war/')
-
-if 'JENKINS_PACKAGING_PROFILE' in os.environ:
-    if PACKAGING_PROFILE == 'dev':
-        DOWNLOAD_MAVEN_REPOSITORY = 'maven-releases'
-        DOWNLOAD_MAVEN_URL  = 'http://nexus/repository/'
-    elif PACKAGING_PROFILE == 'staging':
-        DOWNLOAD_MAVEN_REPOSITORY = 'olblak-sandbox'
-        DOWNLOAD_MAVEN_URL = 'https://repo.jenkins-ci.org'
-else:
-    DOWNLOAD_MAVEN_REPOSITORY = os.environ.get('DOWNLOAD_MAVEN_REPOSITORY', 'maven-releases')
-    DOWNLOAD_MAVEN_URL = os.environ.get("DOWNLOAD_MAVEN_URL", "http://nexus/repository/")
-
-URL = DOWNLOAD_MAVEN_URL + '/' + DOWNLOAD_MAVEN_REPOSITORY + '/org/jenkins-ci/main/jenkins-war/'
 
 PATH = os.environ.get('WAR', '/tmp/jenkins.war')
 VERSION = getJenkinsVersion(
@@ -93,7 +77,7 @@ VERSION = getJenkinsVersion(
 def main():
     print "VERSION: " + VERSION
     print "Downloaded from: " + URL
-    #downloadJenkins(VERSION)
+    downloadJenkins(VERSION)
 
 
 if __name__ == "__main__":
