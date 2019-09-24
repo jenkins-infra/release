@@ -1,0 +1,51 @@
+apiVersion: "v1"
+kind: "Pod"
+metadata:
+  labels:
+    jenkins: "slave"
+    job: "package"
+spec:
+  containers:
+  - args:
+    - "99d"
+    command:
+    - "sleep"
+    env:
+    - name: "HOME"
+      value: "/home/jenkins"
+    image: "microsoft/azure-cli:2.0.59"
+    imagePullPolicy: "IfNotPresent"
+    name: "azure-cli"
+    resources:
+      limits:
+        memory: "512Mi"
+        cpu: "400m"
+      requests:
+        memory: "512Mi"
+        cpu: "400m"
+    securityContext:
+      privileged: false
+    tty: false
+  - args:
+    - "99d"
+    command:
+    - "sleep"
+    env:
+    - name: "HOME"
+      value: "/home/jenkins"
+    image: "olblak/packaging:0543e8"
+    imagePullPolicy: "IfNotPresent"
+    name: "packaging"
+    resources:
+      limits:
+        memory: "1Gi"
+        cpu: "400m"
+      requests:
+        memory: "1Gi"
+        cpu: "400m"
+    securityContext:
+      privileged: false
+    tty: false
+  nodeSelector:
+    kubernetes.io/os: "linux"
+  restartPolicy: "Never"

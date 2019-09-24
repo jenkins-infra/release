@@ -1,0 +1,172 @@
+// -*- Groovy -*-
+/*
+  Require credentials:
+    - Microsoft Azure Service Principal
+    - Azure Storage Account
+
+  Maven docker image cannot be run with the root user
+  https://batmat.net/2017/01/30/do-not-run-your-tests-in-continuous-integration-with-the-root-user/
+  Docker container related to jenkins-jnlp require:
+  * uid 1000,
+  * gid 1000
+  * /home/jenkins/.jenkins
+
+  Jenkins Plugins:
+    * Azure-Credentials
+    * SSH-agent
+
+  docker image olblak/maven is just a customized docker image based on maven where maven is run as
+  user jenkins with uid 1000 and gid 1000, there is also a volume /home/jenkins/.jenkins defined in the image
+  otherwise the directory is created with root permission and Jenkins cannot add files there
+*/
+
+pipeline {
+    agent {
+      kubernetes {
+        label 'release-linux'
+        yamlFile 'release/PodTemplates.d/release-linux.yaml'
+        inheritFrom 'jnlp-linux'
+      }
+    }
+
+    options {
+      buildDiscarder logRotator(
+        artifactDaysToKeepStr: '',
+        artifactNumToKeepStr: '',
+        daysToKeepStr: '',
+        numToKeepStr: '10'
+      )
+      checkoutToSubdirectory 'release'
+      disableConcurrentBuilds()
+    }
+
+    environment {
+      GIT_EMAIL                     = 'jenkins-bot@example.com'
+      GIT_NAME                      = 'jenkins-bot'
+      GIT_SSH_COMMAND               = 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+      GIT_BRANCH                    = 'master'
+      GIT_REPOSITORY                = 'git@github.com:olblak/jenkins.git'
+      GPG_FILE                      = 'gpg-test-jenkins-release.gpg'
+      GPG_KEYNAME                   = 'test-jenkins-release'
+      GPG_PASSPHRASE                = credentials('release-gpg-passphrase')
+      MAVEN_REPOSITORY_URL          = "http://nexus/repository"
+      MAVEN_REPOSITORY_USERNAME     = credentials('maven-repository-username')
+      MAVEN_REPOSITORY_PASSWORD     = credentials('maven-repository-password')
+      SIGN_ALIAS                    = 'jenkins'
+      SIGN_STOREPASS                = credentials('signing-cert-pass')
+    }
+
+    stages {
+      stage('Clean Release') {
+        steps {
+          container('maven') {
+            git branch: env.GIT_BRANCH, credentialsId: 'release-key', url: env.GIT_REPOSITORY
+            sh 'utils/release.sh --cleanRelease'
+          }
+        }
+      }
+      stage('Get Code Signing Certificate') {
+        environment {
+          AZURE_VAULT_NAME              = 'prodreleasecore'
+          AZURE_VAULT_CERT              = 'prodreleasecore'
+          AZURE_VAULT_FILE              = 'jenkins.pem'
+          AZURE_VAULT_CLIENT_ID         = credentials('azure-vault-client-id')
+          AZURE_VAULT_CLIENT_SECRET     = credentials('azure-vault-client-secret')
+          AZURE_VAULT_TENANT_ID         = credentials('azure-vault-tenant-id')
+        }
+
+        steps {
+          container('azure-cli') {
+            sh '''
+              utils/release.sh --downloadAzureKeyvaultSecret
+              utils/release.sh --configureKeystore
+            '''
+          }
+        }
+      }
+      stage('Get GPG key') {
+        environment {
+          AZURE_STORAGE_ACCOUNT         = 'prodreleasecore'
+          AZURE_STORAGE_CONTAINER_NAME  = 'gpg'
+          AZURE_STORAGE_KEY             = credentials('gpg-storage-account-key')
+        }
+
+        steps {
+          container('azure-cli') {
+            sh '''
+              utils/release.sh --getGPGKeyFromAzure
+            '''
+          }
+        }
+      }
+      stage('Prepare Release') {
+        steps {
+          container('maven') {
+            // Maven required git push permission on https://github.com/jenkinsci/jenkins
+            sshagent(['release-key']) {
+              // Maven Release requires gpg key with password password and a certificate key with password
+              sh '''
+                utils/release.sh --configureGPG
+                utils/release.sh --configureGit
+                utils/release.sh --prepareRelease
+              '''
+
+              script {
+                def properties = readProperties file: 'release.properties'
+                env.RELEASE_SCM_TAG = properties['scm.tag']
+                env.RELEASE_VERSION = properties['project.rel.org.jenkins-ci.main:jenkins-war']
+              }
+            }
+          }
+        }
+      }
+      stage('Push Commits') {
+        steps {
+          container('maven') {
+            sshagent(['release-key']) {
+              // We want to only commit to the repository used by the jenkins job
+              // instead of jenkinsci/jenkins as defined in pom.xml
+              sh '''
+                utils/release.sh --pushCommits
+              '''
+            }
+          }
+        }
+      }
+
+      stage('Stage Release') {
+        steps {
+          container('maven') {
+            // Maven required git push permission on https://github.com/jenkinsci/jenkins
+            sshagent(['release-key']) {
+              sh '''
+                utils/release.sh --stageRelease
+                utils/release.sh --verifyGPGSignature
+              '''
+            }
+          }
+        }
+      }
+    }
+    post {
+    /*
+        always {
+            cleanWs()
+        }
+    */
+      failure {
+        input '''Pipeline failed.
+We will keep the build pod around to help you diagnose any failures.
+Select Proceed or Abort to terminate the build pod'''
+        container('maven') {
+          // Maven required git push permission on https://github.com/jenkinsci/jenkins
+          sshagent(['release-key']) {
+            sh '''
+              utils/release.sh --rollback
+            '''
+          }
+        }
+      }
+
+    }
+}

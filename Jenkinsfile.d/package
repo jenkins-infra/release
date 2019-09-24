@@ -1,0 +1,145 @@
+pipeline {
+  agent {
+    kubernetes {
+      label 'package-linux'
+      yamlFile 'release/PodTemplates/package-linux'
+      inheritFrom 'jnlp-linux'
+      workingDir '/home/jenkins/agent'
+    }
+  }
+
+  parameters {
+    choice(
+      choices: [
+        'http://nexus/repository/maven-releases/org/jenkins-ci/main/jenkins-war/',
+        'https://repo.jenkins-ci.org/releases/org/jenkins-ci/main/jenkins-war/'
+      ],
+      description: 'Specify which url will be use to download the jenkins.war',
+      name: 'JENKINS_DOWNLOAD_URL'
+    )
+  string(
+    defaultValue: 'weekly',
+    description: '''Define which version will be package where:
+* \'stable\' means the latest stable version that satifies version pattern X.Y.Z
+* \'weekly\' means the latest weekly version that satisfies version pattern X.Y
+* <version> represents any valid existing version like 2.176.3 available at JENKINS_DOWNLOAD_URL
+''',
+    name: 'JENKINS_VERSION',
+    trim: false
+    )
+  }
+
+
+  options {
+    buildDiscarder logRotator(
+      artifactDaysToKeepStr: '14',
+      artifactNumToKeepStr: '5',
+      daysToKeepStr: '30',
+      numToKeepStr: '10'
+    )
+    checkoutToSubdirectory 'release'
+    disableConcurrentBuilds()
+  }
+
+//  ENV JENKINS_VERSION
+//    stable: It represents the latest stable version that satifies version pattern X.Y.Z
+//    weekly: It represents the latest weekly version that satisfies version pattern X.Y
+//    <version>: where version represent any valid existing version like 2.176.2
+
+  environment {
+    BUILDENV              = '/packaging/env/test.mk'
+    CREDENTIAL            = '/packaging/credentials/test.mk'
+    GPG_FILENAME          = 'gpg-test-jenkins-release.gpg'
+    GPG_FILE              = "$WORKSPACE/$GPG_FILENAME"
+    GPG_KEYNAME           = 'test-jenkins-release'
+    GPG_PASSPHRASE        = credentials('release-gpg-passphrase')
+    GPG_PASSPHRASE_FILE   = "$WORKSPACE/gpg.password.txt"
+    WAR_FILENAME          = 'jenkins.war'
+    WAR                   = "$WORKSPACE/$WAR_FILENAME"
+  }
+
+  stages {
+    stage('Get GPG key') {
+      environment {
+        AZURE_STORAGE_ACCOUNT         = 'prodreleasecore'
+        AZURE_STORAGE_CONTAINER_NAME  = 'gpg'
+        AZURE_STORAGE_KEY             = credentials('gpg-storage-account-key')
+      }
+
+      steps {
+        container('azure-cli') {
+          git branch: master, credentialsId: 'release-key', url: 'git@github.com:olblak/packaging.git'
+      
+          sh '''
+            az storage blob download \
+            --account-name $AZURE_STORAGE_ACCOUNT \
+            --container-name $AZURE_STORAGE_CONTAINER_NAME \
+            --name "$GPG_FILENAME" \
+            --file "$GPG_FILE"
+          '''
+          stash includes: GPG_FILENAME , name: 'GPG'
+
+        }
+        container('packaging'){
+          sh '/entrypoint'
+        }
+      }
+    }
+
+    stage('Download WAR archive to package'){
+      steps{
+        container('packaging'){
+          sh '/packaging/utils/getJenkinsVersion.py'
+          stash includes: WAR_FILENAME, name: "WAR"
+          archiveArtifacts artifacts: "*.war"
+        }
+      }
+    }
+    stage('Build'){
+      failFast false
+      parallel {
+        stage('Debian') {
+          steps {
+            container('packaging'){
+              sh 'make deb'
+              archiveArtifacts artifacts: "target/debian/*.deb"
+            }
+          }
+        }
+        stage('Redhat') {
+          steps {
+            container('packaging'){
+              sh 'make rpm'
+              archiveArtifacts artifacts: "target/rpm/*.rpm"
+            }
+          }
+        }
+        stage('Suse') {
+          steps {
+            container('packaging'){
+              sh 'make suse'
+              archiveArtifacts artifacts: "target/suse/*.rpm"
+            }
+          }
+        }
+        // stage('Windows') {
+        //   agent {
+        //     kubernetes {
+        //       label 'packaging-windows'
+        //       yamlFile 'windowsPodTemplate.yaml'
+        //       inheritFrom 'jnlp-windows'
+        //     }
+        //   }
+        //   steps {
+        //     container('jnlp-window'){
+        //       checkout scm
+        //       unstash 'GPG'
+        //       unstash 'WAR'
+        //       sh 'make msi'
+        //     }
+        //   }
+        // }
+      }
+    }
+  }
+}
