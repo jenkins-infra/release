@@ -49,7 +49,6 @@ pipeline {
     BUILDENV              = 'env/test.mk'
     BRANDING_DIR          = 'branding'
     BRAND                 = 'jenkins.mk'
-    BUILDENV              = 'env/test.mk'
     CREDENTIAL            = 'credentials/test.mk'
     GPG_FILENAME          = 'gpg-test-jenkins-release.gpg'
     GPG_FILE              = "$WORKSPACE/$GPG_FILENAME"
