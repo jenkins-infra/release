@@ -61,7 +61,7 @@ pipeline {
           container('maven') {
             git branch: env.GIT_BRANCH, credentialsId: 'release-key', url: env.GIT_REPOSITORY
             dir ('release'){
-              scm
+              checkout scm
             }
             sh 'release/utils/release.sh --cleanRelease'
           }

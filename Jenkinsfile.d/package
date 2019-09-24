@@ -70,7 +70,7 @@ pipeline {
         container('azure-cli') {
           git branch: master, credentialsId: 'release-key', url: 'git@github.com:olblak/packaging.git'
           dir ('release'){
-            scm
+            checkout scm
           }
       
           sh '''
