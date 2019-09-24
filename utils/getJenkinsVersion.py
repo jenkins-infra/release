@@ -66,7 +66,7 @@ def downloadJenkins(version):
 
 
 # URL = 'https://repo.jenkins-ci.org/releases/org/jenkins-ci/main/jenkins-war/'
-#URL = os.environ.get('JENKINS_DOWNLOAD_URL', 'https://release.repo.jenkins.io/repository/maven-releases/org/jenkins-ci/main/jenkins-war/')
+URL = os.environ.get('JENKINS_DOWNLOAD_URL', 'https://release.repo.jenkins.io/repository/maven-releases/org/jenkins-ci/main/jenkins-war/')
 
 PATH = os.environ.get('WAR', '/tmp/jenkins.war')
 VERSION = getJenkinsVersion(
