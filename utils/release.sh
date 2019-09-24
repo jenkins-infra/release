@@ -204,7 +204,7 @@ function prepareRelease(){
   requireGPGPassphrase
   requireKeystorePass
   printf "\\n Prepare Jenkins Release\\n\\n"
-  mvn -B release:prepare -s settings-release.xml
+  mvn -B -DskipTests release:prepare -s settings-release.xml
 }
 
 function pushCommits(){
@@ -224,23 +224,14 @@ function stageRelease(){
   requireGPGPassphrase
   requireKeystorePass
   printf "\\n Perform Jenkins Release\\n\\n"
-  mvn -B release:stage -s settings-release.xml
+  mvn -B -DskipTests release:stage -s settings-release.xml
 }
-
-#function promoteMavenArtifact(){
-# # http://maven.apache.org/plugins/maven-stage-plugin/copy-mojo.html
-#  mvn \
-#    stage:copy \
-#    -Dversion=$RELEASE_VERSION \
-#    -DsourceRepositoryId=XXX \
-#    -DtargetRepositoryId=YYY
-#
-#}
 
 function validateKeystore(){
   requireKeystorePass
   keytool -keystore "${SIGN_KEYSTORE}" -storepass "${SIGN_STOREPASS}" -list -alias "${SIGN_ALIAS}"
 }
+
 function verifyGPGSignature(){
   gpg --verify "$JENKINS_ASC" "$JENKINS_WAR"
   unzip -qc "$JENKINS_WAR" META-INF/MANIFEST.MF | grep 'Jenkins-Version' | awk '{print $2}'
