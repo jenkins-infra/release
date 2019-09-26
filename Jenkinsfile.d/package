@@ -14,7 +14,7 @@ pipeline {
         'http://nexus/repository/maven-releases/org/jenkins-ci/main/jenkins-war/',
         'https://repo.jenkins-ci.org/releases/org/jenkins-ci/main/jenkins-war/'
       ],
-      description: 'Specify which url will be use to download the jenkins.war',
+      description: 'Specify the endpoint to use for downloading jenkins.war',
       name: 'JENKINS_DOWNLOAD_URL'
     )
   string(
@@ -121,23 +121,22 @@ pipeline {
             }
           }
         }
-        // stage('Windows') {
-        //   agent {
-        //     kubernetes {
-        //       label 'packaging-windows'
-        //       yamlFile 'windowsPodTemplate.yaml'
-        //       inheritFrom 'jnlp-windows'
-        //     }
-        //   }
-        //   steps {
-        //     container('jnlp-window'){
-        //       checkout scm
-        //       unstash 'GPG'
-        //       unstash 'WAR'
-        //       sh 'make msi'
-        //     }
-        //   }
-        // }
+        stage('Windows') {
+          agent {
+            kubernetes {
+              label 'packaging-windows'
+              yamlFile 'PodTemplates.d/package-windows'
+            }
+          }
+          steps {
+            container('jnlp-window'){
+              checkout scm
+              unstash 'GPG'
+              unstash 'WAR'
+              sh 'make msi'
+            }
+          }
+        }
       }
     }
   }
