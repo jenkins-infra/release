@@ -33,7 +33,7 @@ spec:
     env:
     - name: "HOME"
       value: "/home/jenkins"
-    image: "olblak/packaging:latest"
+    image: "jenkinsciinfra/packaging:latest"
     imagePullPolicy: "Always"
     name: "packaging"
     resources:

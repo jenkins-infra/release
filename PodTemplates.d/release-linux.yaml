@@ -3,7 +3,7 @@ kind: "Pod"
 metadata:
   labels:
     jenkins: "slave"
-    job: "releasing"
+    job: "releasee"
 spec:
   containers:
   - args:
@@ -35,7 +35,7 @@ spec:
       value: "/home/jenkins"
     - name: "MAVEN_OPTS"
       value: "-Xmx4g -Xms4g"
-    image: "olblak/maven:3-jdk-8"
+    image: "maven:3-jdk-8"
     imagePullPolicy: "Always"
     name: "maven"
     resources:
