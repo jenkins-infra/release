@@ -18,7 +18,7 @@ spec:
     command:
     - "powershell.exe"
     image: "jenkins4eval/jnlp-agent-vstools-managed"
-    imagePullPolicy: "IfNotPresent"
+    imagePullPolicy: "Always"
     name: "jnlp"
     resources:
       limits:
