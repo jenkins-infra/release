@@ -6,7 +6,7 @@ metadata:
     job: "releasee"
 spec:
   containers:
-    command:
+  - command:
     - "cat"
     env:
     - name: "HOME"
