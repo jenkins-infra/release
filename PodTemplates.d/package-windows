@@ -1,0 +1,37 @@
+apiVersion: "v1"
+kind: "Pod"
+metadata:
+  labels:
+    jenkins: "slave"
+    job: "package"
+spec:
+  containers:
+  - args:
+    - "-f"
+    - "C:/ProgramData/Jenkins/jenkins-agent.ps1"
+    - "-Url"
+    - "${rootUrl}"
+    - "-Secret"
+    - "${secret}"
+    - "-Name"
+    - "${nodeName}"
+    command:
+    - "powershell.exe"
+    image: "jenkins4eval/jnlp-agent-vstools-managed"
+    imagePullPolicy: "Always"
+    name: "jnlp"
+    resources:
+      limits:
+        memory: "1Gi"
+        cpu: "1"
+      requests:
+        memory: "1Gi"
+        cpu: "1"
+    securityContext:
+      privileged: false
+    tty: false
+  tolerations:
+    - key: "os"
+      operator: "Equal"
+      value: "windows"
+      effect: "NoSchedule"

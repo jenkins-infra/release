@@ -135,7 +135,7 @@ cat <<EOT> settings-release.xml
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <stagingRepository>${MAVEN_REPOSITORY_URL}/${MAVEN_REPOSITORY_NAME}</stagingRepository>
+        <stagingRepository>${MAVEN_REPOSITORY_NAME}::default::${MAVEN_REPOSITORY_URL}/${MAVEN_REPOSITORY_NAME}</stagingRepository>
         <gpg.keyname>${GPG_KEYNAME}</gpg.keyname>
         <gpg.passphrase>${GPG_PASSPHRASE}</gpg.passphrase>
         <jarsigner.keystore>${SIGN_KEYSTORE}</jarsigner.keystore>

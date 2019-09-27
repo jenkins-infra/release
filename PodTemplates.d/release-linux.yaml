@@ -6,10 +6,8 @@ metadata:
     job: "releasee"
 spec:
   containers:
-  - args:
-    - "99d"
-    command:
-    - "sleep"
+  - command:
+    - "cat"
     env:
     - name: "HOME"
       value: "/home/jenkins"
@@ -25,11 +23,9 @@ spec:
         cpu: "400m"
     securityContext:
       privileged: false
-    tty: false
-  - args:
-    - "99d"
-    command:
-    - "sleep"
+    tty: true
+  - command:
+    - "cat"
     env:
     - name: "HOME"
       value: "/home/jenkins"
@@ -47,7 +43,7 @@ spec:
         cpu: "2"
     securityContext:
       privileged: false
-    tty: false
+    tty: true
   nodeSelector:
     kubernetes.io/os: "linux"
   restartPolicy: "Never"
