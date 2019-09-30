@@ -131,10 +131,19 @@ pipeline {
           // Windows requirement: Every steps need to be executed inside default jnlp 
           // as 'container' is knowned to not be working
           steps {
-            checkout scm
+            git branch: 'master', credentialsId: 'release-key', url: 'git@github.com:olblak/packaging.git'
+            dir ('release'){
+              checkout scm
+            }
+
             unstash 'GPG'
             unstash 'WAR'
-            sh 'make msi'
+            bat '''
+              $env:WAR = \'C:\\home\\jenkins\\agent\\workspace\\core-package_master\\jenkins.war\'
+              powershell -File C:\\home\\jenkins\\agent\\workspace\\core-package_master\\make.ps1
+            '''
+            archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi'
+            archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi.sha256'
           }
         }
       }
