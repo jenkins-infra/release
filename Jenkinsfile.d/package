@@ -128,13 +128,13 @@ pipeline {
               yamlFile 'PodTemplates.d/package-windows'
             }
           }
+          // Windows requirement: Every steps need to be executed inside default jnlp 
+          // as 'container' is knowned to not be working
           steps {
-            container('jnlp'){
-              checkout scm
-              unstash 'GPG'
-              unstash 'WAR'
-              sh 'make msi'
-            }
+            checkout scm
+            unstash 'GPG'
+            unstash 'WAR'
+            sh 'make msi'
           }
         }
       }
