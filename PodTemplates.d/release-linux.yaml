@@ -30,7 +30,7 @@ spec:
     - name: "HOME"
       value: "/home/jenkins"
     - name: "MAVEN_OPTS"
-      value: "-Xmx4g -Xms4g"
+      value: "-Xmx2g -Xms2g"
     image: "maven:3-jdk-8"
     imagePullPolicy: "Always"
     name: "maven"
