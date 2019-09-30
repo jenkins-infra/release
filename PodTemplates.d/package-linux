@@ -35,10 +35,10 @@ spec:
     resources:
       limits:
         memory: "1Gi"
-        cpu: "400m"
+        cpu: "1"
       requests:
         memory: "1Gi"
-        cpu: "400m"
+        cpu: "1"
     securityContext:
       privileged: false
     tty: true
