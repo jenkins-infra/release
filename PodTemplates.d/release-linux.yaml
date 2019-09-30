@@ -3,7 +3,7 @@ kind: "Pod"
 metadata:
   labels:
     jenkins: "slave"
-    job: "releasee"
+    job: "release"
 spec:
   containers:
   - command:
@@ -37,10 +37,10 @@ spec:
     resources:
       limits:
         memory: "4Gi"
-        cpu: "2"
+        cpu: "4"
       requests:
         memory: "4Gi"
-        cpu: "2"
+        cpu: "4"
     securityContext:
       privileged: false
     tty: true
