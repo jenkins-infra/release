@@ -204,7 +204,7 @@ function prepareRelease(){
   requireGPGPassphrase
   requireKeystorePass
   printf "\\n Prepare Jenkins Release\\n\\n"
-  mvn -B -DskipTests release:prepare -s settings-release.xml
+  mvn -B -DskipTests -Darguments='-DskipTests' release:prepare -s settings-release.xml
 }
 
 function pushCommits(){
