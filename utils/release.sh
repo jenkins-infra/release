@@ -9,7 +9,7 @@ source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
 # https://maven.apache.org/maven-release/maven-release-plugin/perform-mojo.html
 # mvn -Prelease help:active-profiles
 
-#: "${WORKSPACE:=$PWD}" # Normally defined from Jenkins environment
+: "${WORKSPACE:=$PWD}" # Normally defined from Jenkins environment
 
 : "${BRANCH_NAME:=experimental}"
 : "${GIT_REPOSITORY:=scm:git:git://github.com/jenkinsci/jenkins.git}"
@@ -63,7 +63,6 @@ function configureGPG(){
     if [ ! -f "${GPG_FILE}" ]; then
       exit "${GPG_KEYNAME} or ${GPG_FILE} cannot be found"
     else
-      ## --pinenty-mode is needed to avoid gpg prompt during maven release
       gpg --import --batch "${GPG_FILE}"
     fi
   fi
@@ -137,6 +136,12 @@ cat <<EOT> settings-release.xml
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
+      <!-- Following properties can't be defined with -D, as explained here https://issues.apache.org/jira/browse/MNG-4979 -->
+      <properties>
+        <hudson.sign.keystore>${SIGN_KEYSTORE}</hudson.sign.keystore>
+        <hudson.sign.alias>${SIGN_ALIAS}</hudson.sign.alias>
+        <hudson.sign.storepass>${SIGN_STOREPASS}</hudson.sign.storepass>
+      </properties>
       <repositories>
         <repository>
           <id>$MAVEN_REPOSITORY_NAME</id>
@@ -198,21 +203,8 @@ function prepareRelease(){
   requireGPGPassphrase
   requireKeystorePass
   printf "\\n Prepare Jenkins Release\\n\\n"
-  mvn -B \
-    "-Darguments='-DskipTests'" \
-    "-DtagNameFormat='release-@{project.version}'" \
-    "-DpushChanges=false" \
-    "-DlocalCheckout=true" \
-    "-Djarsigner.keystore=${SIGN_KEYSTORE}" \
-    "-Djarsigner.alias=${SIGN_ALIAS}" \
-    "-Djarsigner.storepass=${SIGN_STOREPASS}" \
-    "-Djarsigner.certs=true" \
-    "-Djarsigner.keypass=${SIGN_STOREPASS}" \
-    "-Djarsigner.errorWhenNotSigned=true" \
-    "-Dgpg.keyname=${GPG_KEYNAME}" \
-    "-Dgpg.passphrase=${GPG_PASSPHRASE}" \
-    -s settings-release.xml \
-    release:prepare
+  MAVEN_RELEASE_PREPARE_ARGUMENTS="-Darguments='-DskipTests -DtagNameFormat=release-@{project.version} -DpushChanges=false -DlocalCheckout=true -Djarsigner.certs=true -Djarsigner.keypass=${SIGN_STOREPASS} -Djarsigner.errorWhenNotSigned=true gpg.useagent=false -Dgpg.keyname=${GPG_KEYNAME} -Dgpg.passphrase=${GPG_PASSPHRASE}'"
+  mvn -B -s settings-release.xml  "$MAVEN_RELEASE_PREPARE_ARGUMENTS" release:prepare
 }
 
 function pushCommits(){

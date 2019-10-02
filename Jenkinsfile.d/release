@@ -84,11 +84,9 @@ pipeline {
             // Maven required git push permission on https://github.com/jenkinsci/jenkins
             sshagent(['release-key']) {
               // Maven Release requires gpg key with password password and a certificate key with password
-              sh '''
-                release/utils/release.sh --configureGPG
-                release/utils/release.sh --configureGit
-                release/utils/release.sh --prepareRelease
-              '''
+              sh 'release/utils/release.sh --configureGPG'
+              sh 'release/utils/release.sh --configureGit'
+              sh 'release/utils/release.sh --prepareRelease'
 
               script {
                 def properties = readProperties file: 'release.properties'
