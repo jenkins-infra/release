@@ -19,7 +19,6 @@ set -euxo pipefail
 : "${SIGN_ALIAS:=jenkins}"
 : "${SIGN_KEYSTORE:=${WORKSPACE}/jenkins.pfx}"
 : "${SIGN_CERTIFICATE:=jenkins.pem}"
-: "${MAVEN_PROFILE:=release}"
 : "${MAVEN_REPOSITORY_USERNAME:=jenkins-bot}"
 : "${MAVEN_REPOSITORY_URL:=http://nexus/repository}"
 : "${MAVEN_REPOSITORY_NAME:=maven-releases}"
@@ -45,7 +44,7 @@ function requireAzureKeyvaultCredentials(){
 }
 
 function clean(){
-    mvn -P"${MAVEN_PROFILE}" -s settings-release.xml -B  release:clean
+    mvn -s settings-release.xml -B  release:clean
 }
 
 function configureGit(){
@@ -134,15 +133,6 @@ cat <<EOT> settings-release.xml
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
-      <properties>
-        <stagingRepository>${MAVEN_REPOSITORY_NAME}::default::${MAVEN_REPOSITORY_URL}/${MAVEN_REPOSITORY_NAME}</stagingRepository>
-        <gpg.keyname>${GPG_KEYNAME}</gpg.keyname>
-        <gpg.passphrase>${GPG_PASSPHRASE}</gpg.passphrase>
-        <jarsigner.keystore>${SIGN_KEYSTORE}</jarsigner.keystore>
-        <jarsigner.alias>${SIGN_ALIAS}</jarsigner.alias>
-        <jarsigner.storepass>${SIGN_STOREPASS}</jarsigner.storepass>
-        <jarsigner.keypass>${SIGN_STOREPASS}</jarsigner.keypass>
-      </properties>
       <repositories>
         <repository>
           <id>$MAVEN_REPOSITORY_NAME</id>
@@ -204,7 +194,21 @@ function prepareRelease(){
   requireGPGPassphrase
   requireKeystorePass
   printf "\\n Prepare Jenkins Release\\n\\n"
-  mvn -B -DskipTests -Darguments='-DskipTests' release:prepare -s settings-release.xml
+  mvn -B \
+    "-Darguments='-DskipTests'" \
+    "-DtagNameFormat='release-@{project.version}'" \
+    "-DpushChanges=false" \
+    "-DlocalCheckout=true" \
+    "-Djarsigner.keystore=${SIGN_KEYSTORE}" \
+    "-Djarsigner.alias=${SIGN_ALIAS}" \
+    "-Djarsigner.storepass=${SIGN_STOREPASS}" \
+    "-Djarsigner.certs=true" \
+    "-Djarsigner.keypass=${SIGN_STOREPASS}" \
+    "-Djarsigner.errorWhenNotSigned=true" \
+    "-Dgpg.keyname=${GPG_KEYNAME}" \
+    "-Dgpg.passphrase=${GPG_PASSPHRASE}" \
+    -s settings-release.xml \
+    release:prepare
 }
 
 function pushCommits(){
@@ -224,7 +228,11 @@ function stageRelease(){
   requireGPGPassphrase
   requireKeystorePass
   printf "\\n Perform Jenkins Release\\n\\n"
-  mvn -B -DskipTests release:stage -s settings-release.xml
+  mvn -B \
+    "-Darguments='-DskipTests'" \
+    "-DstagingRepository=${MAVEN_REPOSITORY_NAME}::default::${MAVEN_REPOSITORY_URL}/${MAVEN_REPOSITORY_NAME}" \
+    -s settings-release.xml \
+    release:stage
 }
 
 function validateKeystore(){
