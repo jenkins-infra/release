@@ -24,7 +24,7 @@ pipeline {
     }
 
     environment {
-      GIT_BRANCH                    = 'master'
+      GIT_BRANCH                    = 'forked'
       GIT_REPOSITORY                = 'git@github.com:olblak/jenkins.git'
       GPG_PASSPHRASE                = credentials('release-gpg-passphrase')
       MAVEN_REPOSITORY_USERNAME     = credentials('maven-repository-username')
