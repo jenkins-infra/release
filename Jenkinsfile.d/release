@@ -24,18 +24,11 @@ pipeline {
     }
 
     environment {
-      GIT_EMAIL                     = 'jenkins-bot@example.com'
-      GIT_NAME                      = 'jenkins-bot'
-      GIT_SSH_COMMAND               = 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
       GIT_BRANCH                    = 'master'
       GIT_REPOSITORY                = 'git@github.com:olblak/jenkins.git'
-      GPG_FILE                      = 'gpg-test-jenkins-release.gpg'
-      GPG_KEYNAME                   = 'test-jenkins-release'
       GPG_PASSPHRASE                = credentials('release-gpg-passphrase')
-      MAVEN_REPOSITORY_URL          = "http://nexus/repository"
       MAVEN_REPOSITORY_USERNAME     = credentials('maven-repository-username')
       MAVEN_REPOSITORY_PASSWORD     = credentials('maven-repository-password')
-      SIGN_ALIAS                    = 'jenkins'
       SIGN_STOREPASS                = credentials('signing-cert-pass')
     }
 

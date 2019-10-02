@@ -2,6 +2,10 @@
 
 set -euxo pipefail
 
+: "${RELEASE_PROFILE:=weekly}"
+
+source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
+
 # https://maven.apache.org/maven-release/maven-release-plugin/perform-mojo.html
 # mvn -Prelease help:active-profiles
 
