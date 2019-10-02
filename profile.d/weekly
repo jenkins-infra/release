@@ -1,6 +1,6 @@
 GIT_EMAIL='release@jenkins.io'
 GIT_NAME='release-bot'
-GPG_FILE='gpg-jenkins-release.gpg'
+GPG_FILE='gpg-test-jenkins-release.gpg'
 GPG_KEYNAME=test-jenkins-release
 MAVEN_REPOSITORY_URL='http://nexus/repository'
 MAVEN_REPOSITORY_NAME='maven-releases'
