@@ -24,8 +24,8 @@ pipeline {
     }
 
     environment {
-      GIT_BRANCH                    = 'forked'
-      GIT_REPOSITORY                = 'git@github.com:olblak/jenkins.git'
+      JENKINS_GIT_BRANCH            = 'forked'
+      JENKINS_GIT_REPOSITORY        = 'git@github.com:olblak/jenkins.git'
       GPG_PASSPHRASE                = credentials('release-gpg-passphrase')
       MAVEN_REPOSITORY_USERNAME     = credentials('maven-repository-username')
       MAVEN_REPOSITORY_PASSWORD     = credentials('maven-repository-password')
@@ -36,7 +36,7 @@ pipeline {
       stage('Clean Release') {
         steps {
           container('maven') {
-            git branch: env.GIT_BRANCH, credentialsId: 'release-key', url: env.GIT_REPOSITORY
+            git branch: env.JENKINS_GIT_BRANCH, credentialsId: 'release-key', url: env.JENKINS_GIT_REPOSITORY
             dir ('release'){
               checkout scm
             }

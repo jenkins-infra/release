@@ -11,8 +11,8 @@ source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
 
 : "${WORKSPACE:=$PWD}" # Normally defined from Jenkins environment
 
-: "${BRANCH_NAME:=experimental}"
-: "${GIT_REPOSITORY:=scm:git:git://github.com/jenkinsci/jenkins.git}"
+: "${JENKINS_GIT_BRANCH:=experimental}"
+: "${JENKINS_GIT_REPOSITORY:=scm:git:git://github.com/jenkinsci/jenkins.git}"
 : "${GIT_EMAIL:=jenkins-bot@example.com}"
 : "${GIT_NAME:=jenkins-bot}"
 : "${GIT_SSH:=ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null}"
@@ -52,7 +52,7 @@ function clean(){
 }
 
 function configureGit(){
-  git checkout "${BRANCH_NAME}"
+  git checkout "${JENKINS_GIT_BRANCH}"
   git config --local user.email "${GIT_EMAIL}"
   git config --local user.name "${GIT_NAME}"
 }
@@ -224,6 +224,7 @@ function prepareRelease(){
     -Dgpg.keyname=${GPG_KEYNAME} 
     -Dgpg.passphrase=${GPG_PASSPHRASE}'"
 
+
   mvn -X -B -s settings-release.xml -Darguments="$MAVEN_RELEASE_PREPARE_ARGUMENTS" release:prepare
 }
 
@@ -232,7 +233,7 @@ function pushCommits(){
 
   # Ensure we use ssh credentials
   sed -i 's#url = https://github.com/#url = git@github.com:#' .git/config
-  git push origin "HEAD:$BRANCH_NAME" "$RELEASE_SCM_TAG"
+  git push origin "HEAD:$JENKINS_GIT_BRANCH" "$RELEASE_SCM_TAG"
 }
 
 function rollback(){
@@ -285,7 +286,7 @@ function main(){
             --validateKeystore) echo "Validate Keystore"  && validateKeystore ;;
             --verifyGPGSignature) echo "Verify GPG Signature" && verifyGPGSignature ;;
             --prepareRelease) echo "Prepare Release" && generateSettingsXml && prepareRelease ;;
-            --pushCommits) echo "Push commits on $BRANCH_NAME" && pushCommits ;;
+            --pushCommits) echo "Push commits on $JENKINS_GIT_BRANCH" && pushCommits ;;
             --rollback) echo "Rollback release $RELEASE_SCM_TAG" && rollblack ;;
             --stageRelease) echo "Perform Release" && stageRelease ;;
             -h) echo "help" ;;
