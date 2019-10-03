@@ -63,6 +63,15 @@ function configureGPG(){
     if [ ! -f "${GPG_FILE}" ]; then
       exit "${GPG_KEYNAME} or ${GPG_FILE} cannot be found"
     else
+      gpg --list-keys
+      if [ ! -f "$HOME/.gnupg/gpg.conf" ]; then touch "$HOME/.gnupg/gpg.conf"; fi
+      if ! grep -E '^pinentry-mode loopback' "$HOME/.gnupg/gpg.conf"; then
+        if grep -E '^pinentry-mode' "$HOME/.gnupg/gpg.conf"; then
+          sed -i '/^pinentry-mode/d' "$HOME/.gnupg/gpg.conf"
+        fi
+        ## --pinenty-mode is needed to avoid gpg prompt during maven release
+        echo 'pinentry-mode loopback' >> "$HOME/.gnupg/gpg.conf"
+      fi
       gpg --import --batch "${GPG_FILE}"
     fi
   fi
