@@ -215,23 +215,28 @@ function prepareRelease(){
   printf "\\n Prepare Jenkins Release\\n\\n"
   MAVEN_RELEASE_PREPARE_ARGUMENTS="'
     -DskipTests 
-    -DtagNameFormat=release-@{project.version} 
-    -DpushChanges=false 
-    -DlocalCheckout=true 
     -Djarsigner.certs=true 
     -Djarsigner.keypass=${SIGN_STOREPASS} 
     -Djarsigner.errorWhenNotSigned=true 
     -Dgpg.keyname=${GPG_KEYNAME} 
     -Dgpg.passphrase=${GPG_PASSPHRASE}'"
 
-
-  mvn -X -B -s settings-release.xml -Darguments="$MAVEN_RELEASE_PREPARE_ARGUMENTS" release:prepare
+  mvn \
+    -X \
+    -B \
+    -s settings-release.xml \
+    -Darguments="$MAVEN_RELEASE_PREPARE_ARGUMENTS" \
+    -DtagNameFormat="release-@{project.version}" \
+    -DpushChanges=false \
+    -DlocalCheckout=true \
+    release:prepare
 }
 
 function pushCommits(){
   : "${RELEASE_SCM_TAG:?RELEASE_SCM_TAG not definded}"
 
   # Ensure we use ssh credentials
+  git config --get remote.origin.url
   sed -i 's#url = https://github.com/#url = git@github.com:#' .git/config
   git push origin "HEAD:$JENKINS_GIT_BRANCH" "$RELEASE_SCM_TAG"
 }
