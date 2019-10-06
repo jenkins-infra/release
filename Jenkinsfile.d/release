@@ -36,10 +36,10 @@ pipeline {
       stage('Clean Release') {
         steps {
           container('maven') {
-            git branch: env.JENKINS_GIT_BRANCH, credentialsId: 'release-key', url: env.JENKINS_GIT_REPOSITORY
             dir ('release'){
               checkout scm
             }
+            git branch: env.JENKINS_GIT_BRANCH, credentialsId: 'release-key', url: env.JENKINS_GIT_REPOSITORY
             sh 'release/utils/release.sh --cleanRelease'
           }
         }
