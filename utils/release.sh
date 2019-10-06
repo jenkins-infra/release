@@ -212,6 +212,7 @@ function prepareRelease(){
   requireGPGPassphrase
   requireKeystorePass
   generateSettingsXml
+
   printf "\\n Prepare Jenkins Release\\n\\n"
   MAVEN_RELEASE_PREPARE_ARGUMENTS="'
     -DskipTests 
@@ -221,15 +222,7 @@ function prepareRelease(){
     -Dgpg.keyname=${GPG_KEYNAME} 
     -Dgpg.passphrase=${GPG_PASSPHRASE}'"
 
-  mvn \
-    -X \
-    -B \
-    -s settings-release.xml \
-    -Darguments="$MAVEN_RELEASE_PREPARE_ARGUMENTS" \
-    -DtagNameFormat="release-@{project.version}" \
-    -DpushChanges=false \
-    -DlocalCheckout=true \
-    release:prepare
+  mvn -X -B -s settings-release.xml release:prepare -Darguments="$MAVEN_RELEASE_PREPARE_ARGUMENTS"
 }
 
 function pushCommits(){
