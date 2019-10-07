@@ -2,13 +2,17 @@
 
 set -euxo pipefail
 
+: "${RELEASE_PROFILE:=weekly}"
+
+source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
+
 # https://maven.apache.org/maven-release/maven-release-plugin/perform-mojo.html
 # mvn -Prelease help:active-profiles
 
-#: "${WORKSPACE:=$PWD}" # Normally defined from Jenkins environment
+: "${WORKSPACE:=$PWD}" # Normally defined from Jenkins environment
 
-: "${BRANCH_NAME:=experimental}"
-: "${GIT_REPOSITORY:=scm:git:git://github.com/jenkinsci/jenkins.git}"
+: "${JENKINS_GIT_BRANCH:=experimental}"
+: "${JENKINS_GIT_REPOSITORY:=scm:git:git://github.com/jenkinsci/jenkins.git}"
 : "${GIT_EMAIL:=jenkins-bot@example.com}"
 : "${GIT_NAME:=jenkins-bot}"
 : "${GIT_SSH:=ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null}"
@@ -19,7 +23,6 @@ set -euxo pipefail
 : "${SIGN_ALIAS:=jenkins}"
 : "${SIGN_KEYSTORE:=${WORKSPACE}/jenkins.pfx}"
 : "${SIGN_CERTIFICATE:=jenkins.pem}"
-: "${MAVEN_PROFILE:=release}"
 : "${MAVEN_REPOSITORY_USERNAME:=jenkins-bot}"
 : "${MAVEN_REPOSITORY_URL:=http://nexus/repository}"
 : "${MAVEN_REPOSITORY_NAME:=maven-releases}"
@@ -45,11 +48,11 @@ function requireAzureKeyvaultCredentials(){
 }
 
 function clean(){
-    mvn -P"${MAVEN_PROFILE}" -s settings-release.xml -B  release:clean
+    mvn -s settings-release.xml -B  release:clean
 }
 
 function configureGit(){
-  git checkout "${BRANCH_NAME}"
+  git checkout "${JENKINS_GIT_BRANCH}"
   git config --local user.email "${GIT_EMAIL}"
   git config --local user.name "${GIT_NAME}"
 }
@@ -60,7 +63,15 @@ function configureGPG(){
     if [ ! -f "${GPG_FILE}" ]; then
       exit "${GPG_KEYNAME} or ${GPG_FILE} cannot be found"
     else
-      ## --pinenty-mode is needed to avoid gpg prompt during maven release
+      gpg --list-keys
+      if [ ! -f "$HOME/.gnupg/gpg.conf" ]; then touch "$HOME/.gnupg/gpg.conf"; fi
+      if ! grep -E '^pinentry-mode loopback' "$HOME/.gnupg/gpg.conf"; then
+        if grep -E '^pinentry-mode' "$HOME/.gnupg/gpg.conf"; then
+          sed -i '/^pinentry-mode/d' "$HOME/.gnupg/gpg.conf"
+        fi
+        ## --pinenty-mode is needed to avoid gpg prompt during maven release
+        echo 'pinentry-mode loopback' >> "$HOME/.gnupg/gpg.conf"
+      fi
       gpg --import --batch "${GPG_FILE}"
     fi
   fi
@@ -134,14 +145,11 @@ cat <<EOT> settings-release.xml
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
+      <!-- Following properties can't be defined with -D, as explained here https://issues.apache.org/jira/browse/MNG-4979 -->
       <properties>
-        <stagingRepository>${MAVEN_REPOSITORY_NAME}::default::${MAVEN_REPOSITORY_URL}/${MAVEN_REPOSITORY_NAME}</stagingRepository>
-        <gpg.keyname>${GPG_KEYNAME}</gpg.keyname>
-        <gpg.passphrase>${GPG_PASSPHRASE}</gpg.passphrase>
-        <jarsigner.keystore>${SIGN_KEYSTORE}</jarsigner.keystore>
-        <jarsigner.alias>${SIGN_ALIAS}</jarsigner.alias>
-        <jarsigner.storepass>${SIGN_STOREPASS}</jarsigner.storepass>
-        <jarsigner.keypass>${SIGN_STOREPASS}</jarsigner.keypass>
+        <hudson.sign.keystore>${SIGN_KEYSTORE}</hudson.sign.keystore>
+        <hudson.sign.alias>${SIGN_ALIAS}</hudson.sign.alias>
+        <hudson.sign.storepass>${SIGN_STOREPASS}</hudson.sign.storepass>
       </properties>
       <repositories>
         <repository>
@@ -203,16 +211,27 @@ EOT
 function prepareRelease(){
   requireGPGPassphrase
   requireKeystorePass
+  generateSettingsXml
+
   printf "\\n Prepare Jenkins Release\\n\\n"
-  mvn -B -DskipTests release:prepare -s settings-release.xml
+  MAVEN_RELEASE_PREPARE_ARGUMENTS="'
+    -DskipTests 
+    -Djarsigner.certs=true 
+    -Djarsigner.keypass=${SIGN_STOREPASS} 
+    -Djarsigner.errorWhenNotSigned=true 
+    -Dgpg.keyname=${GPG_KEYNAME} 
+    -Dgpg.passphrase=${GPG_PASSPHRASE}'"
+
+  mvn -X -B -s settings-release.xml release:prepare -Darguments="$MAVEN_RELEASE_PREPARE_ARGUMENTS"
 }
 
 function pushCommits(){
   : "${RELEASE_SCM_TAG:?RELEASE_SCM_TAG not definded}"
 
   # Ensure we use ssh credentials
+  git config --get remote.origin.url
   sed -i 's#url = https://github.com/#url = git@github.com:#' .git/config
-  git push origin "HEAD:$BRANCH_NAME" "$RELEASE_SCM_TAG"
+  git push origin "HEAD:$JENKINS_GIT_BRANCH" "$RELEASE_SCM_TAG"
 }
 
 function rollback(){
@@ -224,7 +243,11 @@ function stageRelease(){
   requireGPGPassphrase
   requireKeystorePass
   printf "\\n Perform Jenkins Release\\n\\n"
-  mvn -B -DskipTests release:stage -s settings-release.xml
+  mvn -B \
+    "-Darguments='-DskipTests'" \
+    "-DstagingRepository=${MAVEN_REPOSITORY_NAME}::default::${MAVEN_REPOSITORY_URL}/${MAVEN_REPOSITORY_NAME}" \
+    -s settings-release.xml \
+    release:stage
 }
 
 function validateKeystore(){
@@ -261,7 +284,7 @@ function main(){
             --validateKeystore) echo "Validate Keystore"  && validateKeystore ;;
             --verifyGPGSignature) echo "Verify GPG Signature" && verifyGPGSignature ;;
             --prepareRelease) echo "Prepare Release" && generateSettingsXml && prepareRelease ;;
-            --pushCommits) echo "Push commits on $BRANCH_NAME" && pushCommits ;;
+            --pushCommits) echo "Push commits on $JENKINS_GIT_BRANCH" && pushCommits ;;
             --rollback) echo "Rollback release $RELEASE_SCM_TAG" && rollblack ;;
             --stageRelease) echo "Perform Release" && stageRelease ;;
             -h) echo "help" ;;
