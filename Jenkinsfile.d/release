@@ -99,7 +99,8 @@ pipeline {
       }
       stage('Push Commits') {
         steps {
-          container('maven') {
+          // ssh agent has weird behaviours when used with a non jenkins user or when no user is associated to pid 1000
+          container('jnlp') {
             sshagent(['release-key']) {
               // We want to only commit to the repository used by the jenkins job
               // instead of jenkinsci/jenkins as defined in pom.xml
