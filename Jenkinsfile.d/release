@@ -81,33 +81,44 @@ pipeline {
       stage('Prepare Release') {
         steps {
           container('maven') {
-            // Maven required git push permission on https://github.com/jenkinsci/jenkins
-            sshagent(['release-key']) {
-              // Maven Release requires gpg key with password password and a certificate key with password
-              sh 'release/utils/release.sh --configureGPG'
-              sh 'release/utils/release.sh --configureGit'
-              sh 'release/utils/release.sh --prepareRelease'
+            // Maven Release requires gpg key with password password and a certificate key with password
+            sh '''
+              release/utils/release.sh --configureGPG
+              release/utils/release.sh --configureGit
+              release/utils/release.sh --prepareRelease
+            '''
 
-              script {
-                def properties = readProperties file: 'release.properties'
-                env.RELEASE_SCM_TAG = properties['scm.tag']
-                env.RELEASE_VERSION = properties['project.rel.org.jenkins-ci.main:jenkins-war']
-              }
+            script {
+              def properties = readProperties file: 'release.properties'
+              env.RELEASE_SCM_TAG = properties['scm.tag']
             }
           }
         }
       }
       stage('Push Commits') {
+        environment {
+          GIT_SSH = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i KEY"
+        }
+
         steps {
-          // ssh agent has weird behaviours when used with a non jenkins user or when no user is associated to pid 1000
-          container('jnlp') {
-            sshagent(['release-key']) {
-              // We want to only commit to the repository used by the jenkins job
-              // instead of jenkinsci/jenkins as defined in pom.xml
+          container('maven') {
+            // ssh agent has weird behaviors when used with a non jenkins user or when no user is associated to pid 1000
+            // https://github.com/jenkinsci/kubernetes-plugin/pull/331
+            // therefor we use withCredentials instead of sshagent
+            // sshagent(['release-key']) {
+            //   // We want to only commit to the repository used by the jenkins job
+            //   // instead of jenkinsci/jenkins as defined in pom.xml
+            //   sh '''
+            //     release/utils/release.sh --pushCommits
+            //   '''
+            // }
+            withCredentials([sshUserPrivateKey(credentialsId: 'release-key', keyFileVariable: 'KEY')]) {
               sh '''
                 release/utils/release.sh --pushCommits
               '''
+
             }
+
           }
         }
       }
@@ -115,12 +126,10 @@ pipeline {
       stage('Stage Release') {
         steps {
           container('maven') {
-            sshagent(['release-key']) {
-              sh '''
-                release/utils/release.sh --stageRelease
-                release/utils/release.sh --verifyGPGSignature
-              '''
-            }
+            sh '''
+              release/utils/release.sh --stageRelease
+              release/utils/release.sh --verifyGPGSignature
+            '''
           }
         }
       }
