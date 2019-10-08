@@ -10,7 +10,7 @@ spec:
     - "cat"
     env:
     - name: "HOME"
-      value: "/home/jenkins"
+      value: "/home/jenkins/agent/workspace"
     image: "microsoft/azure-cli:2.0.59"
     imagePullPolicy: "IfNotPresent"
     name: "azure-cli"
@@ -30,7 +30,7 @@ spec:
     - "cat"
     env:
     - name: "HOME"
-      value: "/home/jenkins"
+      value: "/home/jenkins/agent/workspace"
     - name: "MAVEN_OPTS"
       value: "-Xmx2g -Xms2g"
     image: "maven:3-jdk-8"
