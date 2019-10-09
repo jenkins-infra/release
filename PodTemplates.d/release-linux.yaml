@@ -10,7 +10,7 @@ spec:
     - "cat"
     env:
     - name: "HOME"
-      value: "/home/jenkins"
+      value: "/home/jenkins/agent/workspace"
     image: "microsoft/azure-cli:2.0.59"
     imagePullPolicy: "IfNotPresent"
     name: "azure-cli"
@@ -23,12 +23,14 @@ spec:
         cpu: "400m"
     securityContext:
       privileged: false
+      runAsUser: 1000
+      runAsGroup: 1000
     tty: true
   - command:
     - "cat"
     env:
     - name: "HOME"
-      value: "/home/jenkins"
+      value: "/home/jenkins/agent/workspace"
     - name: "MAVEN_OPTS"
       value: "-Xmx2g -Xms2g"
     image: "maven:3-jdk-8"
@@ -43,6 +45,8 @@ spec:
         cpu: "2"
     securityContext:
       privileged: false
+      runAsUser: 1000
+      runAsGroup: 1000
     tty: true
   nodeSelector:
     kubernetes.io/os: "linux"

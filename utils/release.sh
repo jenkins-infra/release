@@ -12,7 +12,6 @@ source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
 : "${WORKSPACE:=$PWD}" # Normally defined from Jenkins environment
 
 : "${JENKINS_GIT_BRANCH:=experimental}"
-: "${JENKINS_GIT_REPOSITORY:=scm:git:git://github.com/jenkinsci/jenkins.git}"
 : "${GIT_EMAIL:=jenkins-bot@example.com}"
 : "${GIT_NAME:=jenkins-bot}"
 : "${GIT_SSH:=ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null}"

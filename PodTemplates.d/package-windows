@@ -29,6 +29,9 @@ spec:
         cpu: "1"
     securityContext:
       privileged: false
+      # Error: run as uid (1000) is not supported on Windows
+      # runAsUser: 1000
+      # runAsGroup: 1000
     tty: false
   tolerations:
     - key: "os"
