@@ -97,7 +97,7 @@ pipeline {
       }
       stage('Push Commits') {
         environment {
-          GIT_SSH = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i KEY"
+          GIT_SSH = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $RELEASE_SSH_KEY"
         }
 
         steps {
@@ -112,11 +112,8 @@ pipeline {
             //     release/utils/release.sh --pushCommits
             //   '''
             // }
-            withCredentials([sshUserPrivateKey(credentialsId: 'release-key', keyFileVariable: 'KEY')]) {
-              sh '''
-                release/utils/release.sh --pushCommits
-              '''
-
+            withCredentials([sshUserPrivateKey(credentialsId: 'release-key', keyFileVariable: 'RELEASE_SSH_KEY')]) {
+              sh 'release/utils/release.sh --pushCommits'
             }
 
           }
