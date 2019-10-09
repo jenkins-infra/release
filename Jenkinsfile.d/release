@@ -103,7 +103,7 @@ pipeline {
         steps {
           // ssh has weird doesn't work when no user is associated to a uid like 1000, therefor I run git command from
           // the jnlp container.
-          container('maven') {
+          container('jnlp') {
             // https://github.com/jenkinsci/kubernetes-plugin/pull/331
             // therefor we use withCredentials instead of sshagent
             // sshagent(['release-key']) {
