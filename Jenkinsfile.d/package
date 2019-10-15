@@ -101,6 +101,7 @@ pipeline {
           steps {
             container('packaging'){
               sh 'make deb'
+              sh 'make deb.publish'
               archiveArtifacts artifacts: "target/debian/*.deb"
             }
           }
@@ -109,6 +110,7 @@ pipeline {
           steps {
             container('packaging'){
               sh 'make rpm'
+              sh 'make rpm.publish'
               archiveArtifacts artifacts: "target/rpm/*.rpm"
             }
           }
@@ -117,6 +119,7 @@ pipeline {
           steps {
             container('packaging'){
               sh 'make suse'
+              sh 'make suse.publish'
               archiveArtifacts artifacts: "target/suse/*.rpm"
             }
           }
