@@ -51,9 +51,10 @@ pipeline {
     BRAND                 = 'jenkins.mk'
     CREDENTIAL            = 'credentials/test.mk'
     GPG_FILE              = 'gpg-test-jenkins-release.gpg'
-    GPG_KEYNAME           = 'test-jenkins-release'
+    GPG_KEYNAME           = 'test-jenkins-release' \\ Used from jenkins-infra/release
+    GPG_KEYRING           = "$GPG_FILE" \\ Used from jenkinsci/packaging
     GPG_PASSPHRASE        = credentials('release-gpg-passphrase')
-    GPG_PASSPHRASE_FILE   = "$WORKSPACE/gpg.password.txt"
+    GPG_PASSPHRASE_FILE   = "$WORKSPACE/gpg.password.txt" // Used from jenkinsci/packaging
     WAR_FILENAME          = 'jenkins.war'
     WAR                   = "$WORKSPACE/$WAR_FILENAME"
   }
@@ -101,7 +102,11 @@ pipeline {
           steps {
             container('packaging'){
               sh 'make deb'
-              sh 'make deb.publish'
+              sh '''
+                echo $GPG_PASSPHRASE > $GPG_PASSPHRASE_FILE
+                make deb.publish'
+                rm $GPG_PASSPHRASE_FILE
+              '''
               archiveArtifacts artifacts: "target/debian/*.deb"
             }
           }
@@ -110,7 +115,11 @@ pipeline {
           steps {
             container('packaging'){
               sh 'make rpm'
-              sh 'make rpm.publish'
+              sh '''
+                echo $GPG_PASSPHRASE > $GPG_PASSPHRASE_FILE
+                make rpm.publish
+                rm  $GPG_PASSPHRASE_FILE
+              '''
               archiveArtifacts artifacts: "target/rpm/*.rpm"
             }
           }
@@ -119,7 +128,11 @@ pipeline {
           steps {
             container('packaging'){
               sh 'make suse'
-              sh 'make suse.publish'
+              sh '''
+                echo $GPG_PASSPHRASE > $GPG_PASSPHRASE_FILE
+                make suse.publish'
+                rm  $GPG_PASSPHRASE_FILE
+              '''
               archiveArtifacts artifacts: "target/suse/*.rpm"
             }
           }
@@ -132,7 +145,7 @@ pipeline {
             }
           }
           // Windows requirement: Every steps need to be executed inside default jnlp 
-          // as 'container' is knowned to not be working
+          // as the step 'container' is knowned to not be working
           steps {
             git branch: 'master', credentialsId: 'release-key', url: 'git@github.com:olblak/packaging.git'
             dir ('release'){
