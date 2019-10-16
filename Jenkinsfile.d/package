@@ -208,9 +208,4 @@ pipeline {
       }
     }
   }
-  post {
-    failure {
-      input 'Can we proceed?'
-    }
-  }
 }
