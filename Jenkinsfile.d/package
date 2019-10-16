@@ -51,8 +51,8 @@ pipeline {
     BRAND                 = 'jenkins.mk'
     CREDENTIAL            = 'credentials/test.mk'
     GPG_FILE              = 'gpg-test-jenkins-release.gpg'
-    GPG_KEYNAME           = 'test-jenkins-release' \\ Used from jenkins-infra/release
-    GPG_KEYRING           = "$GPG_FILE" \\ Used from jenkinsci/packaging
+    GPG_KEYNAME           = 'test-jenkins-release' // Used from jenkins-infra/release
+    GPG_KEYRING           = "$GPG_FILE" // Used from jenkinsci/packaging
     GPG_PASSPHRASE        = credentials('release-gpg-passphrase')
     GPG_PASSPHRASE_FILE   = "$WORKSPACE/gpg.password.txt" // Used from jenkinsci/packaging
     WAR_FILENAME          = 'jenkins.war'
