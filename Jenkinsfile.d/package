@@ -95,62 +95,117 @@ pipeline {
         }
       }
     }
-    stage('Build'){
+    stage('Package'){
       failFast false
       parallel {
         stage('Debian') {
-          steps {
-            container('packaging'){
-              sh 'make deb'
-              writeFile file: "$GPG_PASSPHRASE_FILE", text: "$GPG_PASSPHRASE"
-              sh 'make -e "GPG_KEYRING=$GPG_KEYRING" -e "GPG_PASSPHRASE_FILE=$GPG_PASSPHRASE_FILE" deb.publish'
-              archiveArtifacts artifacts: "target/debian/*.deb"
+          stages {
+            stage('Build'){
+              steps {
+                container('packaging'){
+                  sh 'make deb'
+                  archiveArtifacts artifacts: "target/debian/*.deb"
+                }
+              }
+            }
+            stage('Publish'){
+              steps {
+                container('packaging'){
+                  writeFile file: "$GPG_PASSPHRASE_FILE", text: "$GPG_PASSPHRASE"
+                  sh '''\
+                    make \
+                      -e \\"GPG_KEYRING=$GPG_KEYRING\\" \
+                      -e \\"GPG_PASSPHRASE_FILE=$GPG_PASSPHRASE_FILE\\" \
+                      deb.publish'
+                  '''
+                }
+              }
             }
           }
         }
         stage('Redhat') {
-          steps {
-            container('packaging'){
-              sh 'make rpm'
-              writeFile file: "$GPG_PASSPHRASE_FILE", text: "$GPG_PASSPHRASE"
-              sh 'make -e "GPG_KEYRING=$GPG_KEYRING" -e "GPG_PASSPHRASE_FILE=$GPG_PASSPHRASE_FILE" rpm.publish'
-              archiveArtifacts artifacts: "target/rpm/*.rpm"
+          stages {
+            stage('Build'){
+              steps {
+                container('packaging'){
+                  sh 'make rpm'
+                  archiveArtifacts artifacts: "target/rpm/*.rpm"
+                }
+              }
+            }
+            stage('Publish'){
+              steps {
+                container('packaging'){
+                  writeFile file: "$GPG_PASSPHRASE_FILE", text: "$GPG_PASSPHRASE"
+                  sh '''\
+                    make \
+                      -e \\"GPG_KEYRING=$GPG_KEYRING\\" \
+                      -e \\"GPG_PASSPHRASE_FILE=$GPG_PASSPHRASE_FILE\\" \
+                      rpm.publish'
+                  '''
+                }
+              }
             }
           }
         }
         stage('Suse') {
-          steps {
-            container('packaging'){
-              sh 'make suse'
-              writeFile file: "$GPG_PASSPHRASE_FILE", text: "$GPG_PASSPHRASE"
-              sh 'make -e "GPG_KEYRING=$GPG_KEYRING" -e "GPG_PASSPHRASE_FILE=$GPG_PASSPHRASE_FILE" suse.publish'
-              archiveArtifacts artifacts: "target/suse/*.rpm"
+          stages {
+            stage('Build'){
+              steps {
+                container('packaging'){
+                  sh 'make suse'
+                  writeFile file: "$GPG_PASSPHRASE_FILE", text: "$GPG_PASSPHRASE"
+                  sh 'make -e "GPG_KEYRING=$GPG_KEYRING" -e "GPG_PASSPHRASE_FILE=$GPG_PASSPHRASE_FILE" suse.publish'
+                  archiveArtifacts artifacts: "target/suse/*.rpm"
+                }
+              }
+            }
+            stage('Publish'){
+              steps {
+                container('packaging'){
+                  writeFile file: "$GPG_PASSPHRASE_FILE", text: "$GPG_PASSPHRASE"
+                  sh '''\
+                    make \
+                      -e \\"GPG_KEYRING=$GPG_KEYRING\\" \
+                      -e \\"GPG_PASSPHRASE_FILE=$GPG_PASSPHRASE_FILE\\" \
+                      suse.publish'
+                  '''
+                }
+              }
             }
           }
         }
         stage('Windows') {
+          // Windows requirement: Every steps need to be executed inside default jnlp 
+          // as the step 'container' is knowned to not be working
           agent {
             kubernetes {
               label 'packaging-windows'
               yamlFile 'PodTemplates.d/package-windows'
             }
           }
-          // Windows requirement: Every steps need to be executed inside default jnlp 
-          // as the step 'container' is knowned to not be working
-          steps {
-            git branch: 'master', credentialsId: 'release-key', url: 'git@github.com:olblak/packaging.git'
-            dir ('release'){
-              checkout scm
-            }
+          stages {
+            stage('Build'){
+              steps {
+                git branch: 'master', credentialsId: 'release-key', url: 'git@github.com:olblak/packaging.git'
+                dir ('release'){
+                  checkout scm
+                }
 
-            unstash 'GPG'
-            unstash 'WAR'
-            bat '''
-              $env:WAR = \'C:\\home\\jenkins\\agent\\workspace\\core-package_master\\jenkins.war\'
-              powershell -File C:\\home\\jenkins\\agent\\workspace\\core-package_master\\make.ps1
-            '''
-            archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi'
-            archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi.sha256'
+                unstash 'GPG'
+                unstash 'WAR'
+                bat '''
+                  $env:WAR = \'C:\\home\\jenkins\\agent\\workspace\\core-package_master\\jenkins.war\'
+                  powershell -File C:\\home\\jenkins\\agent\\workspace\\core-package_master\\make.ps1
+                '''
+                archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi'
+                archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi.sha256'
+              }
+            }
+            //stage('Publish'){
+            //  steps {
+            //  }
+            //}
           }
         }
       }
