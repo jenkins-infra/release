@@ -154,8 +154,6 @@ pipeline {
               steps {
                 container('packaging'){
                   sh 'make suse'
-                  writeFile file: "$GPG_PASSPHRASE_FILE", text: "$GPG_PASSPHRASE"
-                  sh 'make -e "GPG_KEYRING=$GPG_KEYRING" -e "GPG_PASSPHRASE_FILE=$GPG_PASSPHRASE_FILE" suse.publish'
                   archiveArtifacts artifacts: "target/suse/*.rpm"
                 }
               }
