@@ -116,7 +116,7 @@ pipeline {
                     make \
                       -e \\"GPG_KEYRING=$GPG_KEYRING\\" \
                       -e \\"GPG_PASSPHRASE_FILE=$GPG_PASSPHRASE_FILE\\" \
-                      deb.publish'
+                      deb.publish
                   '''
                 }
               }
@@ -141,7 +141,7 @@ pipeline {
                     make \
                       -e \\"GPG_KEYRING=$GPG_KEYRING\\" \
                       -e \\"GPG_PASSPHRASE_FILE=$GPG_PASSPHRASE_FILE\\" \
-                      rpm.publish'
+                      rpm.publish
                   '''
                 }
               }
@@ -168,7 +168,7 @@ pipeline {
                     make \
                       -e \\"GPG_KEYRING=$GPG_KEYRING\\" \
                       -e \\"GPG_PASSPHRASE_FILE=$GPG_PASSPHRASE_FILE\\" \
-                      suse.publish'
+                      suse.publish
                   '''
                 }
               }
