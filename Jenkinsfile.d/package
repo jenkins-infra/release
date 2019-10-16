@@ -102,11 +102,8 @@ pipeline {
           steps {
             container('packaging'){
               sh 'make deb'
-              sh '''
-                echo $GPG_PASSPHRASE > $GPG_PASSPHRASE_FILE
-                make deb.publish'
-                rm $GPG_PASSPHRASE_FILE
-              '''
+              writeFile file: "$GPG_PASSPHRASE_FILE", text: "$GPG_PASSPHRASE"
+              sh 'make -e "GPG_KEYRING=$GPG_KEYRING" -e "GPG_PASSPHRASE_FILE=$GPG_PASSPHRASE_FILE" deb.publish'
               archiveArtifacts artifacts: "target/debian/*.deb"
             }
           }
@@ -115,11 +112,8 @@ pipeline {
           steps {
             container('packaging'){
               sh 'make rpm'
-              sh '''
-                echo $GPG_PASSPHRASE > $GPG_PASSPHRASE_FILE
-                make rpm.publish
-                rm  $GPG_PASSPHRASE_FILE
-              '''
+              writeFile file: "$GPG_PASSPHRASE_FILE", text: "$GPG_PASSPHRASE"
+              sh 'make -e "GPG_KEYRING=$GPG_KEYRING" -e "GPG_PASSPHRASE_FILE=$GPG_PASSPHRASE_FILE" rpm.publish'
               archiveArtifacts artifacts: "target/rpm/*.rpm"
             }
           }
@@ -128,11 +122,8 @@ pipeline {
           steps {
             container('packaging'){
               sh 'make suse'
-              sh '''
-                echo $GPG_PASSPHRASE > $GPG_PASSPHRASE_FILE
-                make suse.publish'
-                rm  $GPG_PASSPHRASE_FILE
-              '''
+              writeFile file: "$GPG_PASSPHRASE_FILE", text: "$GPG_PASSPHRASE"
+              sh 'make -e "GPG_KEYRING=$GPG_KEYRING" -e "GPG_PASSPHRASE_FILE=$GPG_PASSPHRASE_FILE" suse.publish'
               archiveArtifacts artifacts: "target/suse/*.rpm"
             }
           }
@@ -163,6 +154,11 @@ pipeline {
           }
         }
       }
+    }
+  }
+  post {
+    failure {
+      input 'Can we proceed?'
     }
   }
 }
