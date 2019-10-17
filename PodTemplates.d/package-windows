@@ -33,8 +33,15 @@ spec:
       # runAsUser: 1000
       # runAsGroup: 1000
     tty: false
+    volumeMounts:
+      - name: core-packages
+        mountPath: 'C:/Packages'
   tolerations:
     - key: "os"
       operator: "Equal"
       value: "windows"
       effect: "NoSchedule"
+  volumes:
+    - name: core-packages
+      persistentVolumeClaim:
+        claimName: core-packages

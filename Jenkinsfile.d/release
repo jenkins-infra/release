@@ -96,31 +96,29 @@ pipeline {
         }
       }
       stage('Push Commits') {
-        environment {
-          GIT_SSH = 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $RELEASE_SSH_KEY'
-        }
+        // environment {
+        //   GIT_SSH = 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $RELEASE_SSH_KEY'
+        // }
 
         steps {
-          // ssh has weird doesn't work when no user is associated to a uid like 1000, therefor I run git command from
+          // ssh has doesn't work when no user is associated to a uid like 1000, therefor I run git command from
           // the jnlp container.
-          container('maven') {
+          container('jnlp') {
             // https://github.com/jenkinsci/kubernetes-plugin/pull/331
             // therefor we use withCredentials instead of sshagent
-            // sshagent(['release-key']) {
-            //   // We want to only commit to the repository used by the jenkins job
-            //   // instead of jenkinsci/jenkins as defined in pom.xml
-            //   sh '''
-            //     release/utils/release.sh --pushCommits
-            //   '''
-            // }
-            withCredentials([sshUserPrivateKey(credentialsId: 'release-key', keyFileVariable: 'RELEASE_SSH_KEY')]) {
+            // it's fine if used from the jnlp container
+            sshagent(['release-key']) {
+              // We want to only commit to the repository used by the jenkins job
+              // instead of jenkinsci/jenkins as defined in pom.xml
               sh 'release/utils/release.sh --pushCommits'
             }
+            // withCredentials([sshUserPrivateKey(credentialsId: 'release-key', keyFileVariable: 'RELEASE_SSH_KEY')]) {
+            //   sh 'release/utils/release.sh --pushCommits'
+            // }
 
           }
         }
       }
-
       stage('Stage Release') {
         steps {
           container('maven') {

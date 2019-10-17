@@ -26,6 +26,9 @@ spec:
       runAsUser: 1000
       runAsGroup: 1000
     tty: true
+    volumeMounts:
+      - name: core-packages
+        mountPath: /packages
   - command:
     - "cat"
     env:
@@ -46,6 +49,13 @@ spec:
       runAsUser: 1000
       runAsGroup: 1000
     tty: true
+    volumeMounts:
+      - name: core-packages
+        mountPath: /packages
   nodeSelector:
     kubernetes.io/os: "linux"
   restartPolicy: "Never"
+  volumes:
+    - name: core-packages
+      persistentVolumeClaim:
+        claimName: core-packages
