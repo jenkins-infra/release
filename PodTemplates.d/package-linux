@@ -50,12 +50,17 @@ spec:
       runAsGroup: 1000
     tty: true
     volumeMounts:
-      - name: core-packages
-        mountPath: /packages
+      - name: binary-core-packages
+        mountPath: /packages/binary
+      - name: website-core-packages
+        mountPath: /packages/web
   nodeSelector:
     kubernetes.io/os: "linux"
   restartPolicy: "Never"
   volumes:
-    - name: core-packages
+    - name: binary-core-packages
       persistentVolumeClaim:
-        claimName: core-packages
+        claimName: binary-core-packages
+    - name: website-core-packages
+      persistentVolumeClaim:
+        claimName: website-core-packages
