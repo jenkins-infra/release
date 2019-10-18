@@ -108,7 +108,6 @@ pipeline {
             stage('Publish'){
               steps {
                 container('packaging'){
-                  writeFile file: "$GPG_PASSPHRASE_FILE", text: "$GPG_PASSPHRASE"
                   sh 'make deb.publish'
                 }
               }
@@ -128,7 +127,6 @@ pipeline {
             stage('Publish'){
               steps {
                 container('packaging'){
-                  writeFile file: "$GPG_PASSPHRASE_FILE", text: "$GPG_PASSPHRASE"
                   sh 'make rpm.publish'
                 }
               }
@@ -148,7 +146,6 @@ pipeline {
             stage('Publish'){
               steps {
                 container('packaging'){
-                  writeFile file: "$GPG_PASSPHRASE_FILE", text: "$GPG_PASSPHRASE"
                   sh 'make suse.publish'
                 }
               }
