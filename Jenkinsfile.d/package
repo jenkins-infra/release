@@ -95,6 +95,17 @@ pipeline {
     stage('Package'){
       failFast false
       parallel {
+        stage('WAR') {
+          stages {
+            stage('Publish'){
+              steps {
+                container('packaging'){
+                  sh 'make war.publish'
+                }
+              }
+            }
+          }
+        }
         stage('Debian') {
           stages {
             stage('Build'){
