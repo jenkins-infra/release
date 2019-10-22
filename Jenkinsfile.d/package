@@ -192,8 +192,7 @@ pipeline {
                 unstash 'GPG'
                 unstash 'WAR'
                 bat '''
-                  $env:WAR = \'C:\\home\\jenkins\\agent\\workspace\\core-package_master\\jenkins.war\'
-                  powershell -File C:\\home\\jenkins\\agent\\workspace\\core-package_master\\make.ps1
+                  powershell -File C:\\home\\jenkins\\agent\\workspace\\core-package_master\\make.ps1 -War "C:\\home\\jenkins\\agent\\workspace\\core-package_master\\jenkins.war"
                 '''
                 archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi'
                 archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi.sha256'
