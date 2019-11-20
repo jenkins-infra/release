@@ -34,7 +34,7 @@ pipeline {
     stages {
       stage('Clone Jenkins Git Repository') {
         steps {
-          container('maven') {
+          container('jnlp') {
             dir ('release'){
               checkout scm
             }
