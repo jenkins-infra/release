@@ -1,3 +1,5 @@
+JENKINS_GIT_BRANCH=master
+JENKINS_GIT_REPOSITORY=git@github.com:jenkinsci/jenkins.git
 GIT_EMAIL=release@jenkins.io
 GIT_NAME=release-bot
 GPG_FILE=gpg-test-jenkins-release.gpg
