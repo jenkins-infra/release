@@ -54,7 +54,10 @@ function clean(){
 }
 
 function cloneJenkinsGitRepository(){
-  git clone --branch "${JENKINS_GIT_BRANCH}" "${JENKINS_GIT_REPOSITORY}"
+  # `ssh` is needed as git clone doesn't use GIT_SSH_COMMAND
+  # https://git-scm.com/docs/git#Documentation/git.txt-codeGITSSHCOMMANDcode
+  ssh -o StrictHostKeyChecking=no -T git@github.com || true
+  git clone --branch "${JENKINS_GIT_BRANCH}" "${JENKINS_GIT_REPOSITORY}" .
 }
 
 function configureGit(){
