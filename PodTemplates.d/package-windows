@@ -36,12 +36,22 @@ spec:
     volumeMounts:
       - name: core-packages
         mountPath: 'C:/Packages'
+    volumeMounts:
+      - name: binary-core-packages
+        mountPath: /Packages/binary
+      - name: website-core-packages
+        mountPath: /Packages/web
+  nodeSelector:
+    kubernetes.io/os: "windows"
   tolerations:
     - key: "os"
       operator: "Equal"
       value: "windows"
       effect: "NoSchedule"
   volumes:
-    - name: core-packages
+    - name: binary-core-packages
       persistentVolumeClaim:
-        claimName: core-packages
+        claimName: binary-core-packages
+    - name: website-core-packages
+      persistentVolumeClaim:
+        claimName: website-core-packages

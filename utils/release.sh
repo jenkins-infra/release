@@ -47,7 +47,10 @@ function requireAzureKeyvaultCredentials(){
 }
 
 function clean(){
-    mvn -s settings-release.xml -B  release:clean
+
+    # Do not display transfer progress when downloading or uploading
+    # https://maven.apache.org/ref/3.6.1/maven-embedder/cli.html
+    mvn -s settings-release.xml -B --no-transfer-progress release:clean
 }
 
 function configureGit(){
@@ -141,14 +144,16 @@ cat <<EOT> settings-release.xml
   <profiles>
     <profile>
       <id>automated-release</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
       <!-- Following properties can't be defined with -D, as explained here https://issues.apache.org/jira/browse/MNG-4979 -->
       <properties>
         <hudson.sign.keystore>${SIGN_KEYSTORE}</hudson.sign.keystore>
         <hudson.sign.alias>${SIGN_ALIAS}</hudson.sign.alias>
         <hudson.sign.storepass>${SIGN_STOREPASS}</hudson.sign.storepass>
+        <jarsigner.certs>true</jarsigner.certs>
+        <jarsigner.keypass>${SIGN_STOREPASS}</jarsigner.keypass>
+        <jarsigner.errorWhenNotSigned>true</jarsigner.errorWhenNotSigned>
+        <gpg.keyname>${GPG_KEYNAME}</gpg.keyname>
+        <gpg.passphrase>${GPG_PASSPHRASE}</gpg.passphrase>
       </properties>
       <repositories>
         <repository>
@@ -202,6 +207,7 @@ cat <<EOT> settings-release.xml
   </servers>
   <activeProfiles>
     <activeProfile>release</activeProfile>
+    <activeProfile>automated-release</activeProfile>
   </activeProfiles>
 </settings>
 EOT
@@ -213,15 +219,10 @@ function prepareRelease(){
   generateSettingsXml
 
   printf "\\n Prepare Jenkins Release\\n\\n"
-  MAVEN_RELEASE_PREPARE_ARGUMENTS="'
-    -DskipTests 
-    -Djarsigner.certs=true 
-    -Djarsigner.keypass=${SIGN_STOREPASS} 
-    -Djarsigner.errorWhenNotSigned=true 
-    -Dgpg.keyname=${GPG_KEYNAME} 
-    -Dgpg.passphrase=${GPG_PASSPHRASE}'"
 
-  mvn -X -B -s settings-release.xml release:prepare -Darguments="$MAVEN_RELEASE_PREPARE_ARGUMENTS"
+  # Do not display transfer progress when downloading or uploading
+  # https://maven.apache.org/ref/3.6.1/maven-embedder/cli.html
+  mvn -B -s settings-release.xml --no-transfer-progress release:prepare
 }
 
 function pushCommits(){
@@ -242,10 +243,12 @@ function stageRelease(){
   requireGPGPassphrase
   requireKeystorePass
   printf "\\n Perform Jenkins Release\\n\\n"
+  # Do not display transfer progress when downloading or uploading
+  # https://maven.apache.org/ref/3.6.1/maven-embedder/cli.html
   mvn -B \
-    "-Darguments='-DskipTests'" \
     "-DstagingRepository=${MAVEN_REPOSITORY_NAME}::default::${MAVEN_REPOSITORY_URL}/${MAVEN_REPOSITORY_NAME}" \
     -s settings-release.xml \
+    --no-transfer-progress \
     release:stage
 }
 
