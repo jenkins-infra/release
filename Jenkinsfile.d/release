@@ -24,8 +24,7 @@ pipeline {
     }
 
     environment {
-      JENKINS_GIT_BRANCH            = 'master'
-      JENKINS_GIT_REPOSITORY        = 'git@github.com:olblak/jenkins.git'
+      RELEASE_PROFILE               = 'experimental'
       GPG_PASSPHRASE                = credentials('release-gpg-passphrase')
       MAVEN_REPOSITORY_USERNAME     = credentials('maven-repository-username')
       MAVEN_REPOSITORY_PASSWORD     = credentials('maven-repository-password')
@@ -33,13 +32,23 @@ pipeline {
     }
 
     stages {
-      stage('Clean Release') {
+      stage('Clone Jenkins Git Repository') {
         steps {
           container('maven') {
             dir ('release'){
               checkout scm
             }
-            git branch: env.JENKINS_GIT_BRANCH, credentialsId: 'release-key', url: env.JENKINS_GIT_REPOSITORY
+
+            sshagent(['release-key']) {
+              sh 'release/utils/release.sh --cloneJenkinsGitRepository'
+            }
+
+          }
+        }
+      }
+      stage('Clean Release') {
+        steps {
+          container('maven') {
             sh 'release/utils/release.sh --cleanRelease'
           }
         }

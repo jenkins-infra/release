@@ -53,6 +53,10 @@ function clean(){
     mvn -s settings-release.xml -B --no-transfer-progress release:clean
 }
 
+function cloneJenkinsGitRepository(){
+  git clone --branch "${JENKINS_GIT_BRANCH}" "${JENKINS_GIT_REPOSITORY}"
+}
+
 function configureGit(){
   git checkout "${JENKINS_GIT_BRANCH}"
   git config --local user.email "${GIT_EMAIL}"
@@ -277,6 +281,7 @@ function main(){
     do
       case "$1" in
             --cleanRelease) echo "Clean Release" && generateSettingsXml && clean;;
+            --cloneJenkinsGitRepository) echo "Cloning Jenkins Repository" && cloneJenkinsGitRepository ;;
             --configureGPG) echo "ConfigureGPG" && configureGPG ;;
             --configureKeystore) echo "Configure Keystore" && configureKeystore ;;
             --configureGit) echo "Configure Git" && configureGit ;;
