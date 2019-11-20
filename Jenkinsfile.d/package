@@ -185,14 +185,17 @@ pipeline {
                 bat '''
                   powershell -File C:\\home\\jenkins\\agent\\workspace\\core-package_master\\make.ps1 -War "C:\\home\\jenkins\\agent\\workspace\\core-package_master\\jenkins.war"
                 '''
+              }
+            }
+            stage('Publish'){
+              steps {
+                bat '''
+                  powershell -File C:\\home\\jenkins\\agent\\workspace\\core-package_master\\msi\\publish\\publish.ps1
+                '''
                 archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi'
                 archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi.sha256'
               }
             }
-            //stage('Publish'){
-            //  steps {
-            //  }
-            //}
           }
         }
       }
