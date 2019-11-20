@@ -235,6 +235,7 @@ function pushCommits(){
   # Ensure we use ssh credentials
   git config --get remote.origin.url
   sed -i 's#url = https://github.com/#url = git@github.com:#' .git/config
+  git pull 
   git push origin "HEAD:$JENKINS_GIT_BRANCH" "$RELEASE_SCM_TAG"
 }
 
