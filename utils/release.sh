@@ -12,6 +12,7 @@ source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
 : "${WORKSPACE:=$PWD}" # Normally defined from Jenkins environment
 
 : "${JENKINS_GIT_BRANCH:=experimental}"
+: "${JENKINS_GIT_DIRECTORY:=jenkins}"
 : "${GIT_EMAIL:=jenkins-bot@example.com}"
 : "${GIT_NAME:=jenkins-bot}"
 : "${GIT_SSH_COMMAND:=/usr/bin/ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null}"
@@ -27,6 +28,12 @@ source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
 : "${MAVEN_REPOSITORY_NAME:=maven-releases}"
 : "${MAVEN_REPOSITORY_SNAPSHOT_NAME:=maven-snapshots}"
 : "${MAVEN_PUBLIC_JENKINS_REPOSITORY_MIRROR_URL:=http://nexus/repository/jenkins-public/}"
+
+if [ ! -d "$JENKINS_GIT_DIRECTORY" ]; then
+  mkdir -p "$JENKINS_GIT_DIRECTORY"
+fi
+
+pushd $JENKINS_GIT_DIRECTORY
 
 function requireRepositoryPassword(){
   : "${MAVEN_REPOSITORY_PASSWORD:?Repository Password Missing}"
