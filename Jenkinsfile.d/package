@@ -213,7 +213,7 @@ pipeline {
             }
             stage('Publish'){
               steps {
-                dir ($WORKING_DIR){
+                dir (WORKING_DIR){
                   bat """
                     powershell -File C:\\home\\jenkins\\agent\\workspace\\core-package_master\\$WORKING_DIR\\msi\\publish\\publish.ps1
                   """
