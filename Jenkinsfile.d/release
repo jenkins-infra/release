@@ -93,7 +93,7 @@ pipeline {
             '''
 
             script {
-              def properties = readProperties file: 'release.properties'
+              def properties = readProperties file: 'jenkins/release.properties'
               env.RELEASE_SCM_TAG = properties['scm.tag']
             }
           }
