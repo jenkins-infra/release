@@ -1,4 +1,4 @@
-# Jenkins Automated Releases Flow
+# Jenkins Automated Release Flow
 
 As a part of the link:https://issues.jenkins-ci.org/browse/INFRA-910[INFRA-910] EPIC,
 https://jenkins.io/projects/infrastructure/[Jenkins Infrastructure Team] is working on a new Jenkins Core Release Environment
