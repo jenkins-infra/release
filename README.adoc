@@ -11,7 +11,7 @@ The release environment is hosted within the https://github.com/jenkins-infra/op
 It includes a Jenkins instance and a number of other services.
 If you are connected to VPN, the Jenkins instance can be accessed using this URL: https://release.ci.jenkins.io/ .
 
-Chart for Jenkins Core Release Environment environment is available link: https://github.com/jenkins-infra/charts/blob/master/helmfile.d/jenkins-release.yaml[here].
+Chart for Jenkins Core Release Environment environment is available link:https://github.com/jenkins-infra/charts/blob/master/helmfile.d/jenkins-release.yaml[here].
 Jenkins master chart for it is available https://github.com/jenkins-infra/charts/tree/master/charts/jenkins[here].
 
 ## This repository
