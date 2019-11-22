@@ -12,13 +12,14 @@ source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
 : "${WORKSPACE:=$PWD}" # Normally defined from Jenkins environment
 
 : "${JENKINS_GIT_BRANCH:=experimental}"
+: "${WORKING_DIRECTORY:=release}"
 : "${GIT_EMAIL:=jenkins-bot@example.com}"
 : "${GIT_NAME:=jenkins-bot}"
-: "${GIT_SSH:=ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null}"
+: "${GIT_SSH_COMMAND:=/usr/bin/ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null}"
 : "${GPG_KEYNAME:=test-jenkins-release}"
 : "${GPG_FILE:=gpg-test-jenkins-release.gpg}"
-: "${JENKINS_WAR:=$WORKSPACE/war/target/jenkins.war}"
-: "${JENKINS_ASC:=$WORKSPACE/war/target/jenkins.war.asc}"
+: "${JENKINS_WAR:=$WORKSPACE/$WORKING_DIRECTORY/war/target/jenkins.war}"
+: "${JENKINS_ASC:=$WORKSPACE/$WORKING_DIRECTORY/war/target/jenkins.war.asc}"
 : "${SIGN_ALIAS:=jenkins}"
 : "${SIGN_KEYSTORE:=${WORKSPACE}/jenkins.pfx}"
 : "${SIGN_CERTIFICATE:=jenkins.pem}"
@@ -27,6 +28,12 @@ source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
 : "${MAVEN_REPOSITORY_NAME:=maven-releases}"
 : "${MAVEN_REPOSITORY_SNAPSHOT_NAME:=maven-snapshots}"
 : "${MAVEN_PUBLIC_JENKINS_REPOSITORY_MIRROR_URL:=http://nexus/repository/jenkins-public/}"
+
+if [ ! -d "$WORKING_DIRECTORY" ]; then
+  mkdir -p "$WORKING_DIRECTORY"
+fi
+
+pushd $WORKING_DIRECTORY
 
 function requireRepositoryPassword(){
   : "${MAVEN_REPOSITORY_PASSWORD:?Repository Password Missing}"
@@ -54,7 +61,10 @@ function clean(){
 }
 
 function cloneJenkinsGitRepository(){
-  git clone --branch "${JENKINS_GIT_BRANCH}" "${JENKINS_GIT_REPOSITORY}"
+  # `ssh` is needed as git clone doesn't use GIT_SSH_COMMAND
+  # https://git-scm.com/docs/git#Documentation/git.txt-codeGITSSHCOMMANDcode
+  ssh -o StrictHostKeyChecking=no -T git@github.com || true
+  git clone --branch "${JENKINS_GIT_BRANCH}" "${JENKINS_GIT_REPOSITORY}" .
 }
 
 function configureGit(){

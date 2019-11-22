@@ -46,14 +46,17 @@ pipeline {
 //    <version>: where version represent any valid existing version like 2.176.2
 
   environment {
-    BUILDENV              = './env/test.mk'
-    BRAND                 = "./branding/jenkins.mk"
-    CREDENTIAL            = './credentials/test.mk'
-    GPG_FILE              = 'gpg-test-jenkins-release.gpg'
-    GPG_KEYNAME           = 'test-jenkins-release' // Used from jenkins-infra/release
-    GPG_PASSPHRASE        = credentials('release-gpg-passphrase')
-    WAR_FILENAME          = 'jenkins.war'
-    WAR                   = "$WORKSPACE/$WAR_FILENAME"
+    BUILDENV                = './env/test.mk'
+    BRAND                   = "./branding/jenkins.mk"
+    CREDENTIAL              = './credentials/test.mk'
+    GPG_FILE                = 'gpg-test-jenkins-release.gpg'
+    GPG_KEYNAME             = 'test-jenkins-release' // Used from jenkins-infra/release
+    GPG_PASSPHRASE          = credentials('release-gpg-passphrase')
+    PACKAGING_GIT_REPOSITORY  = 'git@github.com:olblak/packaging.git'
+    PACKAGING_GIT_BRANCH      = 'master'
+    WAR_FILENAME            = 'jenkins.war'
+    WAR                     = "$WORKSPACE/$WORKING_DIR/$WAR_FILENAME"
+    WORKING_DIR             = "release"
   }
 
   stages {
@@ -66,19 +69,22 @@ pipeline {
 
       steps {
         container('azure-cli') {
-          git branch: 'master', credentialsId: 'release-key', url: 'git@github.com:olblak/packaging.git'
-          dir ('release'){
-            checkout scm
+          checkout scm
+          dir (WORKING_DIR){
+            git branch: PACKAGING_GIT_BRANCH, credentialsId: 'release-key', url: PACKAGING_GIT_REPOSITORY
           }
       
           sh '''
-            release/utils/release.sh --getGPGKeyFromAzure
+            ./utils/release.sh --getGPGKeyFromAzure
           '''
-          stash includes: GPG_FILE , name: 'GPG'
 
+          dir (WORKING_DIR){
+            stash includes: GPG_FILE , name: 'GPG'
+          }
         }
+
         container('packaging'){
-          sh 'release/utils/release.sh --configureGPG'
+          sh './utils/release.sh --configureGPG'
         }
       }
     }
@@ -86,9 +92,11 @@ pipeline {
     stage('Download WAR archive to package'){
       steps{
         container('packaging'){
-          sh 'release/utils/getJenkinsVersion.py'
-          stash includes: WAR_FILENAME, name: "WAR"
-          archiveArtifacts artifacts: "*.war"
+          sh 'utils/getJenkinsVersion.py'
+          dir (WORKING_DIR){
+            stash includes: WAR_FILENAME, name: "WAR"
+            archiveArtifacts artifacts: "*.war"
+          }
         }
       }
     }
@@ -100,7 +108,9 @@ pipeline {
             stage('Publish'){
               steps {
                 container('packaging'){
-                  sh 'make war.publish'
+                  dir (WORKING_DIR){
+                    sh 'make war.publish'
+                  }
                 }
               }
             }
@@ -111,15 +121,19 @@ pipeline {
             stage('Build'){
               steps {
                 container('packaging'){
-                  sh 'make deb'
-                  archiveArtifacts artifacts: "target/debian/*.deb"
+                  dir (WORKING_DIR){
+                    sh 'make deb'
+                    archiveArtifacts artifacts: "target/debian/*.deb"
+                  }
                 }
               }
             }
             stage('Publish'){
               steps {
                 container('packaging'){
-                  sh 'make deb.publish'
+                  dir (WORKING_DIR){
+                    sh 'make deb.publish'
+                  }
                 }
               }
             }
@@ -130,15 +144,19 @@ pipeline {
             stage('Build'){
               steps {
                 container('packaging'){
-                  sh 'make rpm'
-                  archiveArtifacts artifacts: "target/rpm/*.rpm"
+                  dir (WORKING_DIR){
+                    sh 'make rpm'
+                    archiveArtifacts artifacts: "target/rpm/*.rpm"
+                  }
                 }
               }
             }
             stage('Publish'){
               steps {
                 container('packaging'){
-                  sh 'make rpm.publish'
+                  dir (WORKING_DIR){
+                    sh 'make rpm.publish'
+                  }
                 }
               }
             }
@@ -149,15 +167,19 @@ pipeline {
             stage('Build'){
               steps {
                 container('packaging'){
-                  sh 'make suse'
-                  archiveArtifacts artifacts: "target/suse/*.rpm"
+                  dir (WORKING_DIR){
+                    sh 'make suse'
+                    archiveArtifacts artifacts: "target/suse/*.rpm"
+                  }
                 }
               }
             }
             stage('Publish'){
               steps {
                 container('packaging'){
-                  sh 'make suse.publish'
+                  dir (WORKING_DIR){
+                    sh 'make suse.publish'
+                  }
                 }
               }
             }
@@ -175,24 +197,31 @@ pipeline {
           stages {
             stage('Build'){
               steps {
-                git branch: 'master', credentialsId: 'release-key', url: 'git@github.com:olblak/packaging.git'
-                dir ('release'){
-                  checkout scm
-                }
+                checkout scm
+                dir (WORKING_DIR){
+                  git branch: PACKAGING_GIT_BRANCH, credentialsId: 'release-key', url: PACKAGING_GIT_REPOSITORY
 
-                unstash 'GPG'
-                unstash 'WAR'
-                bat '''
-                  powershell -File C:\\home\\jenkins\\agent\\workspace\\core-package_master\\make.ps1 -War "C:\\home\\jenkins\\agent\\workspace\\core-package_master\\jenkins.war"
-                '''
-                archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi'
-                archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi.sha256'
+                  unstash 'GPG'
+                  unstash 'WAR'
+
+                  bat """
+                    $env:WAR = \'C:\\home\\jenkins\\agent\\workspace\\core-package_master\\$WORKING_DIR\\jenkins.war\'
+                    powershell -File C:\\home\\jenkins\\agent\\workspace\\core-package_master\\$WORKING_DIR\\make.ps1
+                  """
+                }
               }
             }
-            //stage('Publish'){
-            //  steps {
-            //  }
-            //}
+            stage('Publish'){
+              steps {
+                dir (WORKING_DIR){
+                  bat """
+                    powershell -File C:\\home\\jenkins\\agent\\workspace\\core-package_master\\$WORKING_DIR\\msi\\publish\\publish.ps1
+                  """
+                  archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi'
+                  archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi.sha256'
+                }
+              }
+            }
           }
         }
       }

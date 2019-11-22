@@ -34,22 +34,17 @@ pipeline {
     stages {
       stage('Clone Jenkins Git Repository') {
         steps {
-          container('maven') {
-            dir ('release'){
-              checkout scm
-            }
-
+          container('jnlp') {
             sshagent(['release-key']) {
-              sh 'release/utils/release.sh --cloneJenkinsGitRepository'
+              sh 'utils/release.sh --cloneJenkinsGitRepository'
             }
-
           }
         }
       }
       stage('Clean Release') {
         steps {
           container('maven') {
-            sh 'release/utils/release.sh --cleanRelease'
+            sh 'utils/release.sh --cleanRelease'
           }
         }
       }
@@ -66,8 +61,8 @@ pipeline {
         steps {
           container('azure-cli') {
             sh '''
-              release/utils/release.sh --downloadAzureKeyvaultSecret
-              release/utils/release.sh --configureKeystore
+              utils/release.sh --downloadAzureKeyvaultSecret
+              utils/release.sh --configureKeystore
             '''
           }
         }
@@ -82,7 +77,7 @@ pipeline {
         steps {
           container('azure-cli') {
             sh '''
-              release/utils/release.sh --getGPGKeyFromAzure
+              utils/release.sh --getGPGKeyFromAzure
             '''
           }
         }
@@ -92,13 +87,13 @@ pipeline {
           container('maven') {
             // Maven Release requires gpg key with password password and a certificate key with password
             sh '''
-              release/utils/release.sh --configureGPG
-              release/utils/release.sh --configureGit
-              release/utils/release.sh --prepareRelease
+              utils/release.sh --configureGPG
+              utils/release.sh --configureGit
+              utils/release.sh --prepareRelease
             '''
 
             script {
-              def properties = readProperties file: 'release.properties'
+              def properties = readProperties file: 'release/release.properties'
               env.RELEASE_SCM_TAG = properties['scm.tag']
             }
           }
@@ -119,10 +114,10 @@ pipeline {
             sshagent(['release-key']) {
               // We want to only commit to the repository used by the jenkins job
               // instead of jenkinsci/jenkins as defined in pom.xml
-              sh 'release/utils/release.sh --pushCommits'
+              sh 'utils/release.sh --pushCommits'
             }
             // withCredentials([sshUserPrivateKey(credentialsId: 'release-key', keyFileVariable: 'RELEASE_SSH_KEY')]) {
-            //   sh 'release/utils/release.sh --pushCommits'
+            //   sh 'utils/release.sh --pushCommits'
             // }
 
           }
@@ -132,8 +127,8 @@ pipeline {
         steps {
           container('maven') {
             sh '''
-              release/utils/release.sh --stageRelease
-              release/utils/release.sh --verifyGPGSignature
+              utils/release.sh --stageRelease
+              utils/release.sh --verifyGPGSignature
             '''
           }
         }
