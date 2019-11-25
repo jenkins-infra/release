@@ -1,0 +1,39 @@
+# Jenkins Automated Release Flow
+
+As a part of the link:https://issues.jenkins-ci.org/browse/INFRA-910[INFRA-910] EPIC,
+https://jenkins.io/projects/infrastructure/[Jenkins Infrastructure Team] is working on a new Jenkins Core Release Environment
+which would be able to release Jenkins Weekly and LTS versions in an automatic way.
+It includes packaging, staging, and releasing stages.
+
+## Jenkins Core Release Environment
+
+The release environment is hosted within the https://github.com/jenkins-infra/openvpn[Jenkins VPN].
+It includes a Jenkins instance and a number of other services.
+If you are connected to VPN, the Jenkins instance can be accessed using this URL: https://release.ci.jenkins.io/ .
+
+Chart for Jenkins Core Release Environment environment is available link:https://github.com/jenkins-infra/charts/blob/master/helmfile.d/jenkins-release.yaml[here].
+Jenkins master chart for it is available https://github.com/jenkins-infra/charts/tree/master/charts/jenkins[here].
+
+## This repository
+
+This repo contains tools needed to release the https://github.com/jenkinsci/jenkins[Jenkins core] and its components
+from the Jenkins Core Release Environment.
+The following components can be found here:
+
+* Jenkinsfiles for Jenkins packaging and Release
+* Kubernetes POD templates for Linux and Windows packaging environments
+* Kubernetes POD template for the release environment
+* Release profiles and utility scripts
+
+## Jenkins Packaging
+
+* WAR packaging is defined winthin the https://github.com/jenkinsci/jenkins[Jenkins core] repository.
+  It is deployed to the https://repo.jenkins-ci.org/[Jenkins Maven Repo] and http://mirrors.jenkins-ci.org/[mirrors], and then listed on the https://jenkins.io/download/[Downloads Page]
+* Native Installer packaging is defined in the https://github.com/jenkinsci/packaging[jenkinsci/packaging] repository.
+  Native packages are deployed to http://mirrors.jenkins-ci.org/[Jenkins mirrors] and then listed on the https://jenkins.io/download/[Downloads Page]
+* Docker packaging is defined in the https://github.com/jenkinsci/docker[jenkinsci/docker] repository.
+  Packages are deployed to DockerHub as link:https://hub.docker.com/r/jenkins/jankins[jenkins/jenkins]
+
+## References
+
+* https://issues.jenkins-ci.org/browse/INFRA-910[INFRA-910] - EPIC for the new Jenkins Core Release Environment
