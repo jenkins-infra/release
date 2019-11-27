@@ -27,7 +27,7 @@ The following components can be found here:
 
 ## Jenkins Packaging
 
-* WAR packaging is defined winthin the https://github.com/jenkinsci/jenkins[Jenkins core] repository.
+* WAR packaging is defined within the https://github.com/jenkinsci/jenkins[Jenkins core] repository.
   It is deployed to the https://repo.jenkins-ci.org/[Jenkins Maven Repo] and http://mirrors.jenkins-ci.org/[mirrors], and then listed on the https://jenkins.io/download/[Downloads Page]
 * Native Installer packaging is defined in the https://github.com/jenkinsci/packaging[jenkinsci/packaging] repository.
   Native packages are deployed to http://mirrors.jenkins-ci.org/[Jenkins mirrors] and then listed on the https://jenkins.io/download/[Downloads Page]
