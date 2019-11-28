@@ -46,17 +46,19 @@ pipeline {
 //    <version>: where version represent any valid existing version like 2.176.2
 
   environment {
-    BUILDENV                = './env/test.mk'
-    BRAND                   = "./branding/jenkins.mk"
-    CREDENTIAL              = './credentials/test.mk'
-    GPG_FILE                = 'gpg-test-jenkins-release.gpg'
-    GPG_KEYNAME             = 'test-jenkins-release' // Used from jenkins-infra/release
-    GPG_PASSPHRASE          = credentials('release-gpg-passphrase')
+    BUILDENV                  = './env/test.mk'
+    BRAND                     = "./branding/jenkins.mk"
+    CREDENTIAL                = './credentials/test.mk'
+    GPG_FILE                  = 'gpg-test-jenkins-release.gpg'
+    GPG_KEYNAME               = 'test-jenkins-release' // Used from jenkins-infra/release
+    GPG_PASSPHRASE            = credentials('release-gpg-passphrase')
     PACKAGING_GIT_REPOSITORY  = 'git@github.com:olblak/packaging.git'
     PACKAGING_GIT_BRANCH      = 'master'
-    WAR_FILENAME            = 'jenkins.war'
-    WAR                     = "$WORKSPACE/$WORKING_DIR/$WAR_FILENAME"
-    WORKING_DIR             = "release"
+    SIGN_KEYSTORE_FILENAME    = 'jenkins.pfx'
+    SIGN_STOREPASS            = credentials('signing-cert-pass')
+    WAR_FILENAME              = 'jenkins.war'
+    WAR                       = "$WORKSPACE/$WORKING_DIR/$WAR_FILENAME"
+    WORKING_DIR               = "release"
   }
 
   stages {
@@ -86,6 +88,28 @@ pipeline {
         container('packaging'){
           sh './utils/release.sh --configureGPG'
         }
+      }
+    }
+
+    stage('Get Code Signing Certificate') {
+      environment {
+        AZURE_VAULT_NAME              = 'prodreleasecore'
+        AZURE_VAULT_CERT              = 'prodreleasecore'
+        AZURE_VAULT_FILE              = 'jenkins.pem'
+        AZURE_VAULT_CLIENT_ID         = credentials('azure-vault-client-id')
+        AZURE_VAULT_CLIENT_SECRET     = credentials('azure-vault-client-secret')
+        AZURE_VAULT_TENANT_ID         = credentials('azure-vault-tenant-id')
+      }
+
+      steps {
+        container('azure-cli') {
+          sh '''
+            utils/release.sh --downloadAzureKeyvaultSecret
+            utils/release.sh --configureKeystore
+          '''
+        }
+
+        stash includes: SIGN_KEYSTORE_FILENAME, name: 'KEYSTORE'
       }
     }
 
@@ -203,6 +227,7 @@ pipeline {
 
                   unstash 'GPG'
                   unstash 'WAR'
+                  unstash 'KEYSTORE'
 
                   bat """
                     $env:WAR = \'C:\\home\\jenkins\\agent\\workspace\\core-package_master\\$WORKING_DIR\\jenkins.war\'
