@@ -52,8 +52,8 @@ pipeline {
     GPG_FILE                  = 'gpg-test-jenkins-release.gpg'
     GPG_KEYNAME               = 'test-jenkins-release' // Used from jenkins-infra/release
     GPG_PASSPHRASE            = credentials('release-gpg-passphrase')
-    PACKAGING_GIT_REPOSITORY  = 'git@github.com:olblak/packaging.git'
-    PACKAGING_GIT_BRANCH      = 'master'
+    PACKAGING_GIT_REPOSITORY  = 'git@github.com:jenkinsci/packaging.git'
+    PACKAGING_GIT_BRANCH      = 'INFRA-910-core-release-automation'
     SIGN_KEYSTORE_FILENAME    = 'jenkins.pfx'
     SIGN_STOREPASS            = credentials('signing-cert-pass')
     WAR_FILENAME              = 'jenkins.war'
