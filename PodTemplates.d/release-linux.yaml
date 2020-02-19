@@ -32,7 +32,7 @@ spec:
     - name: "HOME"
       value: "/home/jenkins/agent/workspace"
     - name: "MAVEN_OPTS"
-      value: "-Xmx2g -Xms2g"
+      value: "-Xmx8g -Xms8g"
     image: "maven:3-jdk-8"
     imagePullPolicy: "Always"
     name: "maven"
