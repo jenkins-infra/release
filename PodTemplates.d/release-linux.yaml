@@ -48,6 +48,21 @@ spec:
       runAsUser: 1000
       runAsGroup: 1000
     tty: true
-  nodeSelector:
-    kubernetes.io/os: "linux"
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/os
+            operator: In
+            values:
+              - linux
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 1
+        preference:
+          matchExpressions:
+          - key: agentpool
+            operator: In
+            values:
+            - highmemlinux
   restartPolicy: "Never"
