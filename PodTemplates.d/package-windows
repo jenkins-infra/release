@@ -41,8 +41,15 @@ spec:
         mountPath: /Packages/binary
       - name: website-core-packages
         mountPath: /Packages/web
-  nodeSelector:
-    kubernetes.io/os: "windows"
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/os
+            operator: In
+            values:
+              - windows
   tolerations:
     - key: "os"
       operator: "Equal"
