@@ -58,7 +58,7 @@ spec:
             values:
               - linux
       preferredDuringSchedulingIgnoredDuringExecution:
-      - weight: 1
+      - weight: 75
         preference:
           matchExpressions:
           - key: agentpool
