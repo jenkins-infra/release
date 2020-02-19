@@ -58,11 +58,20 @@ spec:
             values:
               - linux
       preferredDuringSchedulingIgnoredDuringExecution:
-      - weight: 75
+      - weight: 1
         preference:
           matchExpressions:
           - key: agentpool
             operator: In
             values:
             - highmemlinux
+  tolerations:
+    - key: "os"
+      operator: "Equal"
+      value: "linux"
+      effect: "NoSchedule"
+    - key: "profile"
+      operator: "Equal"
+      value: "highmem"
+      effect: "NoSchedule"
   restartPolicy: "Never"
