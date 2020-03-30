@@ -34,6 +34,11 @@ pipeline {
 //    <version>: where version represent any valid existing version like 2.176.2
 
   environment {
+    AZURE_VAULT_NAME          = 'prodreleasecore'
+    AZURE_VAULT_CERT          = 'prodreleasecore'
+    AZURE_VAULT_CLIENT_ID     = credentials('azure-vault-client-id')
+    AZURE_VAULT_CLIENT_SECRET = credentials('azure-vault-client-secret')
+    AZURE_VAULT_TENANT_ID     = credentials('azure-vault-tenant-id')
     BUILDENV                  = './env/test.mk'
     BRAND                     = "./branding/jenkins-experimental.mk"
     CREDENTIAL                = './credentials/test.mk'
@@ -73,14 +78,6 @@ pipeline {
     }
 
     stage('Get Code Signing Certificate') {
-      environment {
-        AZURE_VAULT_NAME              = 'prodreleasecore'
-        AZURE_VAULT_CERT              = 'prodreleasecore'
-        AZURE_VAULT_FILE              = 'jenkins.pem'
-        AZURE_VAULT_CLIENT_ID         = credentials('azure-vault-client-id')
-        AZURE_VAULT_CLIENT_SECRET     = credentials('azure-vault-client-secret')
-        AZURE_VAULT_TENANT_ID         = credentials('azure-vault-tenant-id')
-      }
 
       steps {
         container('azure-cli') {

@@ -33,6 +33,7 @@ source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
 : "${MAVEN_PUBLIC_JENKINS_REPOSITORY_MIRROR_URL:=http://nexus/repository/jenkins-public/}"
 
 : "${JENKINS_DOWNLOAD_URL:=$MAVEN_REPOSITORY_URL/$MAVEN_REPOSITORY_NAME/org/jenkins-ci/main/jenkins-war/}"
+: "${AZURE_VAULT_FILE:=$SIGN_KEYSTORE_FILENAME}"
 
 if [ ! -d "$WORKING_DIRECTORY" ]; then
   mkdir -p "$WORKING_DIRECTORY"
