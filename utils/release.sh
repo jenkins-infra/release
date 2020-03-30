@@ -18,6 +18,7 @@ source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
 : "${GIT_SSH_COMMAND:=/usr/bin/ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null}"
 : "${GPG_KEYNAME:=test-jenkins-release}"
 : "${GPG_FILE:=gpg-test-jenkins-release.gpg}"
+: "${GPG_VAULT_NAME:=gpg-test-jenkins-release-gpg}"
 : "${JENKINS_WAR:=$WORKSPACE/$WORKING_DIRECTORY/war/target/jenkins.war}"
 : "${JENKINS_ASC:=$WORKSPACE/$WORKING_DIRECTORY/war/target/jenkins.war.asc}"
 : "${SIGN_ALIAS:=jenkins}"
@@ -127,19 +128,14 @@ function downloadAzureKeyvaultSecret(){
 }
 
 function getGPGKeyFromAzure(){
-  az storage blob download \
-    --account-name "$AZURE_STORAGE_ACCOUNT" \
-    --container-name "$AZURE_STORAGE_CONTAINER_NAME" \
-    --name "$GPG_FILE" \
-    --file "$GPG_FILE"
-}
+  requireAzureKeyvaultCredentials
+  azureAccountAuth
 
-function getGPGKeyFromAzure(){
-  az storage blob download \
-    --account-name "$AZURE_STORAGE_ACCOUNT" \
-    --container-name "$AZURE_STORAGE_CONTAINER_NAME" \
-    --name "$GPG_FILE" \
-    --file "$GPG_FILE"
+  az keyvault secret download \
+    --vault-name "$AZURE_VAULT_NAME" \
+    --name "$GPG_VAULT_NAME" \
+    --file "$GPG_FILE" \
+    --encoding base64
 }
 
 function generateSettingsXml(){

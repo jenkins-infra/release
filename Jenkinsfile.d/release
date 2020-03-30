@@ -62,18 +62,11 @@ pipeline {
           container('azure-cli') {
             sh '''
               utils/release.sh --downloadAzureKeyvaultSecret
-              utils/release.sh --configureKeystore
             '''
           }
         }
       }
       stage('Get GPG key') {
-        environment {
-          AZURE_STORAGE_ACCOUNT         = 'prodreleasecore'
-          AZURE_STORAGE_CONTAINER_NAME  = 'gpg'
-          AZURE_STORAGE_KEY             = credentials('gpg-storage-account-key')
-        }
-
         steps {
           container('azure-cli') {
             sh '''
