@@ -19,6 +19,7 @@ source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
 : "${GPG_KEYNAME:=test-jenkins-release}"
 : "${GPG_FILE:=gpg-test-jenkins-release.gpg}"
 : "${GPG_VAULT_NAME:=gpg-test-jenkins-release-gpg}"
+: "${JENKINS_VERSION:=weekly}"
 : "${JENKINS_WAR:=$WORKSPACE/$WORKING_DIRECTORY/war/target/jenkins.war}"
 : "${JENKINS_ASC:=$WORKSPACE/$WORKING_DIRECTORY/war/target/jenkins.war.asc}"
 : "${SIGN_ALIAS:=jenkins}"
@@ -30,6 +31,8 @@ source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
 : "${MAVEN_REPOSITORY_NAME:=maven-releases}"
 : "${MAVEN_REPOSITORY_SNAPSHOT_NAME:=maven-snapshots}"
 : "${MAVEN_PUBLIC_JENKINS_REPOSITORY_MIRROR_URL:=http://nexus/repository/jenkins-public/}"
+
+: "${JENKINS_DOWNLOAD_URL:=$MAVEN_REPOSITORY_URL/$MAVEN_REPOSITORY_NAME/org/jenkins-ci/main/jenkins-war/}"
 
 if [ ! -d "$WORKING_DIRECTORY" ]; then
   mkdir -p "$WORKING_DIRECTORY"
@@ -125,6 +128,16 @@ function downloadAzureKeyvaultSecret(){
     --vault-name "$AZURE_VAULT_NAME" \
     --name "$AZURE_VAULT_CERT" \
     --file "$AZURE_VAULT_FILE"
+}
+
+# JENKINS_VERSION: Define which version will be package where:
+# * \'stable\' means the latest stable version that satifies version pattern X.Y.Z
+# * \'weekly\' means the latest weekly version that satisfies version pattern X.Y 
+# * <version> represents any valid existing version like 2.176.3 available at JENKINS_DOWNLOAD_URL
+# JENKINS_DOWNLOAD_URL: Specify the endpoint to use for downloading jenkins.war 
+function downloadJenkinsWar(){
+  pwd
+  "$WORKSPACE"/utils/getJenkinsVersion.py
 }
 
 function getGPGKeyFromAzure(){
@@ -295,6 +308,7 @@ function main(){
             --configureGit) echo "Configure Git" && configureGit ;;
             --generateSettingsXml) echo "Generate settings-release.xml" && generateSettingsXml ;;
             --downloadAzureKeyvaultSecret) echo "Download Azure Key Vault Secret" && downloadAzureKeyvaultSecret ;;
+            --downloadJenkins) echo "Download Jenkins from maven repository" && downloadJenkinsWar ;;
             --getGPGKeyFromAzure) echo "Download GPG Key from Azure" && getGPGKeyFromAzure ;;
             --validateKeystore) echo "Validate Keystore"  && validateKeystore ;;
             --verifyGPGSignature) echo "Verify GPG Signature" && verifyGPGSignature ;;

@@ -11,24 +11,12 @@ pipeline {
   parameters {
     choice(
       choices: [
-        'http://nexus/repository/maven-releases/org/jenkins-ci/main/jenkins-war/',
-        'https://repo.jenkins-ci.org/releases/org/jenkins-ci/main/jenkins-war/'
+        'experimental'
       ],
-      description: 'Specify the endpoint to use for downloading jenkins.war',
-      name: 'JENKINS_DOWNLOAD_URL'
-    )
-  string(
-    defaultValue: 'weekly',
-    description: '''Define which version will be package where:
-* \'stable\' means the latest stable version that satifies version pattern X.Y.Z
-* \'weekly\' means the latest weekly version that satisfies version pattern X.Y
-* <version> represents any valid existing version like 2.176.3 available at JENKINS_DOWNLOAD_URL
-''',
-    name: 'JENKINS_VERSION',
-    trim: false
+      description: 'Define which Jenkins Release we are packaging for. https://git.io/Jv7Nr',
+      name: 'RELEASE_PROFILE'
     )
   }
-
 
   options {
     buildDiscarder logRotator(
@@ -49,8 +37,6 @@ pipeline {
     BUILDENV                  = './env/test.mk'
     BRAND                     = "./branding/jenkins-experimental.mk"
     CREDENTIAL                = './credentials/test.mk'
-    GPG_FILE                  = 'gpg-test-jenkins-release.gpg'
-    GPG_KEYNAME               = 'test-jenkins-release' // Used from jenkins-infra/release
     GPG_PASSPHRASE            = credentials('release-gpg-passphrase')
     PACKAGING_GIT_REPOSITORY  = 'git@github.com:jenkinsci/packaging.git'
     PACKAGING_GIT_BRANCH      = 'INFRA-910-core-release-automation'
@@ -111,6 +97,9 @@ pipeline {
       steps{
         container('packaging'){
           sh 'utils/getJenkinsVersion.py'
+          sh '''
+            ./utils/release.sh --downloadJenkins
+          '''
           dir (WORKING_DIR){
             stash includes: WAR_FILENAME, name: "WAR"
             archiveArtifacts artifacts: "*.war"
