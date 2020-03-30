@@ -31,6 +31,7 @@ pipeline {
       AZURE_VAULT_TENANT_ID         = credentials('azure-vault-tenant-id')
       RELEASE_PROFILE               = 'experimental'
       GPG_PASSPHRASE                = credentials('release-gpg-passphrase')
+      GPG_FILE                      = 'jenkins-release.gpg'
       MAVEN_REPOSITORY_USERNAME     = credentials('maven-repository-username')
       MAVEN_REPOSITORY_PASSWORD     = credentials('maven-repository-password')
       SIGN_STOREPASS                = credentials('signing-cert-pass')
