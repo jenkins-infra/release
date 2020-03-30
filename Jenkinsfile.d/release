@@ -15,6 +15,16 @@ pipeline {
       }
     }
 
+    parameters {
+      choice(
+        choices: [
+          'experimental'
+        ],
+        description: 'Define which Jenkins Release we are packaging for. https://git.io/Jv7Nr',
+        name: 'RELEASE_PROFILE'
+      )
+    }
+
     options {
       buildDiscarder logRotator(
         artifactNumToKeepStr: '5',
@@ -29,7 +39,6 @@ pipeline {
       AZURE_VAULT_CLIENT_ID         = credentials('azure-vault-client-id')
       AZURE_VAULT_CLIENT_SECRET     = credentials('azure-vault-client-secret')
       AZURE_VAULT_TENANT_ID         = credentials('azure-vault-tenant-id')
-      RELEASE_PROFILE               = 'experimental'
       GPG_PASSPHRASE                = credentials('release-gpg-passphrase')
       GPG_FILE                      = 'jenkins-release.gpg'
       MAVEN_REPOSITORY_USERNAME     = credentials('maven-repository-username')
