@@ -129,6 +129,10 @@ function downloadAzureKeyvaultSecret(){
     --vault-name "$AZURE_VAULT_NAME" \
     --name "$AZURE_VAULT_CERT" \
     --file "$AZURE_VAULT_FILE"
+
+  if [ ! -f "${SIGN_KEYSTORE}" ]; then
+    cp "$AZURE_VAULT_FILE" "$SIGN_KEYSTORE"
+  fi
 }
 
 # JENKINS_VERSION: Define which version will be package where:
