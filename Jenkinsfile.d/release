@@ -24,6 +24,11 @@ pipeline {
     }
 
     environment {
+      AZURE_VAULT_NAME              = 'prodreleasecore'
+      AZURE_VAULT_CERT              = 'prodreleasecore'
+      AZURE_VAULT_CLIENT_ID         = credentials('azure-vault-client-id')
+      AZURE_VAULT_CLIENT_SECRET     = credentials('azure-vault-client-secret')
+      AZURE_VAULT_TENANT_ID         = credentials('azure-vault-tenant-id')
       RELEASE_PROFILE               = 'experimental'
       GPG_PASSPHRASE                = credentials('release-gpg-passphrase')
       MAVEN_REPOSITORY_USERNAME     = credentials('maven-repository-username')
@@ -49,15 +54,6 @@ pipeline {
         }
       }
       stage('Get Code Signing Certificate') {
-        environment {
-          AZURE_VAULT_NAME              = 'prodreleasecore'
-          AZURE_VAULT_CERT              = 'prodreleasecore'
-          AZURE_VAULT_FILE              = 'jenkins.pem'
-          AZURE_VAULT_CLIENT_ID         = credentials('azure-vault-client-id')
-          AZURE_VAULT_CLIENT_SECRET     = credentials('azure-vault-client-secret')
-          AZURE_VAULT_TENANT_ID         = credentials('azure-vault-tenant-id')
-        }
-
         steps {
           container('azure-cli') {
             sh '''
