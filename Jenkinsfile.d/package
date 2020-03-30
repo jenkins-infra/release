@@ -42,6 +42,7 @@ pipeline {
     BUILDENV                  = './env/test.mk'
     BRAND                     = "./branding/jenkins-experimental.mk"
     CREDENTIAL                = './credentials/test.mk'
+    GPG_FILE                  = 'jenkins-release.gpg'
     GPG_PASSPHRASE            = credentials('release-gpg-passphrase')
     PACKAGING_GIT_REPOSITORY  = 'git@github.com:jenkinsci/packaging.git'
     PACKAGING_GIT_BRANCH      = 'INFRA-910-core-release-automation'
