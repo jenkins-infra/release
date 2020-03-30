@@ -1,5 +1,6 @@
 JENKINS_GIT_BRANCH=master
 JENKINS_GIT_REPOSITORY=git@github.com:olblak/jenkins.git
+JENKINS_VERSION=weekly
 GIT_EMAIL=release@jenkins.io
 GIT_NAME=release-bot
 GPG_FILE=jenkins-release.gpg

@@ -1,10 +1,12 @@
 JENKINS_GIT_BRANCH=master
 JENKINS_GIT_REPOSITORY=git@github.com:jenkinsci/jenkins.git
+JENKINS_VERSION=weekly
 GIT_EMAIL=release@jenkins.io
 GIT_NAME=release-bot
-GPG_FILE=gpg-test-jenkins-release.gpg
-GPG_KEYNAME=test-jenkins-release
-MAVEN_REPOSITORY_URL='http://nexus/repository'
-MAVEN_REPOSITORY_NAME=maven-releases
+GPG_FILE=jenkins-release.gpg
+GPG_KEYNAME="62A9756BFD780C377CF24BA8FCEF32E745F2C3D5"
+GPG_VAULT_NAME="jenkins-release-pgp"
+MAVEN_REPOSITORY_URL='https://repo.jenkins-ci.org'
+MAVEN_REPOSITORY_NAME=releases-weekly
 MAVEN_PUBLIC_JENKINS_REPOSITORY_MIRROR_URL='http://nexus/repository/jenkins-public/'
 SIGN_ALIAS=jenkins
