@@ -117,7 +117,7 @@ function configureKeystore(){
     *.pfx )
       # pfx file download from azure key vault are not password protected, which is required for maven release plugin
       # so we need to add a new password
-      openssl pkcs12 -in ${SIGN_CERTIFICATE} -out tmpjenkins.pem -nodes
+      openssl pkcs12 -in ${SIGN_CERTIFICATE} -out tmpjenkins.pem -nodes -passin pass:""
       openssl pkcs12 -export \
         -out "$SIGN_KEYSTORE" \
         -in tmpjenkins.pem \
