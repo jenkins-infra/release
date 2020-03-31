@@ -25,7 +25,7 @@ source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
 : "${SIGN_ALIAS:=jenkins}"
 : "${SIGN_KEYSTORE_FILENAME:=jenkins.pfx}"
 : "${SIGN_KEYSTORE:=${WORKSPACE}/${SIGN_KEYSTORE_FILENAME}}"
-: "${SIGN_CERTIFICATE:=jenkins.pem}"
+: "${SIGN_CERTIFICATE:=$SIGN_KEYSTORE_FILENAME}"
 : "${MAVEN_REPOSITORY_USERNAME:=jenkins-bot}"
 : "${MAVEN_REPOSITORY_URL:=http://nexus/repository}"
 : "${MAVEN_REPOSITORY_NAME:=maven-releases}"
@@ -33,7 +33,6 @@ source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
 : "${MAVEN_PUBLIC_JENKINS_REPOSITORY_MIRROR_URL:=http://nexus/repository/jenkins-public/}"
 
 : "${JENKINS_DOWNLOAD_URL:=$MAVEN_REPOSITORY_URL/$MAVEN_REPOSITORY_NAME/org/jenkins-ci/main/jenkins-war/}"
-: "${AZURE_VAULT_FILE:=$SIGN_KEYSTORE_FILENAME}"
 
 if [ ! -d "$WORKING_DIRECTORY" ]; then
   mkdir -p "$WORKING_DIRECTORY"
@@ -148,7 +147,7 @@ function downloadAzureKeyvaultSecret(){
     --vault-name "$AZURE_VAULT_NAME" \
     --name "$AZURE_VAULT_CERT" \
     --encoding base64 \
-    --file "$AZURE_VAULT_FILE"
+    --file "$SIGN_CERTIFICATE"
 }
 
 # JENKINS_VERSION: Define which version will be package where:
