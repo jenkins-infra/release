@@ -9,3 +9,6 @@ MAVEN_REPOSITORY_URL='https://repo.jenkins-ci.org'
 MAVEN_REPOSITORY_NAME=olblak-sandbox
 MAVEN_PUBLIC_JENKINS_REPOSITORY_MIRROR_URL='http://nexus/repository/jenkins-public/'
 SIGN_ALIAS=jenkins
+
+# PACKAGING ENV used from jenkinsci/packaging
+RELEASELINE="-experimental"

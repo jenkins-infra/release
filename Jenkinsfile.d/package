@@ -39,9 +39,6 @@ pipeline {
     AZURE_VAULT_CLIENT_ID     = credentials('azure-vault-client-id')
     AZURE_VAULT_CLIENT_SECRET = credentials('azure-vault-client-secret')
     AZURE_VAULT_TENANT_ID     = credentials('azure-vault-tenant-id')
-    BUILDENV                  = './env/test.mk'
-    BRAND                     = "./branding/jenkins-experimental.mk"
-    CREDENTIAL                = './credentials/test.mk'
     GPG_FILE                  = 'jenkins-release.gpg'
     GPG_PASSPHRASE            = credentials('release-gpg-passphrase')
     PACKAGING_GIT_REPOSITORY  = 'git@github.com:jenkinsci/packaging.git'
@@ -49,8 +46,10 @@ pipeline {
     SIGN_KEYSTORE_FILENAME    = 'jenkins.pfx'
     SIGN_STOREPASS            = credentials('signing-cert-pass')
     WAR_FILENAME              = 'jenkins.war'
-    WAR                       = "$WORKSPACE/$WORKING_DIR/$WAR_FILENAME"
-    WORKING_DIR               = "release"
+    WAR                       = "$WORKSPACE/$WORKING_DIRECTORY/$WAR_FILENAME"
+    WORKING_DIRECTORY         = "release"
+    PKCS12_FILE               = "$WORKSPACE/$WORKING_DIRECTORY/jenkins.pfx" // Created by SIGN_KEYSTORE
+    PKCS12_PASSWORD_FILE      = credentials('signing-cert-pass')
   }
 
   stages {
@@ -59,7 +58,7 @@ pipeline {
       steps {
         container('azure-cli') {
           checkout scm
-          dir (WORKING_DIR){
+          dir (WORKING_DIRECTORY){
             git branch: PACKAGING_GIT_BRANCH, credentialsId: 'release-key', url: PACKAGING_GIT_REPOSITORY
           }
       
@@ -67,7 +66,7 @@ pipeline {
             ./utils/release.sh --getGPGKeyFromAzure
           '''
 
-          dir (WORKING_DIR){
+          dir (WORKING_DIRECTORY){
             stash includes: GPG_FILE , name: 'GPG'
           }
         }
@@ -99,7 +98,7 @@ pipeline {
           sh '''
             ./utils/release.sh --downloadJenkins
           '''
-          dir (WORKING_DIR){
+          dir (WORKING_DIRECTORY){
             stash includes: WAR_FILENAME, name: "WAR"
             archiveArtifacts artifacts: "*.war"
           }
@@ -114,9 +113,9 @@ pipeline {
             stage('Publish'){
               steps {
                 container('packaging'){
-                  dir (WORKING_DIR){
-                    sh 'make war.publish'
-                  }
+                  sh '''
+                    ./utils/release.sh --packaging war.publish
+                  '''
                 }
               }
             }
@@ -127,8 +126,10 @@ pipeline {
             stage('Build'){
               steps {
                 container('packaging'){
-                  dir (WORKING_DIR){
-                    sh 'make deb'
+                  sh '''
+                    ./utils/release.sh --packaging deb
+                  '''
+                  dir (WORKING_DIRECTORY){
                     archiveArtifacts artifacts: "target/debian/*.deb"
                   }
                 }
@@ -137,9 +138,9 @@ pipeline {
             stage('Publish'){
               steps {
                 container('packaging'){
-                  dir (WORKING_DIR){
-                    sh 'make deb.publish'
-                  }
+                  sh '''
+                    ./utils/release.sh --packaging deb.publish
+                  '''
                 }
               }
             }
@@ -150,8 +151,10 @@ pipeline {
             stage('Build'){
               steps {
                 container('packaging'){
-                  dir (WORKING_DIR){
-                    sh 'make rpm'
+                  sh '''
+                    ./utils/release.sh --packaging rpm
+                  '''
+                  dir (WORKING_DIRECTORY){
                     archiveArtifacts artifacts: "target/rpm/*.rpm"
                   }
                 }
@@ -160,9 +163,9 @@ pipeline {
             stage('Publish'){
               steps {
                 container('packaging'){
-                  dir (WORKING_DIR){
-                    sh 'make rpm.publish'
-                  }
+                  sh '''
+                    ./utils/release.sh --packaging rpm.publish
+                  '''
                 }
               }
             }
@@ -173,8 +176,10 @@ pipeline {
             stage('Build'){
               steps {
                 container('packaging'){
-                  dir (WORKING_DIR){
-                    sh 'make suse'
+                  sh '''
+                    ./utils/release.sh --packaging suse
+                  '''
+                  dir (WORKING_DIRECTORY){
                     archiveArtifacts artifacts: "target/suse/*.rpm"
                   }
                 }
@@ -183,9 +188,9 @@ pipeline {
             stage('Publish'){
               steps {
                 container('packaging'){
-                  dir (WORKING_DIR){
-                    sh 'make suse.publish'
-                  }
+                  sh '''
+                    ./utils/release.sh --packaging suse.publish
+                  '''
                 }
               }
             }
@@ -204,7 +209,7 @@ pipeline {
             stage('Build'){
               steps {
                 checkout scm
-                dir (WORKING_DIR){
+                dir (WORKING_DIRECTORY){
                   git branch: PACKAGING_GIT_BRANCH, credentialsId: 'release-key', url: PACKAGING_GIT_REPOSITORY
 
                   unstash 'GPG'
@@ -212,17 +217,17 @@ pipeline {
                   unstash 'KEYSTORE'
 
                   bat """
-                    $env:WAR = \'C:\\home\\jenkins\\agent\\workspace\\core-package_master\\$WORKING_DIR\\jenkins.war\'
-                    powershell -File C:\\home\\jenkins\\agent\\workspace\\core-package_master\\$WORKING_DIR\\make.ps1
+                    $env:WAR = \'C:\\home\\jenkins\\agent\\workspace\\core-package_master\\$WORKING_DIRECTORY\\jenkins.war\'
+                    powershell -File C:\\home\\jenkins\\agent\\workspace\\core-package_master\\$WORKING_DIRECTORY\\make.ps1
                   """
                 }
               }
             }
             stage('Publish'){
               steps {
-                dir (WORKING_DIR){
+                dir (WORKING_DIRECTORY){
                   bat """
-                    powershell -File C:\\home\\jenkins\\agent\\workspace\\core-package_master\\$WORKING_DIR\\msi\\publish\\publish.ps1
+                    powershell -File C:\\home\\jenkins\\agent\\workspace\\core-package_master\\$WORKING_DIRECTORY\\msi\\publish\\publish.ps1
                   """
                   archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi'
                   archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi.sha256'

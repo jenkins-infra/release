@@ -257,6 +257,36 @@ cat <<EOT> settings-release.xml
 EOT
 }
 
+function configurePackagingEnv(){
+
+  requireGPGPassphrase
+
+  : "${BRAND:=$WORKING_DIRECTORY/branding/common}"
+  : "${RELEASELINE:=}"
+  : "${ORGANIZATION:=jenkins.io}"
+  : "${BUILDENV:=$WORKING_DIRECTORY/env/release.mk}"
+  : "${CREDENTIAL:=$BRAND}" # For now, we just want this variable to be set to not empty
+  : "${GPG_PASSPHRASE_FILE=$WORKING_DIRECTORY/$GPG_KEYNAME.pass}"
+
+  echo "$GPG_PASSPHRASE" > "$GPG_PASSPHRASE_FILE"
+
+}
+
+function cleanPackagingEnv(){
+  rm "$GPG_PASSPHRASE_FILE"
+}
+
+function packaging(){
+  # Still function need an access to this Makefile
+  # https://github.com/jenkinsci/packaging/blob/master/Makefile
+  # if more than parameter is needed then they have to be quoted
+  # example: `utils/release.sh --packaging "deb rpm suse"`
+
+  configurePackagingEnv
+  make "$@"
+  cleanPackaging
+}
+
 function prepareRelease(){
   requireGPGPassphrase
   requireKeystorePass
@@ -337,6 +367,7 @@ function main(){
             --pushCommits) echo "Push commits on $JENKINS_GIT_BRANCH" && pushCommits ;;
             --rollback) echo "Rollback release $RELEASE_SCM_TAG" && rollblack ;;
             --stageRelease) echo "Perform Release" && stageRelease ;;
+            --packaging) echo 'Execute packaging makefile, quote required around Makefile target' && packaging $2;;
             -h) echo "help" ;;
             -*) echo "help" ;;
         esac
