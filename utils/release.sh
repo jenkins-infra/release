@@ -63,7 +63,7 @@ function clean(){
 
     # Do not display transfer progress when downloading or uploading
     # https://maven.apache.org/ref/3.6.1/maven-embedder/cli.html
-    mvn -s settings-release.xml -B --no-transfer-progress release:clean
+    mvn -s settings-release.xml -B --no-transfer-progress -Darguments=--no-transfer-progress release:clean
 }
 
 function cloneJenkinsGitRepository(){
@@ -251,7 +251,7 @@ function prepareRelease(){
 
   # Do not display transfer progress when downloading or uploading
   # https://maven.apache.org/ref/3.6.1/maven-embedder/cli.html
-  mvn -B -s settings-release.xml --no-transfer-progress release:prepare
+  mvn -B -s settings-release.xml --no-transfer-progress -Darguments=--no-transfer-progress release:prepare
 }
 
 function pushCommits(){
@@ -279,6 +279,7 @@ function stageRelease(){
     "-DstagingRepository=${MAVEN_REPOSITORY_NAME}::default::${MAVEN_REPOSITORY_URL}/${MAVEN_REPOSITORY_NAME}" \
     -s settings-release.xml \
     --no-transfer-progress \
+    -Darguments=--no-transfer-progress \
     release:stage
 }
 
