@@ -266,9 +266,11 @@ function configurePackagingEnv(){
   : "${ORGANIZATION:=jenkins.io}"
   : "${BUILDENV:=$WORKING_DIRECTORY/env/release.mk}"
   : "${CREDENTIAL:=$BRAND}" # For now, we just want this variable to be set to not empty
-  : "${GPG_PASSPHRASE_FILE=$WORKING_DIRECTORY/$GPG_KEYNAME.pass}"
+  : "${GPG_PASSPHRASE_FILE:=$WORKING_DIRECTORY/$GPG_KEYNAME.pass}"
 
-  echo "$GPG_PASSPHRASE" > "$GPG_PASSPHRASE_FILE"
+cat <<EOT> "$GPG_PASSPHRASE_FILE"
+$GPG_PASSPHRASE
+EOT
 
 }
 
