@@ -68,6 +68,7 @@ pipeline {
           container('azure-cli') {
             sh '''
               utils/release.sh --downloadAzureKeyvaultSecret
+              utils/release.sh --configureKeystore
             '''
           }
         }
