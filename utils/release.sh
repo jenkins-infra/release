@@ -278,7 +278,7 @@ function stageRelease(){
   mvn -B \
     "-DstagingRepository=${MAVEN_REPOSITORY_NAME}::default::${MAVEN_REPOSITORY_URL}/${MAVEN_REPOSITORY_NAME}" \
     -s settings-release.xml \
-    --no-transfer-progress
+    --no-transfer-progress \
     -Darguments=--no-transfer-progress \
     release:stage
 }
