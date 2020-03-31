@@ -268,6 +268,14 @@ function configurePackagingEnv(){
   : "${CREDENTIAL:=$BRAND}" # For now, we just want this variable to be set to not empty
   : "${GPG_PASSPHRASE_FILE:=$WORKSPACE/$WORKING_DIRECTORY/$GPG_KEYNAME.pass}"
 
+  export BRAND
+  export RELEASELINE
+  export ORGANIZATION
+  export BUILDENV
+  export CREDENTIAL
+  export GPG_PASSPHRASE_FILE
+  export GPG_KEYNAME
+
 cat <<EOT> "$GPG_PASSPHRASE_FILE"
 $GPG_PASSPHRASE
 EOT
