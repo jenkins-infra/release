@@ -9,3 +9,6 @@ MAVEN_REPOSITORY_URL='https://repo.jenkins-ci.org'
 MAVEN_REPOSITORY_NAME=releases-stable
 MAVEN_PUBLIC_JENKINS_REPOSITORY_MIRROR_URL='http://nexus/repository/jenkins-public/'
 SIGN_ALIAS=jenkins
+
+# Used by jenkinsci/packaging
+RELEASELINE=-stable
