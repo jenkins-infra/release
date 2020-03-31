@@ -261,10 +261,10 @@ function configurePackagingEnv(){
 
   requireGPGPassphrase
 
-  : "${BRAND:=branding/common}"
+  : "${BRAND:=$WORKSPACE/$WORKING_DIRECTORY/branding/common}"
   : "${RELEASELINE:=}"
   : "${ORGANIZATION:=jenkins.io}"
-  : "${BUILDENV:=env/release.mk}"
+  : "${BUILDENV:=$WORKSPACE/$WORKING_DIRECTORY/env/release.mk}"
   : "${CREDENTIAL:=$BRAND}" # For now, we just want this variable to be set to not empty
   : "${GPG_PASSPHRASE_FILE:=$GPG_KEYNAME.pass}"
 
