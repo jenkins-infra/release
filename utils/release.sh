@@ -102,15 +102,34 @@ function configureGPG(){
 
 function configureKeystore(){
   requireKeystorePass
+
   if [ ! -f "${SIGN_CERTIFICATE}" ]; then
       exit "${SIGN_CERTIFICATE} not found"
-  else
-    openssl pkcs12 -export \
-      -out "$SIGN_KEYSTORE" \
-      -in "${SIGN_CERTIFICATE}" \
-      -password "pass:$SIGN_STOREPASS" \
-      -name "$SIGN_ALIAS"
   fi
+
+  case "$SIGN_CERTIFICATE" in
+    *.pem )
+      openssl pkcs12 -export \
+        -out "$SIGN_KEYSTORE" \
+        -in "${SIGN_CERTIFICATE}" \
+        -password "pass:$SIGN_STOREPASS" \
+        -name "$SIGN_ALIAS"
+        ;;
+    *.pfx )
+      # pfx file download from azure key vault are not password protected, which is required for maven release plugin
+      # so we need to add a new password
+      openssl pkcs12 -in ${SIGN_CERTIFICATE} -out tmpjenkins.pem -nodes
+      openssl pkcs12 -export \
+        -out "$SIGN_KEYSTORE" \
+        -in tmpjenkins.pem \
+        -password "pass:$SIGN_STOREPASS" \
+        -name "$SIGN_ALIAS"
+      rm tmpjenkins.pem
+      ;;
+    *)
+      echo "certificate file extension not support for ${SIGN_CERTIFICATE}"
+      ;;
+  esac
 }
 
 function azureAccountAuth(){
@@ -128,11 +147,8 @@ function downloadAzureKeyvaultSecret(){
   az keyvault secret download \
     --vault-name "$AZURE_VAULT_NAME" \
     --name "$AZURE_VAULT_CERT" \
+    --encoding base64 \
     --file "$AZURE_VAULT_FILE"
-
-  if [ ! -f "${SIGN_KEYSTORE}" ]; then
-    cp "$AZURE_VAULT_FILE" "$SIGN_KEYSTORE"
-  fi
 }
 
 # JENKINS_VERSION: Define which version will be package where:
