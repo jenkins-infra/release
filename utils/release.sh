@@ -280,6 +280,11 @@ cat <<EOT> "$GPG_PASSPHRASE_FILE"
 $GPG_PASSPHRASE
 EOT
 
+  if [ ! -f "$GPG_PASSPHRASE_FILE" ]; then
+    echo "$GPG_PASSPHRASE_FILE wasn't correctly created"
+    exit 1
+  fi
+
 }
 
 function cleanPackagingEnv(){
