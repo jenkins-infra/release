@@ -299,7 +299,6 @@ function packaging(){
 
   configurePackagingEnv
   make "$@"
-  cleanPackagingEnv
 }
 
 function prepareRelease(){
