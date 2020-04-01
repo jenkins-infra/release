@@ -239,4 +239,9 @@ pipeline {
       }
     }
   }
+    post {
+      failure {
+        input '''Can I delete the pod? '''
+      }
+    }
 }
