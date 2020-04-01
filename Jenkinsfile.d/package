@@ -217,8 +217,8 @@ pipeline {
                   unstash 'KEYSTORE'
 
                   bat """
-                    $env:WAR = \'C:\\home\\jenkins\\agent\\workspace\\core-package_master\\$WORKING_DIRECTORY\\jenkins.war\'
-                    powershell -File C:\\home\\jenkins\\agent\\workspace\\core-package_master\\$WORKING_DIRECTORY\\make.ps1
+                    set WAR=%CD%\\jenkins.war
+                    powershell -File %CD%\\make.ps1
                   """
                 }
               }
