@@ -216,19 +216,20 @@ pipeline {
                   unstash 'WAR'
                   unstash 'KEYSTORE'
 
-                  bat """
-                    set WAR=%CD%\\jenkins.war
-                    powershell -File %CD%\\make.ps1
-                  """
+                  powershell '''
+                    Get-ChildItem env:
+                    $env:WAR=(Resolve-Path .\\jenkins.war).Path
+                    & .\\make.ps1
+                  '''
                 }
               }
             }
             stage('Publish'){
               steps {
                 dir (WORKING_DIRECTORY){
-                  bat """
-                    powershell -File C:\\home\\jenkins\\agent\\workspace\\core-package_master\\$WORKING_DIRECTORY\\msi\\publish\\publish.ps1
-                  """
+                  powershell '''
+                    & .\\msi\\publish\\publish.ps1
+                  '''
                   archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi'
                   archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi.sha256'
                 }
