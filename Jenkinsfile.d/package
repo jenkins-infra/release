@@ -113,9 +113,11 @@ pipeline {
             stage('Publish'){
               steps {
                 container('packaging'){
-                  sh '''
-                    ./utils/release.sh --packaging war.publish
-                  '''
+                  sshagent(['pkgserver']) {
+                    sh '''
+                      ./utils/release.sh --packaging war.publish
+                    '''
+                  }
                 }
               }
             }
@@ -138,9 +140,11 @@ pipeline {
             stage('Publish'){
               steps {
                 container('packaging'){
-                  sh '''
-                    ./utils/release.sh --packaging deb.publish
-                  '''
+                  sshagent(['pkgserver']) {
+                    sh '''
+                      ./utils/release.sh --packaging deb.publish
+                    '''
+                  }
                 }
               }
             }
@@ -163,9 +167,11 @@ pipeline {
             stage('Publish'){
               steps {
                 container('packaging'){
-                  sh '''
-                    ./utils/release.sh --packaging rpm.publish
-                  '''
+                  sshagent(['pkgserver']) {
+                    sh '''
+                      ./utils/release.sh --packaging rpm.publish
+                    '''
+                  }
                 }
               }
             }
@@ -188,9 +194,11 @@ pipeline {
             stage('Publish'){
               steps {
                 container('packaging'){
-                  sh '''
-                    ./utils/release.sh --packaging suse.publish
-                  '''
+                  sshagent(['pkgserver']) {
+                    sh '''
+                      ./utils/release.sh --packaging suse.publish
+                    '''
+                  }
                 }
               }
             }
@@ -226,12 +234,14 @@ pipeline {
             }
             stage('Publish'){
               steps {
-                dir (WORKING_DIRECTORY){
-                  powershell '''
-                    & .\\msi\\publish\\publish.ps1
-                  '''
-                  archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi'
-                  archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi.sha256'
+                sshagent(['pkgserver']) {
+                  dir (WORKING_DIRECTORY){
+                    powershell '''
+                      & .\\msi\\publish\\publish.ps1
+                    '''
+                    archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi'
+                    archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi.sha256'
+                  }
                 }
               }
             }
