@@ -353,7 +353,7 @@ function verifyGPGSignature(){
 }
 
 function verifyCertificateSignature(){
-  jarsigner -verbose -verify "$JENKINS_WAR"
+  jarsigner -verbose -verify -certs -strict "$JENKINS_WAR"
 }
 
 function main(){
