@@ -249,6 +249,21 @@ pipeline {
         }
       }
     }
+    // Force mirror synchronization
+    stage('Synchronize mirror'){
+      environment {
+        PKGSERVER = "mirrorbrain@pkg.jenkins.io"
+      }
+      steps{
+        container('jnlp'){
+          sshagent(['pkgserver']) {
+            sh '''
+              ssh $PKGSERVER /srv/releases/sync.sh
+            '''
+          }
+        }
+      }
+    }
   }
     post {
       failure {
