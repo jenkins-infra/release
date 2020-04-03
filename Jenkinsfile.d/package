@@ -232,7 +232,7 @@ pipeline {
                     & .\\make.ps1
                   '''
 
-                  archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi*' , name: 'MSI'
+                  archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi*'
                 }
               }
             }
