@@ -47,6 +47,8 @@ pipeline {
     SIGN_STOREPASS            = credentials('signing-cert-pass')
     WAR_FILENAME              = 'jenkins.war'
     WAR                       = "$WORKSPACE/$WORKING_DIRECTORY/$WAR_FILENAME"
+    MSI_FILENAME              = 'jenkins.msi'
+    MSI                       = "$WORKSPACE/$WORKING_DIRECTORY/$MSI_FILENAME"
     WORKING_DIRECTORY         = "release"
     PKCS12_FILE               = "$WORKSPACE/$WORKING_DIRECTORY/jenkins.pfx" // Created by SIGN_KEYSTORE
     PKCS12_PASSWORD_FILE      = credentials('signing-cert-pass')
@@ -204,17 +206,17 @@ pipeline {
             }
           }
         }
-        stage('Windows') {
-          // Windows requirement: Every steps need to be executed inside default jnlp 
-          // as the step 'container' is knowned to not be working
-          agent {
-            kubernetes {
-              label 'packaging-windows'
-              yamlFile 'PodTemplates.d/package-windows'
-            }
-          }
+        stage('Windows') { 
           stages {
-            stage('Build'){
+            stage('Build') {
+              // Windows requirement: Every steps need to be executed inside default jnlp 
+              // as the step 'container' is known to not be working
+              agent {
+                kubernetes {
+                  label 'packaging-windows'
+                  yamlFile 'PodTemplates.d/package-windows'
+                }
+              }
               steps {
                 checkout scm
                 dir (WORKING_DIRECTORY){
@@ -229,19 +231,21 @@ pipeline {
                     $env:WAR=(Resolve-Path .\\jenkins.war).Path
                     & .\\make.ps1
                   '''
+
+                  archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi*' , name: 'MSI'
                 }
               }
             }
             stage('Publish'){
               steps {
-                sshagent(['pkgserver']) {
-                  dir (WORKING_DIRECTORY){
-                    powershell '''
-                      & .\\msi\\publish\\publish.ps1
+                container('packaging') {
+                  unarchive mapping: ['**/*.msi*': MSI_FILENAME]
+                  sshagent(['pkgserver']) {
+                    sh '''
+                      ./utils/release.sh --packaging msi.publish
                     '''
-                    archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi'
-                    archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi.sha256'
                   }
+                  archiveArtifacts "${MSI}.sha256"
                 }
               }
             }
