@@ -115,9 +115,11 @@ pipeline {
             stage('Publish'){
               steps {
                 container('packaging'){
-                  sh '''
-                    ./utils/release.sh --packaging war.publish
-                  '''
+                  sshagent(['pkgserver']) {
+                    sh '''
+                      ./utils/release.sh --packaging war.publish
+                    '''
+                  }
                 }
               }
             }
@@ -140,9 +142,11 @@ pipeline {
             stage('Publish'){
               steps {
                 container('packaging'){
-                  sh '''
-                    ./utils/release.sh --packaging deb.publish
-                  '''
+                  sshagent(['pkgserver']) {
+                    sh '''
+                      ./utils/release.sh --packaging deb.publish
+                    '''
+                  }
                 }
               }
             }
@@ -165,9 +169,11 @@ pipeline {
             stage('Publish'){
               steps {
                 container('packaging'){
-                  sh '''
-                    ./utils/release.sh --packaging rpm.publish
-                  '''
+                  sshagent(['pkgserver']) {
+                    sh '''
+                      ./utils/release.sh --packaging rpm.publish
+                    '''
+                  }
                 }
               }
             }
@@ -190,9 +196,11 @@ pipeline {
             stage('Publish'){
               steps {
                 container('packaging'){
-                  sh '''
-                    ./utils/release.sh --packaging suse.publish
-                  '''
+                  sshagent(['pkgserver']) {
+                    sh '''
+                      ./utils/release.sh --packaging suse.publish
+                    '''
+                  }
                 }
               }
             }
@@ -230,15 +238,32 @@ pipeline {
             }
             stage('Publish'){
               steps {
-                container('packaging'){
+                container('packaging') {
                   unarchive mapping: ['**/*.msi*': MSI_FILENAME]
-                  sh '''
-                    ./utils/release.sh --packaging msi.publish
-                  '''
+                  sshagent(['pkgserver']) {
+                    sh '''
+                      ./utils/release.sh --packaging msi.publish
+                    '''
+                  }
                   archiveArtifacts "${MSI}.sha256"
                 }
               }
             }
+          }
+        }
+      }
+    }
+    // Force mirror synchronization
+    stage('Synchronize mirror'){
+      environment {
+        PKGSERVER = "mirrorbrain@pkg.jenkins.io"
+      }
+      steps{
+        container('jnlp'){
+          sshagent(['pkgserver']) {
+            sh '''
+              ssh $PKGSERVER /srv/releases/sync.sh
+            '''
           }
         }
       }

@@ -128,7 +128,22 @@ pipeline {
           container('maven') {
             sh '''
               utils/release.sh --stageRelease
+            '''
+          }
+        }
+      }
+      stage('Stage Release') {
+        steps {
+          container('maven') {
+            sh '''
               utils/release.sh --verifyGPGSignature
+            '''
+          }
+        }
+        steps {
+          container('maven') {
+            sh '''
+              utils/release.sh --verifyCertificateSignature
             '''
           }
         }
