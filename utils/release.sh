@@ -352,6 +352,10 @@ function verifyGPGSignature(){
   unzip -qc "$JENKINS_WAR" META-INF/MANIFEST.MF | grep 'Jenkins-Version' | awk '{print $2}'
 }
 
+function verifyCertificateSignature(){
+  jarsigner -verbose -verify "$JENKINS_WAR"
+}
+
 function main(){
   if [ $# -eq 0 ] ;then
     configureGPG
@@ -359,6 +363,7 @@ function main(){
     configureGit
     validateKeystore
     verifyGPGSignature
+    verifyCertificateSignature
     generateSettingsXml
     prepareRelease
     stageRelease
@@ -377,6 +382,7 @@ function main(){
             --getGPGKeyFromAzure) echo "Download GPG Key from Azure" && getGPGKeyFromAzure ;;
             --validateKeystore) echo "Validate Keystore"  && validateKeystore ;;
             --verifyGPGSignature) echo "Verify GPG Signature" && verifyGPGSignature ;;
+            --verifyCertificateSignature) echo "Verify certificate signature" && verifyCertificateSignature ;;
             --prepareRelease) echo "Prepare Release" && generateSettingsXml && prepareRelease ;;
             --pushCommits) echo "Push commits on $JENKINS_GIT_BRANCH" && pushCommits ;;
             --rollback) echo "Rollback release $RELEASE_SCM_TAG" && rollblack ;;
