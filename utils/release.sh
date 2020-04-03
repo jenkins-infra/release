@@ -2,7 +2,7 @@
 
 set -euxo pipefail
 
-: "${RELEASE_PROFILE:=weekly}"
+: "${RELEASE_PROFILE:?Release profile required}"
 
 source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
 
