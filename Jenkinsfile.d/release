@@ -132,16 +132,12 @@ pipeline {
           }
         }
       }
-      stage('Stage Release') {
+      stage('Verify artifacts') {
         steps {
           container('maven') {
             sh '''
               utils/release.sh --verifyGPGSignature
             '''
-          }
-        }
-        steps {
-          container('maven') {
             sh '''
               utils/release.sh --verifyCertificateSignature
             '''
