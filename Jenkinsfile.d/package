@@ -239,7 +239,7 @@ pipeline {
             stage('Publish'){
               steps {
                 container('packaging') {
-                  unarchive mapping: ['**/*.msi*': MSI_FILENAME]
+                  unarchive mapping: ['**/*.msi*': MSI]
                   sshagent(['pkgserver']) {
                     sh '''
                       ./utils/release.sh --packaging msi.publish
