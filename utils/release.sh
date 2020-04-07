@@ -22,6 +22,7 @@ source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
 : "${JENKINS_VERSION:=weekly}"
 : "${JENKINS_WAR:=$WORKSPACE/$WORKING_DIRECTORY/war/target/jenkins.war}"
 : "${JENKINS_ASC:=$WORKSPACE/$WORKING_DIRECTORY/war/target/jenkins.war.asc}"
+: "${PKGSERVER:=mirrorbrain@pkg.jenkins.io}"
 : "${SIGN_ALIAS:=jenkins}"
 : "${SIGN_KEYSTORE_FILENAME:=jenkins.pfx}"
 : "${SIGN_KEYSTORE:=${WORKSPACE}/${SIGN_KEYSTORE_FILENAME}}"
@@ -31,6 +32,7 @@ source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
 : "${MAVEN_REPOSITORY_NAME:=maven-releases}"
 : "${MAVEN_REPOSITORY_SNAPSHOT_NAME:=maven-snapshots}"
 : "${MAVEN_PUBLIC_JENKINS_REPOSITORY_MIRROR_URL:=http://nexus/repository/jenkins-public/}"
+: "${PKGSERVER_SSH_OPTS:=-p 22}"
 
 : "${JENKINS_DOWNLOAD_URL:=$MAVEN_REPOSITORY_URL/$MAVEN_REPOSITORY_NAME/org/jenkins-ci/main/jenkins-war/}"
 
@@ -356,6 +358,12 @@ function verifyCertificateSignature(){
   jarsigner -verbose -verify -certs -strict "$JENKINS_WAR"
 }
 
+function syncMirror(){
+
+  PKGSERVER_SSH_OPTS=($PKGSERVER_SSH_OPTS)
+  ssh "${PKGSERVER_SSH_OPTS[@]}" "$PKGSERVER" /srv/releases/sync.sh
+}
+
 function main(){
   if [ $# -eq 0 ] ;then
     configureGPG
@@ -387,7 +395,8 @@ function main(){
             --pushCommits) echo "Push commits on $JENKINS_GIT_BRANCH" && pushCommits ;;
             --rollback) echo "Rollback release $RELEASE_SCM_TAG" && rollblack ;;
             --stageRelease) echo "Perform Release" && stageRelease ;;
-            --packaging) echo 'Execute packaging makefile, quote required around Makefile target' && packaging $2;;
+            --packaging) echo 'Execute packaging makefile, quote required around Makefile target' && packaging "$2";;
+            --syncMirror) echo 'Trigger mirror synchronization' && syncMirror ;;
             -h) echo "help" ;;
             -*) echo "help" ;;
         esac
