@@ -245,7 +245,6 @@ pipeline {
                       ./utils/release.sh --packaging msi.publish
                     '''
                   }
-                  archiveArtifacts "${WORKING_DIRECTORY}/${MSI_FILENAME}.sha256"
                 }
               }
             }
