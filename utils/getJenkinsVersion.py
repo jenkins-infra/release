@@ -91,7 +91,7 @@ def downloadJenkins(version):
         content = response.read().decode(encoding='utf-8', errors='ignore')
 
         f = open(PATH, 'w')
-        f.write(str(content))
+        f.write(content)
         f.close()
         print("War downloaded to {}".format(PATH))
 
