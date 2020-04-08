@@ -36,6 +36,19 @@ source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
 
 : "${JENKINS_DOWNLOAD_URL:=$MAVEN_REPOSITORY_URL/$MAVEN_REPOSITORY_NAME/org/jenkins-ci/main/jenkins-war/}"
 
+export JENKINS_VERSION
+export JENKINS_DOWNLOAD_URL
+export MAVEN_REPOSITORY_USERNAME
+export MAVEN_REPOSITORY_PASSWORD
+export WAR
+export BRAND
+export RELEASELINE
+export ORGANIZATION
+export BUILDENV
+export CREDENTIAL
+export GPG_PASSPHRASE_FILE
+export GPG_KEYNAME
+
 if [ ! -d "$WORKING_DIRECTORY" ]; then
   mkdir -p "$WORKING_DIRECTORY"
 fi
@@ -158,7 +171,6 @@ function downloadAzureKeyvaultSecret(){
 # * <version> represents any valid existing version like 2.176.3 available at JENKINS_DOWNLOAD_URL
 # JENKINS_DOWNLOAD_URL: Specify the endpoint to use for downloading jenkins.war 
 function downloadJenkinsWar(){
-  pwd
   "$WORKSPACE"/utils/getJenkinsVersion.py
 }
 
@@ -269,14 +281,6 @@ function configurePackagingEnv(){
   : "${BUILDENV:=$WORKSPACE/$WORKING_DIRECTORY/env/release.mk}"
   : "${CREDENTIAL:=$BRAND}" # For now, we just want this variable to be set to not empty
   : "${GPG_PASSPHRASE_FILE:=$WORKSPACE/$WORKING_DIRECTORY/$GPG_KEYNAME.pass}"
-
-  export BRAND
-  export RELEASELINE
-  export ORGANIZATION
-  export BUILDENV
-  export CREDENTIAL
-  export GPG_PASSPHRASE_FILE
-  export GPG_KEYNAME
 
 cat <<EOT> "$GPG_PASSPHRASE_FILE"
 $GPG_PASSPHRASE
