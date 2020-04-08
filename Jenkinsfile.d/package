@@ -47,6 +47,8 @@ pipeline {
     SIGN_STOREPASS            = credentials('signing-cert-pass')
     WAR_FILENAME              = 'jenkins.war'
     WAR                       = "$WORKSPACE/$WORKING_DIRECTORY/$WAR_FILENAME"
+    MAVEN_REPOSITORY_USERNAME = credentials('maven-repository-username')
+    MAVEN_REPOSITORY_PASSWORD = credentials('maven-repository-password')
     MSI_FILENAME              = 'jenkins.msi'
     MSI                       = "$WORKSPACE/$WORKING_DIRECTORY/$MSI_FILENAME"
     WORKING_DIRECTORY         = "release"
