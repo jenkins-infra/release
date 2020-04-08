@@ -88,11 +88,10 @@ def downloadJenkins(version):
                 "Authorization", "Basic %s" % base64string.decode('utf-8'))
 
         response = urllib.request.urlopen(request)
-        content = response.read().decode(encoding='utf-8', errors='ignore')
+        content = response.read()
 
-        f = open(PATH, 'w')
-        f.write(content)
-        f.close()
+        open(PATH, 'wb').write(content)
+
         print("War downloaded to {}".format(PATH))
 
     except URLError as e:
