@@ -231,15 +231,18 @@ pipeline {
                     $env:WAR=(Resolve-Path .\\jenkins.war).Path
                     & .\\make.ps1
                   '''
+                  // Don't archive the full path
+                  dir('msi\\build\\bin\\Release\\en-US') {
+                    archiveArtifacts '*.msi*'
+                  }
 
-                  archiveArtifacts 'msi\\build\\bin\\Release\\en-US\\*.msi*'
                 }
               }
             }
             stage('Publish'){
               steps {
                 container('packaging') {
-                  unarchive mapping: ['**/*.msi*': MSI]
+                  unarchive mapping: ['*.msi*': WORKING_DIRECTORY]
                   sshagent(['pkgserver']) {
                     sh '''
                       ./utils/release.sh --packaging msi.publish
