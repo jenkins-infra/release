@@ -38,6 +38,8 @@ source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
 
 export JENKINS_VERSION
 export JENKINS_DOWNLOAD_URL
+export MAVEN_REPOSITORY_USERNAME
+export MAVEN_REPOSITORY_PASSWORD
 export WAR
 export BRAND
 export RELEASELINE
