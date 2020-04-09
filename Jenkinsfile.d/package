@@ -98,7 +98,6 @@ pipeline {
     stage('Download WAR archive to package'){
       steps{
         container('packaging'){
-          sh 'utils/getJenkinsVersion.py'
           sh '''
             ./utils/release.sh --downloadJenkins
           '''
