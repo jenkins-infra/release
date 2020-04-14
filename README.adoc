@@ -58,7 +58,7 @@ Estimated time +- 1h30
 . Connect to the Jenkins VPN
 . Open your favorite browser to https://release.ci.jenkins.io
 . Trigger the release job on the master branch. https://release.ci.jenkins.io/blue/organizations/jenkins/core-release/branches[Link]
-. Once triggered, it asks you which release line you want to do. It's important to know that the release line matches one of the profile defines https://github.com/jenkins-infra/release/tree/master/profile.d[here], so please carefully review the settings and be sure that is what you are looking for.
+. Once triggered, it asks you which release line you want to do. It's important to know that the release line matches one of the profiles defined https://github.com/jenkins-infra/release/tree/master/profile.d[here], so please carefully review the settings and be sure that is what you are looking for.
 . At the end of the job, several git commit and maven artifacts will be pushed on their respective locations
 
 === Validate
