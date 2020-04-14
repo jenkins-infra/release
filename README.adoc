@@ -120,6 +120,7 @@ https://github.com/jenkins-infra/release/blob/master/utils/getJenkinsVersion.py[
 
 Estimated time +- 30min
 
+. Connect to the Jenkins VPN
 . Open your favorite browser to https://release.ci.jenkins.io[release.ci.jenkins.io]
 . Trigger the packaging job on the master branch. https://release.ci.jenkins.io/blue/organizations/jenkins/core-package/branches[Link]
 . Once triggered, it asks you which release line you want to package for. The release line matches one of the profile defines in https://github.com/jenkins-infra/release/tree/master/profile.d[profile.d], so please carefully review those settings in order to validate that's what you are looking for.
