@@ -74,7 +74,7 @@ To promote your maven artifacts, you have to manually move them to the right loc
 
 == Package
 
-The packaging process looks after the latest Jenkins version published on a Maven repository and then build and publish artifacts for Debian, Redhat, Suse, Windows and also republish the War file on the package server.
+The packaging process looks after the latest Jenkins version published on a Maven repository and then build and publish artifacts for Debian, Red Hat, SUSE, Windows and also republishes the War file on the package server.
 
 Remark: Packages are not published if a similar version was already published.
 
