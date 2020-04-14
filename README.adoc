@@ -55,6 +55,7 @@ Those are the most important settings defined in your release profile that will 
 
 Estimated time +- 1h30
 
+. Connect to the Jenkins VPN
 . Open your favorite browser to https://release.ci.jenkins.io
 . Trigger the release job on the master branch. https://release.ci.jenkins.io/blue/organizations/jenkins/core-release/branches[Link]
 . Once triggered, it asks you which release line you want to do. It's important to know that the release line matches one of the profile defines https://github.com/jenkins-infra/release/tree/master/profile.d[here], so please carefully review the settings and be sure that is what you are looking for.
