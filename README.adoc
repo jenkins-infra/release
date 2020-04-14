@@ -184,3 +184,4 @@ Show pkcs12 information
 * https://repo.jenkins-ci.org[repo.jenkins-ci.org], Jenkins Maven repository
 * https://mirrors.jenkins.io[mirrors.jenkins.io]
 * https://issues.jenkins-ci.org/browse/INFRA-910[INFRA-910] - EPIC for the new Jenkins Core Release Environment
+* https://github.com/jenkins-infra/docker-packaging[docker-packaging], defines the docker image used to execute packaging scripts
