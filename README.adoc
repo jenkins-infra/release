@@ -11,7 +11,7 @@ This repository contains everything needed to release https://github.com/jenkins
 
 The release process implies following Git repository:
 
-* https://github.com/jenkinsci/jenkins[jenkinsci/jenkins] or any other git repository containing the Jenkins code that needs to be released and or packaged for.
+* https://github.com/jenkinsci/jenkins[jenkinsci/jenkins] or any other git repository containing the Jenkins code to be released.
 * https://github.com/jenkinsci/packaging[jenkinsci/packaging] contains every tools and configuration used to package Jenkins for OS distribution [Debian,Redhat,Suse,MSI,WAR]
 * https://github.com/jenkins-infra/chart[jenkins-infra/chart] contains Helm chart used to deploy release.ci.jenkins.io on top of Kubernetes.
 * https://github.com/jenkins-infra/azure[jenkins-infra/azure] contains the terraform code used to provision infrastructures needed by the release environment
