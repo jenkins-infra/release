@@ -1,39 +1,187 @@
-# Jenkins Automated Release Flow
+= Jenkins Release
+:toc: right
 
-As a part of the link:https://issues.jenkins-ci.org/browse/INFRA-910[INFRA-910] EPIC,
-https://jenkins.io/projects/infrastructure/[Jenkins Infrastructure Team] is working on a new Jenkins Core Release Environment
-which would be able to release Jenkins Weekly and LTS versions in an automatic way.
-It includes packaging, staging, and releasing stages.
+== Introduction
 
-## Jenkins Core Release Environment
+This repository contains everything needed to release https://github.com/jenkinsci/jenkins[Jenkins core]:
 
-The release environment is hosted within the https://github.com/jenkins-infra/openvpn[Jenkins VPN].
-It includes a Jenkins instance and a number of other services.
-If you are connected to VPN, the Jenkins instance can be accessed using this URL: https://release.ci.jenkins.io/ .
+* Jenkinsfiles for Releasing and Packaging.
+* Kubernetes POD templates definition for releasing and packaging on Linux and Windows environments.
+* Any configuration or utility scripts
 
-Chart for Jenkins Core Release Environment environment is available link:https://github.com/jenkins-infra/charts/blob/master/helmfile.d/jenkins-release.yaml[here].
-Jenkins master chart for it is available https://github.com/jenkins-infra/charts/tree/master/charts/jenkins[here].
+The release process implies following Git repository:
 
-## This repository
+* https://github.com/jenkinsci/jenkins[jenkinsci/jenkins] or any other git repository containing the Jenkins code to be released.
+* https://github.com/jenkinsci/packaging[jenkinsci/packaging] contains tools and configuration to package Jenkins for OS distribution [Debian, Red Hat, SUSE, MSI, WAR]
+* https://github.com/jenkins-infra/chart[jenkins-infra/chart] contains Helm chart used to deploy release.ci.jenkins.io on top of Kubernetes.
+* https://github.com/jenkins-infra/azure[jenkins-infra/azure] contains the terraform code used to provision infrastructure needed by the release environment
 
-This repo contains tools needed to release the https://github.com/jenkinsci/jenkins[Jenkins core] and its components
-from the Jenkins Core Release Environment.
-The following components can be found here:
+== Release
 
-* Jenkinsfiles for Jenkins packaging and Release
-* Kubernetes POD templates for Linux and Windows packaging environments
-* Kubernetes POD template for the release environment
-* Release profiles and utility scripts
+The release process uses the maven release plugin to do everything needed to generate a release and then publishes generated artifacts on a Maven repository. It involves signing with a GPG key and a code signing certificate.
 
-## Jenkins Packaging
+Remark: It's important to notice that we do not use the maven release plugin to checkout our Jenkins repository neither to push changes as we want to be able to use a different git repository than the one defined in the Jenkins pom.xml
 
-* WAR packaging is defined within the https://github.com/jenkinsci/jenkins[Jenkins core] repository.
-  It is deployed to the https://repo.jenkins-ci.org/[Jenkins Maven Repo] and http://mirrors.jenkins-ci.org/[mirrors], and then listed on the https://jenkins.io/download/[Downloads Page]
-* Native Installer packaging is defined in the https://github.com/jenkinsci/packaging[jenkinsci/packaging] repository.
-  Native packages are deployed to http://mirrors.jenkins-ci.org/[Jenkins mirrors] and then listed on the https://jenkins.io/download/[Downloads Page]
-* Docker packaging is defined in the https://github.com/jenkinsci/docker[jenkinsci/docker] repository.
-  Packages are deployed to DockerHub as link:https://hub.docker.com/r/jenkins/jankins[jenkins/jenkins]
+=== Required
 
-## References
+- [x] https://github.com/jenkins-infra/openvpn[Jenkins VPN Access]
+- [x] Being part of LDAP group 'release-core'
+- [x] Access to https://release.ci.jenkins.io[release.ci.jenkins.io]
 
+=== Settings
+
+Those are the most important settings defined in your release profile that will impact your release:
+
+[cols="1,3", options="header"]
+.Settings
+|===
+| Variable | Description
+
+| `JENKINS_GIT_REPOSITORY`
+| Defines the Jenkins git repository used by release, to release from and then push generated commits.
+
+| `JENKINS_GIT_BRANCH`
+| Defines the Jenkins branch used to checkout and then pushes commits related to the release.
+
+|`MAVEN_REPOSITORY_URL`
+| Defines the maven repository URL where it pushes generated artifacts
+
+|`MAVEN_REPOSITORY_NAME`
+| Defines the maven repository name where it pushes generated artifacts
+
+|===
+
+=== Steps
+
+Estimated time +- 1h30
+
+. Connect to the Jenkins VPN
+. Open your favorite browser to https://release.ci.jenkins.io
+. Trigger the release job on the master branch. https://release.ci.jenkins.io/blue/organizations/jenkins/core-release/branches[Link]
+. Once triggered, it asks you which release line you want to do. It's important to know that the release line matches one of the profiles defined https://github.com/jenkins-infra/release/tree/master/profile.d[here], so please carefully review the settings and be sure that is what you are looking for.
+. At the end of the job, several git commit and maven artifacts will be pushed on their respective locations
+
+=== Validate
+To validate that the release went well, except by having a green build, you can double-check that your artifacts have been correctly pushed on your Maven repository located on `$MAVEN_REPOSITORY_URL/$MAVEN_REPOSITORY_NAME/org/jenkins-ci/main/jenkins-war/` and also that running `jarsigner -verify <your generated artifact>` is correct.
+
+=== Stage
+Currently, we do not provide an automated way to promote a release but you can still stage a release by specifying a staging git repository and/or a different maven repository. Then you have to promote manually your release.
+
+To promote your git repository, you have to open a pull request from your git repository to https://github.com/jenkinsci/jenkins/compare?expand=1[jenkinsci/jenkins] on the appropriated branch.
+
+To promote your maven artifacts, you have to manually move them to the right location.
+
+
+== Package
+
+The packaging process looks after the latest Jenkins version published on a Maven repository and then build and publish artifacts for Debian, Red Hat, SUSE, Windows and also republishes the War file on the package server.
+
+Remark: Packages are not published if a similar version was already published.
+
+=== Required
+
+- [x] https://github.com/jenkins-infra/openvpn[Jenkins VPN Access]
+- [x] Being part of LDAP group 'release-core'
+- [x] Access to https://release.ci.jenkins.io[release.ci.jenkins.io]
+
+=== Settings
+
+Those are the most important settings defined in your release profile that will impact the packaging process:
+
+[cols="1,3a", options="header"]
+.Settings
+|===
+| Variable | Description
+
+| JENKINS_VERSION
+| Define which version of Jenkins will be downloaded where version accept following value:
+
+* `weekly`, fetches the latest version available on a maven repository.
+* `stable`, fetches the latest version that matches pattern X.Y.Z
+* `version`, a valid version
+
+https://github.com/jenkins-infra/release/blob/master/utils/getJenkinsVersion.py[getJenkinsVersion.py]
+
+| MAVEN_REPOSITORY_URL
+| Defines the maven repository URL used to download the jenkins.war
+
+| MAVEN_REPOSITORY_NAME
+| Defines the maven repository name used to download the jenkins.war
+
+| PKGSERVER
+| Defines where the different packages will be published
+
+| RELEASELINE
+| Define the release line used by packaging scripts in https://github.com/jenkinsci/packaging[jenkinsci/packaging]
+
+|===
+
+=== Steps
+
+Estimated time +- 30min
+
+. Connect to the Jenkins VPN
+. Open your favorite browser to https://release.ci.jenkins.io[release.ci.jenkins.io]
+. Trigger the packaging job on the master branch. https://release.ci.jenkins.io/blue/organizations/jenkins/core-package/branches[Link]
+. Once triggered, it asks you which release line you want to package for. The release line matches one of the profile defines in https://github.com/jenkins-infra/release/tree/master/profile.d[profile.d], so please carefully review those settings in order to validate that's what you are looking for.
+
+Once the job is done, every package will be published and then mirror synced
+
+=== Validate
+Ensure that packages are correctly published on pkg.jenkins.io and correctly signed.
+
+=== Stage
+Staging packages is not supported.
+
+== Certificate
+The Jenkins project uses a Digicert account provided by CDF to request code signing certificate.
+The release environment is designed to download a pkcs12 certificate from Azure key vault.
+
+. Get a code signing certificate from Digicert
+. Convert the code signing certificate from Digicert to a pkcs12 certificate which also includes the private key
+. Upload the pkcs12 certificate to Azure Key Vault
+. Update the release environment credentials with appropriated password
+
+.Certificate Fields
+----
+   Country Name: US
+   State: DE
+   Organization: CDF Binary Project a Series of LF Projects, LLC
+   Organization Unit: Jenkins Project
+   Common Name: Jenkins
+----
+
+Generate a new code signing certificate private key and a certificate signing request:
+
+  openssl req -out jenkins-release.csr -new -newkey rsa:4096 -keyout jenkins-release.key
+
+
+Show csr information
+
+  openssl req -text -noout -verify -in jenkins-release.csr
+
+Show private key information
+
+  openssl rsa -in jenkins-release.key -check
+
+Show certificate information
+
+  openssl x509 -in jenkins-release.crt -text -noout
+
+Convert p7b  to pkcs12
+
+  openssl pkcs7 -in digicert.p7b -text -print_certs -out intermediateCert.pem
+  openssl pkcs12 -export -in intermediateCert.pem -inkey jenkins-release.key -out jenkins-release.p12
+
+Show pkcs12 information
+
+  openssl pkcs12 -info -in jenkins.pfx
+
+== Miscellaneous
+
+* Jenkins docker images are describe from https://github.com/jenkinsci/docker[jenkinsci/docker] repository and deployed to DockerHub as link:https://hub.docker.com/r/jenkins/jenkins[jenkins/jenkins]
+* https://pkg.jenkins.io[pkg.jenkins.io], service to download Jenkins packages
+* https://repo.jenkins-ci.org[repo.jenkins-ci.org], Jenkins Maven repository
+* https://mirrors.jenkins.io[mirrors.jenkins.io]
 * https://issues.jenkins-ci.org/browse/INFRA-910[INFRA-910] - EPIC for the new Jenkins Core Release Environment
+* https://github.com/jenkins-infra/docker-packaging[docker-packaging], defines the docker image used to execute packaging scripts
