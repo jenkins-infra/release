@@ -30,7 +30,7 @@ spec:
       - name: binary-core-packages
         mountPath: /srv/releases/jenkins
       - name: website-core-packages
-        mountPath: /packages/web
+        mountPath: /var/www/pkg.jenkins.io.staging/
   - command:
     - "cat"
     env:
@@ -55,7 +55,7 @@ spec:
       - name: binary-core-packages
         mountPath: /srv/releases/jenkins
       - name: website-core-packages
-        mountPath: /packages/web
+        mountPath: /var/www/pkg.jenkins.io.staging/
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
