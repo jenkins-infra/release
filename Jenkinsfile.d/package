@@ -259,7 +259,7 @@ pipeline {
         PKGSERVER = "mirrorbrain@pkg.jenkins.io"
       }
       steps{
-        container('jnlp'){
+        container('packaging'){
           sshagent(['pkgserver']) {
             sh '''
               ssh $PKGSERVER /srv/releases/sync.sh
