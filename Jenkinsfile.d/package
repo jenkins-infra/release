@@ -259,7 +259,7 @@ pipeline {
     // Force mirror synchronization
     stage('Synchronize mirror'){
       steps{
-        container('jnlp'){
+        container('packaging'){
           sshagent(['pkgserver']) {
             sh '''
               ./utils/release.sh --syncMirror
