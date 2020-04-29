@@ -177,6 +177,10 @@ Show pkcs12 information
 
   openssl pkcs12 -info -in jenkins.pfx
 
+== Core Maintainers
+
+More information about Jenkins Core maintainers and the different roles can be found in https://github.com/jenkinsci/jenkins/blob/master/docs/MAINTAINERS.adoc[MAINTAINERS]
+
 == Miscellaneous
 
 * Jenkins docker images are describe from https://github.com/jenkinsci/docker[jenkinsci/docker] repository and deployed to DockerHub as link:https://hub.docker.com/r/jenkins/jenkins[jenkins/jenkins]
