@@ -179,7 +179,7 @@ Show pkcs12 information
 
 == Core Maintainers
 
-More information about Jenkins Core maintainers and the different roles can be found https://github.com/jenkinsci/jenkins/blob/master/docs/MAINTAINERS.adoc[here]
+More information about Jenkins Core maintainers and the different roles can be found in https://github.com/jenkinsci/jenkins/blob/master/docs/MAINTAINERS.adoc[MAINTAINERS]
 
 == Miscellaneous
 
