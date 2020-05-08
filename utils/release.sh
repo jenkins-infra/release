@@ -319,6 +319,16 @@ function prepareRelease(){
   mvn -B -s settings-release.xml --no-transfer-progress -Darguments=--no-transfer-progress release:prepare
 }
 
+function promoteMavenArtifacts(){
+  printf "\\n Promote Maven Artifacts\\n\\n"
+
+  version=$(./utils/getJenkinsVersion.py --version)
+
+  ./utils/promoteMavenArtifacts.py --version "$version"
+
+
+}
+
 function pushCommits(){
   : "${RELEASE_SCM_TAG:?RELEASE_SCM_TAG not definded}"
 
@@ -410,6 +420,7 @@ function main(){
             --verifyCertificateSignature) echo "Verify certificate signature" && verifyCertificateSignature ;;
             --performRelease) echo "Perform Release" && performRelease ;;
             --prepareRelease) echo "Prepare Release" && generateSettingsXml && prepareRelease ;;
+            --promoteMavenArtifacts) echo "Promote Maven Artifacts" && promoteMavenArtifacts ;;
             --pushCommits) echo "Push commits on $RELEASE_GIT_BRANCH" && pushCommits ;;
             --rollback) echo "Rollback release $RELEASE_SCM_TAG" && rollblack ;;
             --stageRelease) echo "Stage Release" && stageRelease ;;
