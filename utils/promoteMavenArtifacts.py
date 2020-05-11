@@ -75,8 +75,6 @@ def get_directories(repository, path, version):
 
     payload = f'''items.find({{"$and":[{{"repo":{{"$eq": "{ repository }"}}}},{{"path":{{"$match": "{ path[1:] }/*/{version}"}}}}]}}).include("repo","name","path")'''
 
-    print(payload)
-
     url = f"{ URL }/api/search/aql"
 
     response = requests.post(url,
@@ -186,8 +184,8 @@ if __name__ == "__main__":
 
         print(f"[{index}/{len(directories)}] - {srcFilePath}")
 
-        if not is_directory_exist(targetRepoKey, directory + "/" + VERSION):
-            print(f"Copying '{directory}' from { srcRepoKey } to { targetRepoKey }")
+        if not is_directory_exist(targetRepoKey, directory):
+            print(f"\nCopying '{directory}' from { srcRepoKey } to { targetRepoKey }\n")
             copy_item(srcRepoKey,
                       srcFilePath,
                       targetRepoKey,
@@ -195,3 +193,5 @@ if __name__ == "__main__":
                       dryrun,
                       0,
                       1)
+        else:
+            print(f"\nAlready exist on { targetRepoKey }\n")
