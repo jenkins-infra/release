@@ -153,6 +153,32 @@ def is_required_parameters():
     return result
 
 
+def move_item(srcRepoKey, srcFilePath,
+              targetRepoKey, targetFilePath,
+              dryRun, suppressLayout, failFast):
+    """
+        Move will move items between two repositories
+        then update the metadata.xml.
+        ! Items are removed from the source repository
+    """
+
+    url = f"{ URL }/api/move/{ srcRepoKey }{ srcFilePath }?to=/{ targetRepoKey}/{ targetFilePath }&dry={ dryRun }&suppressLayout={ suppressLayout} 0&failFAst={ failFast }"
+
+    response = requests.post(url,
+                             auth=requests.auth.HTTPBasicAuth(
+                                 USERNAME,
+                                 PASSWORD))
+    j = response.json()
+
+    print(url)
+    print(j)
+
+    for result in j['messages']:
+        print(f"{result['message']}")
+
+    print("\n")
+
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
@@ -161,6 +187,9 @@ if __name__ == "__main__":
     parser.add_argument("--dry_run",
                         help="Don't copy items",
                         action="store_true")
+    parser.add_argument("-m", "--mode", choices=["move", "copy"],
+                        default="copy",
+                        help="Method uses to promote items")
 
     args = parser.parse_args()
 
@@ -186,12 +215,23 @@ if __name__ == "__main__":
 
         if not is_directory_exist(targetRepoKey, directory):
             print(f"\nCopying '{directory}' from { srcRepoKey } to { targetRepoKey }\n")
-            copy_item(srcRepoKey,
-                      srcFilePath,
-                      targetRepoKey,
-                      targetFilePath,
-                      dryrun,
-                      0,
-                      1)
+            print(f"Promotion mode: {args.mode}\n")
+
+            if args.mode == "copy":
+                copy_item(srcRepoKey,
+                          srcFilePath,
+                          targetRepoKey,
+                          targetFilePath,
+                          dryrun,
+                          0,
+                          1)
+            elif args.mode == "move":
+                move_item(srcRepoKey,
+                          srcFilePath,
+                          targetRepoKey,
+                          targetFilePath,
+                          dryrun,
+                          0,
+                          1)
         else:
             print(f"\nAlready exist on { targetRepoKey }\n")
