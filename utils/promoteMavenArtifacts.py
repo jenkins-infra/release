@@ -146,9 +146,6 @@ def is_required_parameters():
     if not targetRepoKey:
         print("Missing environment variable MAVEN_REPOSITORY_TARGET_NAME")
         result = False
-    if not VERSION:
-        print("Missing environment variable JENKINS_VERSION")
-        result = False
 
     return result
 
@@ -183,7 +180,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("version",
-                        help="specify version that need to be promoted")
+                        help="Specify version that need to be promoted")
     parser.add_argument("--dry_run",
                         help="Don't copy items",
                         action="store_true")
@@ -191,15 +188,23 @@ if __name__ == "__main__":
                         default="copy",
                         help="Method uses to promote items, default [copy]")
     parser.add_argument("-g", "--groupID",
-                        default="", action='append',
+                        default=[], action='append',
                         help="Method uses to promote items")
 
     args = parser.parse_args()
-    
-    print(f"args.groupID")
-    sys.exit()
 
-    VERSION = args.version
+    if len(args.groupID) == 0:
+        directories = get_directories(srcRepoKey,
+                                      "/org/jenkins-ci/main",
+                                      args.version)
+    else:
+        for i in range(len(args.groupID)):
+            args.groupID[i] = args.groupID[i] + "/" + args.version
+
+        directories = args.groupID
+
+    print(f"Following directories will be promoted: \n{directories}\n\n")
+
     dryrun = int(args.dry_run)
 
     if not is_required_parameters():
@@ -211,17 +216,14 @@ if __name__ == "__main__":
 
     print(f"Artifactory version: {get_api_version()}\n")
 
-    directories = get_directories(srcRepoKey, "/org/jenkins-ci/main", VERSION)
-
     for index, directory in enumerate(directories, start=1):
         srcFilePath = directory
-        targetFilePath = re.sub("/" + VERSION + "$", '', directory)
+        targetFilePath = re.sub("/" + args.version + "$", '', directory)
 
         print(f"[{index}/{len(directories)}] - {srcFilePath}")
 
         if not is_directory_exist(targetRepoKey, directory):
-            print(f"\nCopying '{directory}' from { srcRepoKey } to { targetRepoKey }\n")
-            print(f"Promotion mode: {args.mode}\n")
+            print(f"\nPlanning to {args.mode} '{directory}' from { srcRepoKey } to { targetRepoKey }\n")
 
             if args.mode == "copy":
                 copy_item(srcRepoKey,
