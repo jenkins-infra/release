@@ -189,9 +189,15 @@ if __name__ == "__main__":
                         action="store_true")
     parser.add_argument("-m", "--mode", choices=["move", "copy"],
                         default="copy",
+                        help="Method uses to promote items, default [copy]")
+    parser.add_argument("-g", "--groupID",
+                        default="", action='append',
                         help="Method uses to promote items")
 
     args = parser.parse_args()
+    
+    print(f"args.groupID")
+    sys.exit()
 
     VERSION = args.version
     dryrun = int(args.dry_run)
