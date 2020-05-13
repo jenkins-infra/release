@@ -10,8 +10,8 @@ URL = os.environ.get("MAVEN_REPOSITORY_URL", "https://repo.jenkins-ci.org")
 USERNAME = os.environ.get("MAVEN_REPOSITORY_USERNAME")
 PASSWORD = os.environ.get("MAVEN_REPOSITORY_PASSWORD")
 
-srcRepoKey = os.environ.get("MAVEN_REPOSITORY_SOURCE_NAME")
-targetRepoKey = os.environ.get("MAVEN_REPOSITORY_TARGET_NAME")
+srcRepoKey = os.environ.get("MAVEN_REPOSITORY_NAME")
+targetRepoKey = os.environ.get("MAVEN_REPOSITORY_PRODUCTION_NAME")
 
 
 # directories = [
