@@ -167,9 +167,9 @@ function downloadAzureKeyvaultSecret(){
 
 # JENKINS_VERSION: Define which version will be package where:
 # * \'stable\' means the latest stable version that satifies version pattern X.Y.Z
-# * \'weekly\' means the latest weekly version that satisfies version pattern X.Y 
+# * \'weekly\' means the latest weekly version that satisfies version pattern X.Y
 # * <version> represents any valid existing version like 2.176.3 available at JENKINS_DOWNLOAD_URL
-# JENKINS_DOWNLOAD_URL: Specify the endpoint to use for downloading jenkins.war 
+# JENKINS_DOWNLOAD_URL: Specify the endpoint to use for downloading jenkins.war
 function downloadJenkinsWar(){
   "$WORKSPACE"/utils/getJenkinsVersion.py
 }
@@ -329,14 +329,47 @@ function promoteMavenArtifacts(){
 
 }
 
+function promoteStagingGitRepository(){
+
+  : "${JENKINS_GIT_STAGING_REPOSITORY_PATH:=$WORKSPACE/stagingGitRepository}"
+
+  : "${JENKINS_GIT_STAGING_REPOSITORY:=$JENKINS_GIT_REPOSITORY}"
+  : "${JENKINS_GIT_STAGING_BRANCH:=$JENKINS_GIT_BRANCH}"
+
+  : "${JENKINS_GIT_PRODUCTION_REPOSITORY:?Required remote origin like git@github.com:jenkinsci/jenkins.git }"
+  : "${JENKINS_GIT_PRODUCTION_BRANCH:=$JENKINS_GIT_BRANCH}"
+
+  # Ensure we always work from a clean environment
+  if [ -d "$JENKINS_GIT_STAGING_REPOSITORY_PATH" ];then
+    rm -Rf "$JENKINS_GIT_STAGING_REPOSITORY_PATH"
+  fi
+
+  mkdir -p "$JENKINS_GIT_STAGING_REPOSITORY_PATH"
+  pushd "$JENKINS_GIT_STAGING_REPOSITORY_PATH"
+
+  # Clone production repository on a specific branch
+  git clone --branch $JENKINS_GIT_PRODUCTION_BRANCH "$JENKINS_GIT_PRODUCTION_REPOSITORY" .
+
+  # Fetch commits from staging repository
+  git fetch "$JENKINS_GIT_STAGING_REPOSITORY" "$JENKINS_GIT_STAGING_BRANCH"
+
+  # Merge commits from staging repository
+  git merge --no-edit --log=20 FETCH_HEAD
+
+  git push
+
+  popd
+
+}
+
 function pushCommits(){
   : "${RELEASE_SCM_TAG:?RELEASE_SCM_TAG not definded}"
 
   # Ensure we use ssh credentials
   git config --get remote.origin.url
   sed -i 's#url = https://github.com/#url = git@github.com:#' .git/config
-  git pull 
-  git push origin "HEAD:$RELEASE_GIT_BRANCH" "$RELEASE_SCM_TAG"
+  git pull
+  git push origin "HEAD:$JENKINS_GIT_BRANCH" "$RELEASE_SCM_TAG"
 }
 
 function rollback(){
@@ -422,6 +455,7 @@ function main(){
             --prepareRelease) echo "Prepare Release" && generateSettingsXml && prepareRelease ;;
             --promoteMavenArtifacts) echo "Promote Maven Artifacts" && promoteMavenArtifacts ;;
             --pushCommits) echo "Push commits on $RELEASE_GIT_BRANCH" && pushCommits ;;
+            --promoteStagingGitRepository) echo "Promote Staging Git Repository" && promoteStagingGitRepository ;;
             --rollback) echo "Rollback release $RELEASE_SCM_TAG" && rollblack ;;
             --stageRelease) echo "Stage Release" && stageRelease ;;
             --packaging) echo 'Execute packaging makefile, quote required around Makefile target' && packaging "$2";;
