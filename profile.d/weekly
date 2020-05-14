@@ -1,3 +1,7 @@
+#
+# WARNING: Any variables defined here, override those defined from the Jenkinsfile
+#
+#
 RELEASE_GIT_BRANCH=master
 RELEASE_GIT_REPOSITORY=git@github.com:jenkinsci/jenkins.git
 JENKINS_VERSION=weekly

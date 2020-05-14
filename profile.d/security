@@ -1,3 +1,6 @@
+#
+# WARNING: Any variables defined here, override those defined from the Jenkinsfile
+#
 # JENKINS_GIT_BRANCH is provided at run time
 JENKINS_GIT_REPOSITORY=git@github.com:jenkinsci-cert/jenkins.git
 JENKINS_VERSION is provided at run time
