@@ -16,8 +16,34 @@ pipeline {
       description: 'Define which Jenkins Release we are packaging for. https://git.io/Jv7Nr',
       name: 'RELEASE_PROFILE'
     )
-    booleanParam defaultValue: false, description: 'Enable Maven repository promotion', name: 'MAVEN_STAGING_REPOSITORY_PROMOTION_ENABLED'
-    booleanParam defaultValue: false, description: 'Enable Git repository promotion', name: 'GIT_STAGING_REPOSITORY_PROMOTION_ENABLED'
+    string(
+      defaultValue: '',
+      description: 'Define which Jenkins Version to package',
+      name: 'JENKINS_VERSION',
+      trim: false
+    ),
+    string(
+      defaultValue: '',
+      description: 'Define staging git branch uses for promotion',
+      name: 'JENKINS_GIT_BRANCH',
+      trim: false
+    ),
+    string(
+      defaultValue: '',
+      description: 'Define which maven repository to use for packaging and promotion',
+      name: 'MAVEN_REPOSITORY_NAME',
+      trim: false
+    )
+    booleanParam(
+      defaultValue: false,
+      description: 'Enable Maven repository promotion',
+      name: 'MAVEN_STAGING_REPOSITORY_PROMOTION_ENABLED'
+    )
+    booleanParam(
+      defaultValue: false,
+      description: 'Enable Git repository promotion',
+      name: 'GIT_STAGING_REPOSITORY_PROMOTION_ENABLED'
+    )
   }
 
   options {
