@@ -1,0 +1,57 @@
+pipeline {
+
+  agent {
+    kubernetes {
+      label 'release-security'
+    }
+  }
+
+  options {
+    artifactDaysToKeepStr: '14',
+    artifactNumToKeepStr: '5',
+    daysToKeepStr: '30',
+    numToKeepStr: '10'
+  }
+  disableConcurrentBuilds()
+
+  parameters {
+    string(
+      defaultValue: '',
+      description: 'Define which Jenkins version to use for packaging',
+      name: 'JENKINS_VERSION',
+      trim: false
+    ),
+    string(
+      defaultValue: '',
+      description: 'Define which branch we are going to release from and commit changes',
+      name: 'JENKINS_GIT_BRANCH',
+      trim: false
+    ),
+    string(
+      defaultValue: '',
+      description: 'Define which maven repository to use to push Maven artifacts',
+      name: 'MAVEN_REPOSITORY_NAME',
+      trim: false
+    )
+  }
+
+  stages {
+    stage("Release"){
+      build 'core-release', parameters: [
+        string(name: "RELEASE_PROFILE", value: "security")
+        string(name: "JENKINS_GIT_BRANCH", value: params.JENKINS_GIT_BRANCH)
+        string(name: "MAVEN_REPOSITORY_NAME", value: params.MAVEN_REPOSITORY_NAME)
+      ]
+    }
+    stage("Package"){
+      build 'core-package', parameters: [
+        string(name: "RELEASE_PROFILE", value: "security")
+        string(name: "JENKINS_VERSION", value: params.JENKINS_VERSION)
+        string(name: "JENKINS_GIT_BRANCH", value: params.JENKINS_GIT_BRANCH)
+        string(name: "MAVEN_REPOSITORY_NAME", value: params.MAVEN_REPOSITORY_NAME)
+        booleanParam(name: "MAVEN_STAGING_REPOSITORY_PROMOTION_ENABLED", value: true)
+        booleanParam(name: "GIT_STAGING_REPOSITORY_PROMOTION_ENABLED", value: true)
+      ]
+    }
+  }
+}

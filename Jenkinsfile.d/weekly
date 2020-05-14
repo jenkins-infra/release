@@ -1,0 +1,36 @@
+pipeline {
+
+  agent {
+    kubernetes {
+      label 'release-weekly'
+    }
+  }
+
+  options {
+    artifactDaysToKeepStr: '14',
+    artifactNumToKeepStr: '5',
+    daysToKeepStr: '30',
+    numToKeepStr: '10'
+  }
+
+  disableConcurrentBuilds()
+
+  // Every Monday at 10:30:59 AM Coordinated Universal Time;
+  triggers {
+    cron '30 10 * * 1'
+  }
+
+  stages {
+    stage("Release"){
+      build 'core-release', parameters: [
+        string(name: "RELEASE_PROFILE", value: "weekly")
+      ]
+    }
+
+    stage("Package"){
+      build 'core-package', parameters: [
+        string(name: "RELEASE_PROFILE", value: "weekly")
+      ]
+    }
+  }
+}
