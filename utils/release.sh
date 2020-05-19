@@ -11,7 +11,7 @@ source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
 
 : "${WORKSPACE:=$PWD}" # Normally defined from Jenkins environment
 
-: "${JENKINS_GIT_BRANCH:=experimental}"
+: "${RELEASE_GIT_BRANCH:=experimental}"
 : "${WORKING_DIRECTORY:=release}"
 : "${GIT_EMAIL:=jenkins-bot@example.com}"
 : "${GIT_NAME:=jenkins-bot}"
@@ -84,11 +84,11 @@ function cloneJenkinsGitRepository(){
   # `ssh` is needed as git clone doesn't use GIT_SSH_COMMAND
   # https://git-scm.com/docs/git#Documentation/git.txt-codeGITSSHCOMMANDcode
   ssh -o StrictHostKeyChecking=no -T git@github.com || true
-  git clone --branch "${JENKINS_GIT_BRANCH}" "${JENKINS_GIT_REPOSITORY}" .
+  git clone --branch "${RELEASE_GIT_BRANCH}" "${RELEASE_GIT_REPOSITORY}" .
 }
 
 function configureGit(){
-  git checkout "${JENKINS_GIT_BRANCH}"
+  git checkout "${RELEASE_GIT_BRANCH}"
   git config --local user.email "${GIT_EMAIL}"
   git config --local user.name "${GIT_NAME}"
 }
@@ -326,7 +326,7 @@ function pushCommits(){
   git config --get remote.origin.url
   sed -i 's#url = https://github.com/#url = git@github.com:#' .git/config
   git pull 
-  git push origin "HEAD:$JENKINS_GIT_BRANCH" "$RELEASE_SCM_TAG"
+  git push origin "HEAD:$RELEASE_GIT_BRANCH" "$RELEASE_SCM_TAG"
 }
 
 function rollback(){
@@ -396,7 +396,7 @@ function main(){
             --verifyGPGSignature) echo "Verify GPG Signature" && verifyGPGSignature ;;
             --verifyCertificateSignature) echo "Verify certificate signature" && verifyCertificateSignature ;;
             --prepareRelease) echo "Prepare Release" && generateSettingsXml && prepareRelease ;;
-            --pushCommits) echo "Push commits on $JENKINS_GIT_BRANCH" && pushCommits ;;
+            --pushCommits) echo "Push commits on $RELEASE_GIT_BRANCH" && pushCommits ;;
             --rollback) echo "Rollback release $RELEASE_SCM_TAG" && rollblack ;;
             --stageRelease) echo "Perform Release" && stageRelease ;;
             --packaging) echo 'Execute packaging makefile, quote required around Makefile target' && packaging "$2";;

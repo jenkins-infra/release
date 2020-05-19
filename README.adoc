@@ -37,10 +37,10 @@ Those are the most important settings defined in your release profile that will 
 |===
 | Variable | Description
 
-| `JENKINS_GIT_REPOSITORY`
+| `RELEASE_GIT_REPOSITORY`
 | Defines the Jenkins git repository used by release, to release from and then push generated commits.
 
-| `JENKINS_GIT_BRANCH`
+| `RELEASE_GIT_BRANCH`
 | Defines the Jenkins branch used to checkout and then pushes commits related to the release.
 
 |`MAVEN_REPOSITORY_URL`
