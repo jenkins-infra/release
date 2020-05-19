@@ -80,7 +80,7 @@ function clean(){
     mvn -s settings-release.xml -B --no-transfer-progress -Darguments=--no-transfer-progress release:clean
 }
 
-function cloneJenkinsGitRepository(){
+function cloneReleaseGitRepository(){
   # `ssh` is needed as git clone doesn't use GIT_SSH_COMMAND
   # https://git-scm.com/docs/git#Documentation/git.txt-codeGITSSHCOMMANDcode
   ssh -o StrictHostKeyChecking=no -T git@github.com || true
@@ -384,7 +384,7 @@ function main(){
     do
       case "$1" in
             --cleanRelease) echo "Clean Release" && generateSettingsXml && clean;;
-            --cloneJenkinsGitRepository) echo "Cloning Jenkins Repository" && cloneJenkinsGitRepository ;;
+            --cloneReleaseGitRepository) echo "Cloning Jenkins Repository" && cloneReleaseGitRepository ;;
             --configureGPG) echo "ConfigureGPG" && configureGPG ;;
             --configureKeystore) echo "Configure Keystore" && configureKeystore ;;
             --configureGit) echo "Configure Git" && configureGit ;;

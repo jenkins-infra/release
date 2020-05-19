@@ -47,11 +47,11 @@ pipeline {
     }
 
     stages {
-      stage('Clone Jenkins Git Repository') {
+      stage('Clone Release Git Repository') {
         steps {
           container('jnlp') {
             sshagent(['release-key']) {
-              sh 'utils/release.sh --cloneJenkinsGitRepository'
+              sh 'utils/release.sh --cloneReleaseGitRepository'
             }
           }
         }
