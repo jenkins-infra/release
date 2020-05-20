@@ -40,7 +40,7 @@ pipeline {
   stages {
     stage("Release"){
       steps {
-        build job: 'core-release/master', parameters: [
+        build job: 'core/release/master', parameters: [
           string(name: "RELEASE_PROFILE", value: "security")
           string(name: "JENKINS_GIT_BRANCH", value: params.JENKINS_GIT_BRANCH)
           string(name: "MAVEN_REPOSITORY_NAME", value: params.MAVEN_REPOSITORY_NAME)
@@ -49,7 +49,7 @@ pipeline {
     }
     stage("Package"){
       steps {
-        build job: 'core-package/master', parameters: [
+        build job: 'core/package/master', parameters: [
           string(name: "RELEASE_PROFILE", value: "security")
           string(name: "JENKINS_VERSION", value: params.JENKINS_VERSION)
           string(name: "JENKINS_GIT_BRANCH", value: params.JENKINS_GIT_BRANCH)
