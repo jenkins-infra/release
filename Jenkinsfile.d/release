@@ -30,7 +30,7 @@ pipeline {
       description: 'Define which branch we are going to release from and commit changes',
       name: 'JENKINS_GIT_BRANCH',
       trim: false
-    ),
+    )
     string(
       defaultValue: '',
       description: 'Define which maven repository to use to push Maven artifacts',

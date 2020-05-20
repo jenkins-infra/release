@@ -21,13 +21,13 @@ pipeline {
       description: 'Define which Jenkins Version to package',
       name: 'JENKINS_VERSION',
       trim: false
-    ),
+    )
     string(
       defaultValue: '',
       description: 'Define staging git branch uses for promotion',
       name: 'JENKINS_GIT_BRANCH',
       trim: false
-    ),
+    )
     string(
       defaultValue: '',
       description: 'Define which maven repository to use for packaging and promotion',
