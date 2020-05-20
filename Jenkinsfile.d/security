@@ -7,12 +7,14 @@ pipeline {
   }
 
   options {
-    artifactDaysToKeepStr: '14',
-    artifactNumToKeepStr: '5',
-    daysToKeepStr: '30',
-    numToKeepStr: '10'
+    buildDiscarder logRotator(
+      artifactDaysToKeepStr: '14',
+      artifactNumToKeepStr: '5',
+      daysToKeepStr: '30',
+      numToKeepStr: '10'
+    )
+    disableConcurrentBuilds()
   }
-  disableConcurrentBuilds()
 
   parameters {
     string(
