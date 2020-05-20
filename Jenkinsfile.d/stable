@@ -7,23 +7,29 @@ pipeline {
   }
 
   options {
-    artifactDaysToKeepStr: '14',
-    artifactNumToKeepStr: '5',
-    daysToKeepStr: '30',
-    numToKeepStr: '10'
+    buildDiscarder logRotator(
+      artifactDaysToKeepStr: '14',
+      artifactNumToKeepStr: '5',
+      daysToKeepStr: '30',
+      numToKeepStr: '10'
+    )
+    disableConcurrentBuilds()
   }
-  disableConcurrentBuilds()
 
   stages {
     stage("Release"){
-      build 'core-release', parameters: [
-        string(name: "RELEASE_PROFILE", value: "stable")
-      ]
+      steps {
+        build job: 'core-release', parameters: [
+          string(name: "RELEASE_PROFILE", value: "stable")
+        ]
+      }
     }
     stage("Package"){
-      build 'core-package', parameters: [
-        string(name: "RELEASE_PROFILE", value: "stable")
-      ]
+      steps {
+        build job: 'core-package', parameters: [
+          string(name: "RELEASE_PROFILE", value: "stable")
+        ]
+      }
     }
   }
 }

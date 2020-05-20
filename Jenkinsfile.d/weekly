@@ -23,15 +23,19 @@ pipeline {
 
   stages {
     stage("Release"){
-      build 'core-release', parameters: [
-        string(name: "RELEASE_PROFILE", value: "weekly")
-      ]
+      steps {
+        build job: 'core-release', parameters: [
+          string(name: "RELEASE_PROFILE", value: "weekly")
+        ]
+      }
     }
 
     stage("Package"){
-      build 'core-package', parameters: [
-        string(name: "RELEASE_PROFILE", value: "weekly")
-      ]
+      steps {
+        build job: 'core-package', parameters: [
+          string(name: "RELEASE_PROFILE", value: "weekly")
+        ]
+      }
     }
   }
 }
