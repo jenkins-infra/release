@@ -24,7 +24,7 @@ pipeline {
   stages {
     stage("Release"){
       steps {
-        build job: 'core-release', parameters: [
+        build job: 'core-release/master', parameters: [
           string(name: "RELEASE_PROFILE", value: "weekly")
         ]
       }
@@ -32,7 +32,7 @@ pipeline {
 
     stage("Package"){
       steps {
-        build job: 'core-package', parameters: [
+        build job: 'core-package/master', parameters: [
           string(name: "RELEASE_PROFILE", value: "weekly")
         ]
       }
