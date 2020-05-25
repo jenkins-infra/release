@@ -1,5 +1,5 @@
-JENKINS_GIT_BRANCH=master
-JENKINS_GIT_REPOSITORY=git@github.com:jenkinsci/jenkins.git
+RELEASE_GIT_BRANCH=master
+RELEASE_GIT_REPOSITORY=git@github.com:jenkinsci/jenkins.git
 JENKINS_VERSION=stable
 GIT_EMAIL=release@jenkins.io
 GIT_NAME=release-bot

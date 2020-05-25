@@ -11,7 +11,7 @@ source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
 
 : "${WORKSPACE:=$PWD}" # Normally defined from Jenkins environment
 
-: "${JENKINS_GIT_BRANCH:=experimental}"
+: "${RELEASE_GIT_BRANCH:=experimental}"
 : "${WORKING_DIRECTORY:=release}"
 : "${GIT_EMAIL:=jenkins-bot@example.com}"
 : "${GIT_NAME:=jenkins-bot}"
@@ -80,15 +80,15 @@ function clean(){
     mvn -s settings-release.xml -B --no-transfer-progress -Darguments=--no-transfer-progress release:clean
 }
 
-function cloneJenkinsGitRepository(){
+function cloneReleaseGitRepository(){
   # `ssh` is needed as git clone doesn't use GIT_SSH_COMMAND
   # https://git-scm.com/docs/git#Documentation/git.txt-codeGITSSHCOMMANDcode
   ssh -o StrictHostKeyChecking=no -T git@github.com || true
-  git clone --branch "${JENKINS_GIT_BRANCH}" "${JENKINS_GIT_REPOSITORY}" .
+  git clone --branch "${RELEASE_GIT_BRANCH}" "${RELEASE_GIT_REPOSITORY}" .
 }
 
 function configureGit(){
-  git checkout "${JENKINS_GIT_BRANCH}"
+  git checkout "${RELEASE_GIT_BRANCH}"
   git config --local user.email "${GIT_EMAIL}"
   git config --local user.name "${GIT_NAME}"
 }
@@ -326,7 +326,7 @@ function pushCommits(){
   git config --get remote.origin.url
   sed -i 's#url = https://github.com/#url = git@github.com:#' .git/config
   git pull 
-  git push origin "HEAD:$JENKINS_GIT_BRANCH" "$RELEASE_SCM_TAG"
+  git push origin "HEAD:$RELEASE_GIT_BRANCH" "$RELEASE_SCM_TAG"
 }
 
 function rollback(){
@@ -337,7 +337,7 @@ function rollback(){
 function stageRelease(){
   requireGPGPassphrase
   requireKeystorePass
-  printf "\\n Perform Jenkins Release\\n\\n"
+  printf "\\n Stage Jenkins Release\\n\\n"
   # Do not display transfer progress when downloading or uploading
   # https://maven.apache.org/ref/3.6.1/maven-embedder/cli.html
   mvn -B \
@@ -346,6 +346,19 @@ function stageRelease(){
     --no-transfer-progress \
     -Darguments=--no-transfer-progress \
     release:stage
+}
+
+function performRelease(){
+  requireGPGPassphrase
+  requireKeystorePass
+  printf "\\n Perform Jenkins Release\\n\\n"
+  # Do not display transfer progress when downloading or uploading
+  # https://maven.apache.org/ref/3.6.1/maven-embedder/cli.html
+  mvn -B \
+    -s settings-release.xml \
+    --no-transfer-progress \
+    -Darguments=--no-transfer-progress \
+    release:perform
 }
 
 function validateKeystore(){
@@ -384,7 +397,7 @@ function main(){
     do
       case "$1" in
             --cleanRelease) echo "Clean Release" && generateSettingsXml && clean;;
-            --cloneJenkinsGitRepository) echo "Cloning Jenkins Repository" && cloneJenkinsGitRepository ;;
+            --cloneReleaseGitRepository) echo "Cloning Jenkins Repository" && cloneReleaseGitRepository ;;
             --configureGPG) echo "ConfigureGPG" && configureGPG ;;
             --configureKeystore) echo "Configure Keystore" && configureKeystore ;;
             --configureGit) echo "Configure Git" && configureGit ;;
@@ -395,10 +408,11 @@ function main(){
             --validateKeystore) echo "Validate Keystore"  && validateKeystore ;;
             --verifyGPGSignature) echo "Verify GPG Signature" && verifyGPGSignature ;;
             --verifyCertificateSignature) echo "Verify certificate signature" && verifyCertificateSignature ;;
+            --performRelease) echo "Perform Release" && performRelease ;;
             --prepareRelease) echo "Prepare Release" && generateSettingsXml && prepareRelease ;;
-            --pushCommits) echo "Push commits on $JENKINS_GIT_BRANCH" && pushCommits ;;
+            --pushCommits) echo "Push commits on $RELEASE_GIT_BRANCH" && pushCommits ;;
             --rollback) echo "Rollback release $RELEASE_SCM_TAG" && rollblack ;;
-            --stageRelease) echo "Perform Release" && stageRelease ;;
+            --stageRelease) echo "Stage Release" && stageRelease ;;
             --packaging) echo 'Execute packaging makefile, quote required around Makefile target' && packaging "$2";;
             --syncMirror) echo 'Trigger mirror synchronization' && syncMirror ;;
             -h) echo "help" ;;
