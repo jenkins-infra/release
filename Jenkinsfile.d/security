@@ -20,7 +20,7 @@ pipeline {
     string(
       defaultValue: '',
       description: 'Define which branch we are going to release from and commit changes',
-      name: 'JENKINS_GIT_BRANCH',
+      name: 'RELEASE_GIT_BRANCH',
       trim: false
     ),
     string(
@@ -36,7 +36,7 @@ pipeline {
       steps {
         build job: 'core/release/master', parameters: [
           string(name: "RELEASE_PROFILE", value: "security")
-          string(name: "JENKINS_GIT_BRANCH", value: params.JENKINS_GIT_BRANCH)
+          string(name: "RELEASE_GIT_BRANCH", value: params.RELEASE_GIT_BRANCH)
           string(name: "MAVEN_REPOSITORY_NAME", value: params.MAVEN_REPOSITORY_NAME)
         ]
       }
@@ -46,7 +46,7 @@ pipeline {
         build job: 'core/package/master', parameters: [
           string(name: "RELEASE_PROFILE", value: "security")
           string(name: "JENKINS_VERSION", value: params.JENKINS_VERSION)
-          string(name: "JENKINS_GIT_BRANCH", value: params.JENKINS_GIT_BRANCH)
+          string(name: "RELEASE_GIT_BRANCH", value: params.RELEASE_GIT_BRANCH)
           string(name: "MAVEN_REPOSITORY_NAME", value: params.MAVEN_REPOSITORY_NAME)
           booleanParam(name: "MAVEN_STAGING_REPOSITORY_PROMOTION_ENABLED", value: true)
           booleanParam(name: "GIT_STAGING_REPOSITORY_PROMOTION_ENABLED", value: true)

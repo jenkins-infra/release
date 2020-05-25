@@ -25,7 +25,7 @@ pipeline {
     string(
       defaultValue: '',
       description: 'Define staging git branch uses for promotion',
-      name: 'JENKINS_GIT_BRANCH',
+      name: 'RELEASE_GIT_BRANCH',
       trim: false
     )
     string(

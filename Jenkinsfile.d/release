@@ -28,7 +28,7 @@ pipeline {
     string(
       defaultValue: '',
       description: 'Define which branch we are going to release from and commit changes',
-      name: 'JENKINS_GIT_BRANCH',
+      name: 'RELEASE_GIT_BRANCH',
       trim: false
     )
     string(

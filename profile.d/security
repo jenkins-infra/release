@@ -1,8 +1,8 @@
 #
 # WARNING: Any variables defined here, override those defined from the Jenkinsfile
 #
-# JENKINS_GIT_BRANCH is provided at run time
-JENKINS_GIT_REPOSITORY=git@github.com:jenkinsci-cert/jenkins.git
+# RELEASE_GIT_BRANCH is provided at run time
+RELEASE_GIT_REPOSITORY=git@github.com:jenkinsci-cert/jenkins.git
 JENKINS_VERSION is provided at run time
 GIT_EMAIL=release@jenkins.io
 GIT_NAME=release-bot
@@ -15,8 +15,8 @@ SIGN_ALIAS=jenkins
 
 ### Git Staging Promotion Settings
 #
-JENKINS_GIT_PRODUCTION_REPOSITORY=git@github.com:jenkinsci/jenkins.git
-JENKINS_GIT_PRODUCTION_BRANCH=master
+RELEASE_GIT_PRODUCTION_REPOSITORY=git@github.com:jenkinsci/jenkins.git
+RELEASE_GIT_PRODUCTION_BRANCH=master
 
 ### Maven Staging Promotion Settings
 #

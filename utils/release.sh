@@ -331,27 +331,27 @@ function promoteStagingMavenArtifacts(){
 
 function promoteStagingGitRepository(){
 
-  : "${JENKINS_GIT_STAGING_REPOSITORY_PATH:=$WORKSPACE/stagingGitRepository}"
+  : "${RELEASE_GIT_STAGING_REPOSITORY_PATH:=$WORKSPACE/stagingGitRepository}"
 
-  : "${JENKINS_GIT_STAGING_REPOSITORY:=$JENKINS_GIT_REPOSITORY}"
-  : "${JENKINS_GIT_STAGING_BRANCH:=$JENKINS_GIT_BRANCH}"
+  : "${RELEASE_GIT_STAGING_REPOSITORY:=$RELEASE_GIT_REPOSITORY}"
+  : "${RELEASE_GIT_STAGING_BRANCH:=$RELEASE_GIT_BRANCH}"
 
-  : "${JENKINS_GIT_PRODUCTION_REPOSITORY:?Required remote origin like git@github.com:jenkinsci/jenkins.git }"
-  : "${JENKINS_GIT_PRODUCTION_BRANCH:=$JENKINS_GIT_BRANCH}"
+  : "${RELEASE_GIT_PRODUCTION_REPOSITORY:?Required remote origin like git@github.com:jenkinsci/jenkins.git }"
+  : "${RELEASE_GIT_PRODUCTION_BRANCH:=$RELEASE_GIT_BRANCH}"
 
   # Ensure we always work from a clean environment
-  if [ -d "$JENKINS_GIT_STAGING_REPOSITORY_PATH" ];then
-    rm -Rf "$JENKINS_GIT_STAGING_REPOSITORY_PATH"
+  if [ -d "$RELEASE_GIT_STAGING_REPOSITORY_PATH" ];then
+    rm -Rf "$RELEASE_GIT_STAGING_REPOSITORY_PATH"
   fi
 
-  mkdir -p "$JENKINS_GIT_STAGING_REPOSITORY_PATH"
-  pushd "$JENKINS_GIT_STAGING_REPOSITORY_PATH"
+  mkdir -p "$RELEASE_GIT_STAGING_REPOSITORY_PATH"
+  pushd "$RELEASE_GIT_STAGING_REPOSITORY_PATH"
 
   # Clone production repository on a specific branch
-  git clone --branch $JENKINS_GIT_PRODUCTION_BRANCH "$JENKINS_GIT_PRODUCTION_REPOSITORY" .
+  git clone --branch $RELEASE_GIT_PRODUCTION_BRANCH "$RELEASE_GIT_PRODUCTION_REPOSITORY" .
 
   # Fetch commits from staging repository
-  git fetch "$JENKINS_GIT_STAGING_REPOSITORY" "$JENKINS_GIT_STAGING_BRANCH"
+  git fetch "$RELEASE_GIT_STAGING_REPOSITORY" "$RELEASE_GIT_STAGING_BRANCH"
 
   # Merge commits from staging repository
   git merge --no-edit --log=20 FETCH_HEAD
@@ -369,7 +369,7 @@ function pushCommits(){
   git config --get remote.origin.url
   sed -i 's#url = https://github.com/#url = git@github.com:#' .git/config
   git pull
-  git push origin "HEAD:$JENKINS_GIT_BRANCH" "$RELEASE_SCM_TAG"
+  git push origin "HEAD:$RELEASE_GIT_BRANCH" "$RELEASE_SCM_TAG"
 }
 
 function rollback(){
