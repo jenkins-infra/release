@@ -337,7 +337,7 @@ function rollback(){
 function stageRelease(){
   requireGPGPassphrase
   requireKeystorePass
-  printf "\\n Perform Jenkins Release\\n\\n"
+  printf "\\n Stage Jenkins Release\\n\\n"
   # Do not display transfer progress when downloading or uploading
   # https://maven.apache.org/ref/3.6.1/maven-embedder/cli.html
   mvn -B \
@@ -346,6 +346,19 @@ function stageRelease(){
     --no-transfer-progress \
     -Darguments=--no-transfer-progress \
     release:stage
+}
+
+function performRelease(){
+  requireGPGPassphrase
+  requireKeystorePass
+  printf "\\n Perform Jenkins Release\\n\\n"
+  # Do not display transfer progress when downloading or uploading
+  # https://maven.apache.org/ref/3.6.1/maven-embedder/cli.html
+  mvn -B \
+    -s settings-release.xml \
+    --no-transfer-progress \
+    -Darguments=--no-transfer-progress \
+    release:perform
 }
 
 function validateKeystore(){
@@ -395,10 +408,11 @@ function main(){
             --validateKeystore) echo "Validate Keystore"  && validateKeystore ;;
             --verifyGPGSignature) echo "Verify GPG Signature" && verifyGPGSignature ;;
             --verifyCertificateSignature) echo "Verify certificate signature" && verifyCertificateSignature ;;
+            --performRelease) echo "Perform Release" && performRelease ;;
             --prepareRelease) echo "Prepare Release" && generateSettingsXml && prepareRelease ;;
             --pushCommits) echo "Push commits on $RELEASE_GIT_BRANCH" && pushCommits ;;
             --rollback) echo "Rollback release $RELEASE_SCM_TAG" && rollblack ;;
-            --stageRelease) echo "Perform Release" && stageRelease ;;
+            --stageRelease) echo "Stage Release" && stageRelease ;;
             --packaging) echo 'Execute packaging makefile, quote required around Makefile target' && packaging "$2";;
             --syncMirror) echo 'Trigger mirror synchronization' && syncMirror ;;
             -h) echo "help" ;;

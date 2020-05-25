@@ -104,7 +104,7 @@ pipeline {
         steps {
           container('maven') {
             sh '''
-              utils/release.sh --stageRelease
+              utils/release.sh --performRelease
             '''
           }
         }
