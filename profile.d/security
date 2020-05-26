@@ -2,8 +2,11 @@
 # WARNING: Any variables defined here, override those defined from the Jenkinsfile
 #
 # RELEASE_GIT_BRANCH is provided at run time
+#
 RELEASE_GIT_REPOSITORY=git@github.com:jenkinsci-cert/jenkins.git
-JENKINS_VERSION is provided at run time
+#
+# JENKINS_VERSION is provided at run time
+#
 GIT_EMAIL=release@jenkins.io
 GIT_NAME=release-bot
 GPG_KEYNAME=62A9756BFD780C377CF24BA8FCEF32E745F2C3D5
@@ -24,3 +27,7 @@ RELEASE_GIT_PRODUCTION_BRANCH=master
 #         as retrieved from ./utils/getJenkinsVersion.py
 
 MAVEN_REPOSITORY_PRODUCTION_NAME=releases
+
+# Following line will move every items from source to destination, keep in mind that it deletes from source and override on destination if already exist!.
+# It's wise to disable delete permission on destination repository as explained here https://www.jfrog.com/confluence/display/JFROG/Permissions#Permissions-RepositoryPermissions
+PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS="repository --mode move --source $MAVEN_REPOSITORY_NAME --destination $MAVEN_REPOSITORY_PRODUCTION_NAME --url $MAVEN_REPOSITORY_URL --username $MAVEN_REPOSITORY_USERNAME --password $MAVEN_REPOSITORY_PASSWORD"
