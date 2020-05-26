@@ -1,45 +1,48 @@
 #!/usr/bin/env python3
 
-import os
 import re
 import sys
 import argparse
 import requests
 
-URL = os.environ.get("MAVEN_REPOSITORY_URL", "https://repo.jenkins-ci.org")
-USERNAME = os.environ.get("MAVEN_REPOSITORY_USERNAME")
-PASSWORD = os.environ.get("MAVEN_REPOSITORY_PASSWORD")
-
-srcRepoKey = os.environ.get("MAVEN_REPOSITORY_NAME")
-targetRepoKey = os.environ.get("MAVEN_REPOSITORY_PRODUCTION_NAME")
 
 
-# directories = [
-#     "/org/jenkins-ci/main/cli",
-#     "/org/jenkins-ci/main/jenkins-bom",
-#     "/org/jenkins-ci/main/jenkins-core",
-#     "/org/jenkins-ci/main/jenkins-parent",
-#     "/org/jenkins-ci/main/jenkins-war",
-# ]
-
-
-def get_api_version():
-
+def get_api_version(url,username,password):
     """
         getApiVersion() return the api version
     """
 
-    url = URL + '/api/system/version'
+    url = url + '/api/system/version'
 
     response = requests.get(url,
                             auth=requests.auth.HTTPBasicAuth(
-                                USERNAME,
-                                PASSWORD))
+                                username,
+                                password))
 
     return response.json()['version']
 
 
-def copy_item(srcRepoKey, srcFilePath,
+def calculate_metadata(url, username, password, destination, path):
+    """
+        Calculate metadata will recursively update metadata.xml files
+    """
+
+    url = f"{ url }/api/maven/calculateMetadata/{ destination }/{ path }?nonRecursive=false"
+
+    response = requests.post(url,
+                             auth=requests.auth.HTTPBasicAuth(
+                                 username,
+                                 password))
+
+    if response.status_code == 200:
+        print(f"Every metadata.xml under {destination}/{path} were successfully updated\n")
+    else:
+        print(response.text)
+        print(f"Something went wrong while updating every metadata.xml under {destination}/{path} successfully updated\n")
+
+
+def copy_item(url, username, password,
+              srcRepoKey, srcFilePath,
               targetRepoKey, targetFilePath,
               dryRun, suppressLayout, failFast):
     """
@@ -47,12 +50,12 @@ def copy_item(srcRepoKey, srcFilePath,
         then update the metadata.xml
     """
 
-    url = f"{ URL }/api/copy/{ srcRepoKey }{ srcFilePath }?to=/{ targetRepoKey}/{ targetFilePath }&dry={ dryRun }&suppressLayout={ suppressLayout} 0&failFAst={ failFast }"
+    url = f"{ url }/api/copy/{ srcRepoKey }{ srcFilePath }?to=/{ targetRepoKey}/{ targetFilePath }&dry={ dryRun }&suppressLayout={ suppressLayout} 0&failFAst={ failFast }"
 
     response = requests.post(url,
                              auth=requests.auth.HTTPBasicAuth(
-                                 USERNAME,
-                                 PASSWORD))
+                                 username,
+                                 password))
     j = response.json()
 
     print(url)
@@ -64,7 +67,7 @@ def copy_item(srcRepoKey, srcFilePath,
     print("\n")
 
 
-def get_directories(repository, path, version):
+def get_directories(url, username, password, repository, path, version):
     """
         get_directories tries to guess,
         based on a path and a version,
@@ -75,12 +78,12 @@ def get_directories(repository, path, version):
 
     payload = f'''items.find({{"$and":[{{"repo":{{"$eq": "{ repository }"}}}},{{"path":{{"$match": "{ path[1:] }/*/{version}"}}}}]}}).include("repo","name","path")'''
 
-    url = f"{ URL }/api/search/aql"
+    url = f"{ url }/api/search/aql"
 
     response = requests.post(url,
                              auth=requests.auth.HTTPBasicAuth(
-                                 USERNAME,
-                                 PASSWORD),
+                                 username,
+                                 password),
                              data=payload)
 
     j = response.json()
@@ -93,17 +96,17 @@ def get_directories(repository, path, version):
     return directories
 
 
-def is_directory_exist(repository, directory):
+def is_directory_exist(url, username, password, repository, directory):
     """
         is_directory_exist query a maven repository
         to see if a directory already exist
     """
-    url = URL + '/api/storage/' + repository + directory
+    url = url + '/api/storage/' + repository + directory
 
     response = requests.get(url,
                             auth=requests.auth.HTTPBasicAuth(
-                                USERNAME,
-                                PASSWORD))
+                                username,
+                                password))
 
     if response.status_code != 200:
         return False
@@ -111,46 +114,19 @@ def is_directory_exist(repository, directory):
     return response.status_code == 200
 
 
-def is_alive():
+def is_alive(url):
     """
         is_alive test if a maven repository is reachable based on a ping test
     """
-    url = URL + '/api/system/ping'
+    url = url + '/api/system/ping'
 
-    response = requests.get(url,
-                            auth=requests.auth.HTTPBasicAuth(
-                                USERNAME,
-                                PASSWORD))
+    response = requests.get(url)
 
     return response.status_code == 200
 
 
-def is_required_parameters():
-    """
-        is_required_parameters check if all settings are provided
-    """
-    result = True
-
-    if not URL:
-        print("Missing environment variable MAVEN_REPOSITORY_URL")
-        result = False
-    if not USERNAME:
-        print("Missing environment variable MAVEN_REPOSITORY_USERNAME")
-        result = False
-    if not PASSWORD:
-        print("Missing environment variable MAVEN_REPOSITORY_USERNAME")
-        result = False
-    if not srcRepoKey:
-        print("Missing environment variable MAVEN_REPOSITORY_SOURCE_NAME")
-        result = False
-    if not targetRepoKey:
-        print("Missing environment variable MAVEN_REPOSITORY_TARGET_NAME")
-        result = False
-
-    return result
-
-
-def move_item(srcRepoKey, srcFilePath,
+def move_item(url, username, password,
+              srcRepoKey, srcFilePath,
               targetRepoKey, targetFilePath,
               dryRun, suppressLayout, failFast):
     """
@@ -159,12 +135,12 @@ def move_item(srcRepoKey, srcFilePath,
         ! Items are removed from the source repository
     """
 
-    url = f"{ URL }/api/move/{ srcRepoKey }{ srcFilePath }?to=/{ targetRepoKey}/{ targetFilePath }&dry={ dryRun }&suppressLayout={ suppressLayout} 0&failFAst={ failFast }"
+    url = f"{ username }/api/move/{ srcRepoKey }{ srcFilePath }?to=/{ targetRepoKey}/{ targetFilePath }&dry={ dryRun }&suppressLayout={ suppressLayout} 0&failFAst={ failFast }"
 
     response = requests.post(url,
                              auth=requests.auth.HTTPBasicAuth(
-                                 USERNAME,
-                                 PASSWORD))
+                                 username,
+                                 password))
     j = response.json()
 
     print(url)
@@ -176,25 +152,15 @@ def move_item(srcRepoKey, srcFilePath,
     print("\n")
 
 
-if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("version",
-                        help="Specify version that need to be promoted")
-    parser.add_argument("--dry_run",
-                        help="Don't copy items",
-                        action="store_true")
-    parser.add_argument("-m", "--mode", choices=["move", "copy"],
-                        default="copy",
-                        help="Method uses to promote items, default [copy]")
-    parser.add_argument("-g", "--groupID",
-                        default=[], action='append',
-                        help="Method uses to promote items")
-
-    args = parser.parse_args()
-
+def promote_item(args):
+    """
+        Promote item from one repository to another for a specific version
+    """
     if len(args.groupID) == 0:
-        directories = get_directories(srcRepoKey,
+        directories = get_directories(args.url,
+                                      args.username,
+                                      args.password,
+                                      args.source,
                                       "/org/jenkins-ci/main",
                                       args.version)
     else:
@@ -207,39 +173,176 @@ if __name__ == "__main__":
 
     dryrun = int(args.dry_run)
 
-    if not is_required_parameters():
-        sys.exit(1)
-
-    if not is_alive():
-        print(f"{ URL } not reachable")
+    if not is_alive(args.url):
+        print(f"{ args.url } not reachable")
         sys.exit(2)
 
-    print(f"Artifactory version: {get_api_version()}\n")
+    api_version = get_api_version(args.url,
+                                  args.username,
+                                  args.password)
+
+    print(f"Artifactory version: {api_version}\n")
 
     for index, directory in enumerate(directories, start=1):
-        srcFilePath = directory
-        targetFilePath = re.sub("/" + args.version + "$", '', directory)
+        src_file_path = directory
+        target_file_path = re.sub("/" + args.version + "$", '', directory)
 
-        print(f"[{index}/{len(directories)}] - {srcFilePath}")
+        print(f"[{index}/{len(directories)}] - {src_file_path}")
 
-        if not is_directory_exist(targetRepoKey, directory):
-            print(f"\nPlanning to {args.mode} '{directory}' from { srcRepoKey } to { targetRepoKey }\n")
+        if not is_directory_exist(args.url,
+                                  args.username,
+                                  args.password,
+                                  args.destination,
+                                  directory):
+            print(f"Planning to {args.mode} '{directory}' from { args.source } to { args.destination }\n")
 
             if args.mode == "copy":
-                copy_item(srcRepoKey,
-                          srcFilePath,
-                          targetRepoKey,
-                          targetFilePath,
+                copy_item(args.url,
+                          args.username,
+                          args.password,
+                          args.source,
+                          src_file_path,
+                          args.destination,
+                          target_file_path,
                           dryrun,
                           0,
                           1)
             elif args.mode == "move":
-                move_item(srcRepoKey,
-                          srcFilePath,
-                          targetRepoKey,
-                          targetFilePath,
+                move_item(args.url,
+                          args.username,
+                          args.password,
+                          args.source,
+                          src_file_path,
+                          args.destination,
+                          target_file_path,
                           dryrun,
                           0,
                           1)
         else:
-            print(f"\nAlready exist on { targetRepoKey }\n")
+            print(f"\nAlready exist on { args.destination }\n")
+
+
+def promote_repository(args):
+    """
+        Promote full repository content from source to destination
+    """
+
+    dryrun = int(args.dry_run)
+
+    if not is_alive(args.url):
+        print(f"{ args.url } not reachable")
+        sys.exit(2)
+
+    api_version = get_api_version(args.url,
+                                  args.username,
+                                  args.password)
+
+    print(f"Artifactory version: {api_version}\n")
+
+    print(f"Planning to {args.mode} { args.source } to { args.destination }\n")
+
+    if args.mode == "copy":
+        copy_item(args.url,
+                  args.username,
+                  args.password,
+                  args.source, "/",
+                  args.destination, "/",
+                  dryrun, 0, 1)
+    elif args.mode == "move":
+        move_item(args.url,
+                  args.username,
+                  args.password,
+                  args.source, "/",
+                  args.destination, "/",
+                  dryrun, 0, 1)
+
+    calculate_metadata(args.url,
+                       args.username,
+                       args.password,
+                       args.destination,
+                       "")
+
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(dest="subparser")
+
+    repo_parser = subparsers.add_parser("repository",
+                                        help="Maven repository promotion")
+
+    repo_parser.add_argument("--source",
+                             required=True,
+                             help="Specify source repository")
+
+    repo_parser.add_argument("--destination",
+                             required=True,
+                             help="Specify target repository")
+
+    repo_parser.add_argument("--username",
+                             required=True,
+                             help="Set maven repository username repository")
+
+    repo_parser.add_argument("--password",
+                             required=True,
+                             help="Set maven repository username repository")
+
+    repo_parser.add_argument("--url",
+                             default="https://repo.jenkins-ci.org",
+                             required=True,
+                             help="Set maven repository url")
+
+    repo_parser.add_argument("--dry_run",
+                             help="Don't copy items",
+                             action="store_true")
+    repo_parser.add_argument("-m", "--mode", choices=["move", "copy"],
+                             default="copy",
+                             help="Method uses to promote items [copy]")
+
+    item_parser = subparsers.add_parser("item",
+                                        help="Maven repository item promotion")
+
+    item_parser.add_argument("version",
+                             help="Specify version that need to be promoted")
+    item_parser.add_argument("--dry_run",
+                             help="Don't copy items",
+                             action="store_true")
+    item_parser.add_argument("-m", "--mode", choices=["move", "copy"],
+                             default="copy",
+                             help="Method uses to promote items [copy]")
+    item_parser.add_argument("-g", "--groupID",
+                             default=[], action='append',
+                             help="Method uses to promote items")
+    item_parser.add_argument("--source",
+                             required=True,
+                             help="Specify source repository")
+
+    item_parser.add_argument("--destination",
+                             required=True,
+                             help="Specify target repository")
+
+    item_parser.add_argument("--username",
+                             required=True,
+                             help="Set maven repository username repository")
+
+    item_parser.add_argument("--password",
+                             required=True,
+                             help="Set maven repository username repository")
+
+    repo_parser.add_argument("--search",
+                             default="/org/jenkins-ci/main",
+                             required=False,
+                             help="If no --groupID are provided then it search for items under this path that have a valid version")
+
+
+    item_parser.add_argument("--url",
+                             default="https://repo.jenkins-ci.org",
+                             help="Set maven repository url")
+
+    args = parser.parse_args()
+
+    if args.subparser == 'item':
+        promote_item(args)
+
+    elif args.subparser == 'repository':
+        promote_repository(args)
