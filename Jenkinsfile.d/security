@@ -48,6 +48,7 @@ pipeline {
           string(name: "JENKINS_VERSION", value: params.JENKINS_VERSION)
           string(name: "RELEASE_GIT_BRANCH", value: params.RELEASE_GIT_BRANCH)
           string(name: "MAVEN_REPOSITORY_NAME", value: params.MAVEN_REPOSITORY_NAME)
+          string(name: "MAVEN_REPOSITORY_PRODUCTION_NAME", value: params.MAVEN_REPOSITORY_PRODUCTION_NAME)
           booleanParam(name: "MAVEN_STAGING_REPOSITORY_PROMOTION_ENABLED", value: true)
           booleanParam(name: "GIT_STAGING_REPOSITORY_PROMOTION_ENABLED", value: true)
         ]
