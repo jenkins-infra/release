@@ -34,6 +34,12 @@ pipeline {
       name: 'MAVEN_REPOSITORY_NAME',
       trim: false
     )
+    string(
+      defaultValue: '',
+      description: 'Define which maven repository to promote to if MAVEN_STAGING_REPOSITORY_PROMOTION_ENABLED set to true',
+      name: 'MAVEN_REPOSITORY_PRODUCTION_NAME',
+      trim: false
+    )
     booleanParam(
       defaultValue: false,
       description: 'Enable Maven repository promotion',
