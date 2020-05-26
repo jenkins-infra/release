@@ -322,9 +322,9 @@ function prepareRelease(){
 function promoteStagingMavenArtifacts(){
   printf "\\n Promote Maven Artifacts\\n\\n"
 
-  version=$(./utils/getJenkinsVersion.py --version)
+  PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS=($PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS)
 
-  ./utils/promoteMavenArtifacts.py --version "$version"
+  ../utils/promoteMavenArtifacts.py "${PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS[@]}"
 
 
 }
