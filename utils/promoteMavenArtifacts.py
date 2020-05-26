@@ -329,11 +329,10 @@ if __name__ == "__main__":
                              required=True,
                              help="Set maven repository username repository")
 
-    repo_parser.add_argument("--search",
+    item_parser.add_argument("--search",
                              default="/org/jenkins-ci/main",
                              required=False,
                              help="If no --groupID are provided then it search for items under this path that have a valid version")
-
 
     item_parser.add_argument("--url",
                              default="https://repo.jenkins-ci.org",
