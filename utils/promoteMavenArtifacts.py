@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import re
 import sys
 import argparse
 import requests
@@ -185,7 +184,8 @@ def promote_item(args):
 
     for index, directory in enumerate(directories, start=1):
         src_file_path = directory
-        target_file_path = re.sub("/" + args.version + "$", '', directory)
+        target_file_path = directory
+
         print(f"[{index}/{len(directories)}] - {src_file_path}")
 
         if not is_directory_exist(args.url,
