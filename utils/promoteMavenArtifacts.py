@@ -135,7 +135,7 @@ def move_item(url, username, password,
         ! Items are removed from the source repository
     """
 
-    url = f"{ username }/api/move/{ srcRepoKey }{ srcFilePath }?to=/{ targetRepoKey}/{ targetFilePath }&dry={ dryRun }&suppressLayout={ suppressLayout} 0&failFAst={ failFast }"
+    url = f"{ url }/api/move/{ srcRepoKey }{ srcFilePath }?to=/{ targetRepoKey}/{ targetFilePath }&dry={ dryRun }&suppressLayout={ suppressLayout} 0&failFAst={ failFast }"
 
     response = requests.post(url,
                              auth=requests.auth.HTTPBasicAuth(
