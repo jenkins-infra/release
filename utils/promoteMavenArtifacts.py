@@ -186,7 +186,6 @@ def promote_item(args):
     for index, directory in enumerate(directories, start=1):
         src_file_path = directory
         target_file_path = re.sub("/" + args.version + "$", '', directory)
-
         print(f"[{index}/{len(directories)}] - {src_file_path}")
 
         if not is_directory_exist(args.url,
@@ -245,15 +244,15 @@ def promote_repository(args):
         copy_item(args.url,
                   args.username,
                   args.password,
-                  args.source, "/",
-                  args.destination, "/",
+                  args.source, "",
+                  args.destination, "",
                   dryrun, 0, 1)
     elif args.mode == "move":
         move_item(args.url,
                   args.username,
                   args.password,
-                  args.source, "/",
-                  args.destination, "/",
+                  args.source, "",
+                  args.destination, "",
                   dryrun, 0, 1)
 
     calculate_metadata(args.url,
