@@ -16,13 +16,13 @@ pipeline {
       description: 'Define which Jenkins version to use for packaging',
       name: 'JENKINS_VERSION',
       trim: false
-    ),
+    )
     string(
       defaultValue: '',
       description: 'Define which branch we are going to release from and commit changes',
       name: 'RELEASE_GIT_BRANCH',
       trim: false
-    ),
+    )
     string(
       defaultValue: '',
       description: 'Define which maven repository to use to push Maven artifacts',
