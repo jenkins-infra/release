@@ -16,15 +16,43 @@ pipeline {
       description: 'Define which Jenkins Release we are packaging for. https://git.io/Jv7Nr',
       name: 'RELEASE_PROFILE'
     )
+    string(
+      defaultValue: '',
+      description: 'Define which Jenkins Version to package',
+      name: 'JENKINS_VERSION',
+      trim: false
+    )
+    string(
+      defaultValue: '',
+      description: 'Define staging git branch uses for promotion',
+      name: 'RELEASE_GIT_BRANCH',
+      trim: false
+    )
+    string(
+      defaultValue: '',
+      description: 'Define which maven repository to use for packaging and promotion',
+      name: 'MAVEN_REPOSITORY_NAME',
+      trim: false
+    )
+    string(
+      defaultValue: '',
+      description: 'Define which maven repository to promote to if MAVEN_STAGING_REPOSITORY_PROMOTION_ENABLED set to true',
+      name: 'MAVEN_REPOSITORY_PRODUCTION_NAME',
+      trim: false
+    )
+    booleanParam(
+      defaultValue: false,
+      description: 'Enable Maven repository promotion',
+      name: 'MAVEN_STAGING_REPOSITORY_PROMOTION_ENABLED'
+    )
+    booleanParam(
+      defaultValue: false,
+      description: 'Enable Git repository promotion',
+      name: 'GIT_STAGING_REPOSITORY_PROMOTION_ENABLED'
+    )
   }
 
   options {
-    buildDiscarder logRotator(
-      artifactDaysToKeepStr: '14',
-      artifactNumToKeepStr: '5',
-      daysToKeepStr: '30',
-      numToKeepStr: '10'
-    )
     disableConcurrentBuilds()
   }
 
@@ -250,6 +278,40 @@ pipeline {
                     '''
                   }
                 }
+              }
+            }
+          }
+        }
+      }
+    }
+    stage('Promote'){
+      failFast true
+      parallel {
+        stage('Maven Repository') {
+          when {
+            environment name: 'MAVEN_STAGING_REPOSITORY_PROMOTION_ENABLED', value: 'true'
+          }
+
+          steps {
+            container('packaging'){
+              sshagent(['pkgserver']) {
+                sh '''
+                  ./utils/release.sh --promoteStagingMavenArtifacts
+                '''
+              }
+            }
+          }
+        }
+        stage('Git Repository') {
+          when {
+            environment name: 'GIT_STAGING_REPOSITORY_PROMOTION_ENABLED', value: 'true'
+          }
+          steps {
+            container('packaging'){
+              sshagent(['pkgserver']) {
+                sh '''
+                  ./utils/release.sh --promoteStagingGitRepository
+                '''
               }
             }
           }

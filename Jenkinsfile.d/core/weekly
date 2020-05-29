@@ -1,0 +1,35 @@
+pipeline {
+
+  agent {
+    kubernetes {
+      label 'release-weekly'
+    }
+  }
+
+  options {
+    disableConcurrentBuilds()
+  }
+
+  // Every Monday at 10:30:59 AM Coordinated Universal Time;
+  triggers {
+    cron '30 10 * * 1'
+  }
+
+  stages {
+    stage("Release"){
+      steps {
+        build job: 'core/release/master', parameters: [
+          string(name: "RELEASE_PROFILE", value: "weekly")
+        ]
+      }
+    }
+
+    stage("Package"){
+      steps {
+        build job: 'core/package/master', parameters: [
+          string(name: "RELEASE_PROFILE", value: "weekly")
+        ]
+      }
+    }
+  }
+}

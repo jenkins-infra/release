@@ -5,6 +5,8 @@ import urllib.request
 import base64
 import xml.etree.ElementTree as ET
 import os
+import argparse
+import sys
 
 
 USERNAME = os.environ.get('MAVEN_REPOSITORY_USERNAME', '')
@@ -47,38 +49,34 @@ def getJenkinsVersion(metadataUrl, version):
                 if len(version.text.split('.')) == 3:
                     result = version.text
 
-            print("Latest Stable Jenkins version detected: {}".format(result))
-
         # Search in Maven repository for latest version of Jenkins
         # that satisfies X.Y which represents weekly version
         elif version == 'weekly':
             result = root.find('versioning/release').text
-            print("Latest Jenkins version detected: {}".format(result))
 
         # In this case we assume that we provided a valid version
         elif len(version.split('.')) > 0:
             result = version
-            print("Jenkins version specified: {}".format(result))
 
         else:
             print("Something went wrong with version: {}".format(version))
-            exit(1)
+            sys.exit(1)
 
         return result
 
-    except URLError as e:
+    except URLError as error:
         msg = 'Something went wrong while retrieving stable version: {}'
-        print(msg.format(e))
-        exit(1)
+        print(msg.format(error))
+        sys.exit(1)
 
 
 def downloadJenkins(version):
-    downloadUrl = URL + '{}/jenkins-war-{}.war'.format(version, version)
+    download_url = URL + f'{version}/jenkins-war-{version}.war'
 
-    print("Downloading version {} from {} ".format(version, downloadUrl))
+    print("Downloading version {} from {} ".format(version, download_url))
 
     try:
-        request = urllib.request.Request(downloadUrl)
+        request = urllib.request.Request(download_url)
 
         if USERNAME != "":
             base64string = base64.b64encode(
@@ -94,9 +92,9 @@ def downloadJenkins(version):
 
         print("War downloaded to {}".format(PATH))
 
-    except URLError as e:
-        print(type(e))
-        exit(1)
+    except URLError as err:
+        print(type(err))
+        sys.exit(1)
 
 
 VERSION = getJenkinsVersion(
@@ -106,6 +104,19 @@ VERSION = getJenkinsVersion(
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-v",
+        "--version",
+        help="Only Show Jenkins version",
+        action="store_true")
+
+    args = parser.parse_args()
+
+    if args.version:
+        print(f"{VERSION}")
+        sys.exit(0)
+
     print("VERSION: " + VERSION)
     print("Downloaded from: " + URL)
     downloadJenkins(VERSION)

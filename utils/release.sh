@@ -167,9 +167,9 @@ function downloadAzureKeyvaultSecret(){
 
 # JENKINS_VERSION: Define which version will be package where:
 # * \'stable\' means the latest stable version that satifies version pattern X.Y.Z
-# * \'weekly\' means the latest weekly version that satisfies version pattern X.Y 
+# * \'weekly\' means the latest weekly version that satisfies version pattern X.Y
 # * <version> represents any valid existing version like 2.176.3 available at JENKINS_DOWNLOAD_URL
-# JENKINS_DOWNLOAD_URL: Specify the endpoint to use for downloading jenkins.war 
+# JENKINS_DOWNLOAD_URL: Specify the endpoint to use for downloading jenkins.war
 function downloadJenkinsWar(){
   "$WORKSPACE"/utils/getJenkinsVersion.py
 }
@@ -319,13 +319,56 @@ function prepareRelease(){
   mvn -B -s settings-release.xml --no-transfer-progress -Darguments=--no-transfer-progress release:prepare
 }
 
+function promoteStagingMavenArtifacts(){
+  printf "\\n Promote Maven Artifacts\\n\\n"
+
+  PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS=($PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS)
+
+  ../utils/promoteMavenArtifacts.py "${PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS[@]}"
+
+
+}
+
+function promoteStagingGitRepository(){
+
+  : "${RELEASE_GIT_STAGING_REPOSITORY_PATH:=$WORKSPACE/stagingGitRepository}"
+
+  : "${RELEASE_GIT_STAGING_REPOSITORY:=$RELEASE_GIT_REPOSITORY}"
+  : "${RELEASE_GIT_STAGING_BRANCH:=$RELEASE_GIT_BRANCH}"
+
+  : "${RELEASE_GIT_PRODUCTION_REPOSITORY:?Required remote origin like git@github.com:jenkinsci/jenkins.git }"
+  : "${RELEASE_GIT_PRODUCTION_BRANCH:=$RELEASE_GIT_BRANCH}"
+
+  # Ensure we always work from a clean environment
+  if [ -d "$RELEASE_GIT_STAGING_REPOSITORY_PATH" ];then
+    rm -Rf "$RELEASE_GIT_STAGING_REPOSITORY_PATH"
+  fi
+
+  mkdir -p "$RELEASE_GIT_STAGING_REPOSITORY_PATH"
+  pushd "$RELEASE_GIT_STAGING_REPOSITORY_PATH"
+
+  # Clone production repository on a specific branch
+  git clone --branch $RELEASE_GIT_PRODUCTION_BRANCH "$RELEASE_GIT_PRODUCTION_REPOSITORY" .
+
+  # Fetch commits from staging repository
+  git fetch "$RELEASE_GIT_STAGING_REPOSITORY" "$RELEASE_GIT_STAGING_BRANCH"
+
+  # Merge commits from staging repository
+  git merge --no-edit --log=20 FETCH_HEAD
+
+  git push
+
+  popd
+
+}
+
 function pushCommits(){
   : "${RELEASE_SCM_TAG:?RELEASE_SCM_TAG not definded}"
 
   # Ensure we use ssh credentials
   git config --get remote.origin.url
   sed -i 's#url = https://github.com/#url = git@github.com:#' .git/config
-  git pull 
+  git pull
   git push origin "HEAD:$RELEASE_GIT_BRANCH" "$RELEASE_SCM_TAG"
 }
 
@@ -411,6 +454,8 @@ function main(){
             --performRelease) echo "Perform Release" && performRelease ;;
             --prepareRelease) echo "Prepare Release" && generateSettingsXml && prepareRelease ;;
             --pushCommits) echo "Push commits on $RELEASE_GIT_BRANCH" && pushCommits ;;
+            --promoteStagingMavenArtifacts) echo "Promote Staging Maven Artifacts" && promoteStagingMavenArtifacts ;;
+            --promoteStagingGitRepository) echo "Promote Staging Git Repository" && promoteStagingGitRepository ;;
             --rollback) echo "Rollback release $RELEASE_SCM_TAG" && rollblack ;;
             --stageRelease) echo "Stage Release" && stageRelease ;;
             --packaging) echo 'Execute packaging makefile, quote required around Makefile target' && packaging "$2";;

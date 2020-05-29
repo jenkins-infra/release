@@ -1,0 +1,164 @@
+// -*- Groovy -*-
+
+/*
+  Jenkins Plugins:
+    * Azure-Credentials
+    * SSH-agent
+*/
+
+pipeline {
+  agent {
+    kubernetes {
+      label 'release-linux'
+      yamlFile 'PodTemplates.d/release-linux.yaml'
+      inheritFrom 'jnlp-linux'
+    }
+  }
+
+  parameters {
+    choice(
+      choices: [
+        'security',
+        'stable',
+        'weekly'
+      ],
+      description: 'Define which release profile we are going to use. https://git.io/Jv7Nr',
+      name: 'RELEASE_PROFILE'
+    )
+    string(
+      defaultValue: '',
+      description: 'Define which branch we are going to release from and commit changes',
+      name: 'RELEASE_GIT_BRANCH',
+      trim: false
+    )
+    string(
+      defaultValue: '',
+      description: 'Define which maven repository to use to push Maven artifacts',
+      name: 'MAVEN_REPOSITORY_NAME',
+      trim: false
+    )
+  }
+
+  options {
+    disableConcurrentBuilds()
+  }
+
+  environment {
+    AZURE_VAULT_NAME              = 'prodreleasecore'
+    AZURE_VAULT_CERT              = 'prodreleasecore'
+    AZURE_VAULT_CLIENT_ID         = credentials('azure-vault-client-id')
+    AZURE_VAULT_CLIENT_SECRET     = credentials('azure-vault-client-secret')
+    AZURE_VAULT_TENANT_ID         = credentials('azure-vault-tenant-id')
+    GPG_PASSPHRASE                = credentials('release-gpg-passphrase')
+    GPG_FILE                      = 'jenkins-release.gpg'
+    MAVEN_REPOSITORY_USERNAME     = credentials('maven-repository-username')
+    MAVEN_REPOSITORY_PASSWORD     = credentials('maven-repository-password')
+    SIGN_STOREPASS                = credentials('signing-cert-pass')
+  }
+
+    stages {
+      stage('Clone Release Git Repository') {
+        steps {
+          container('jnlp') {
+            sshagent(['release-key']) {
+              sh 'utils/release.sh --cloneReleaseGitRepository'
+            }
+          }
+        }
+      }
+    }
+    stage('Clean Release') {
+      steps {
+        container('maven') {
+          sh 'utils/release.sh --cleanRelease'
+        }
+      }
+    }
+    stage('Get Code Signing Certificate') {
+      steps {
+        container('azure-cli') {
+          sh '''
+            utils/release.sh --downloadAzureKeyvaultSecret
+            utils/release.sh --configureKeystore
+          '''
+        }
+      }
+    }
+    stage('Get GPG key') {
+      steps {
+        container('azure-cli') {
+          sh '''
+            utils/release.sh --getGPGKeyFromAzure
+          '''
+        }
+      }
+    }
+    stage('Prepare Release') {
+      steps {
+        container('maven') {
+          // Maven Release requires gpg key with password password and a certificate key with password
+          sh '''
+            utils/release.sh --configureGPG
+            utils/release.sh --configureGit
+            utils/release.sh --prepareRelease
+          '''
+
+          script {
+            def properties = readProperties file: 'release/release.properties'
+            env.RELEASE_SCM_TAG = properties['scm.tag']
+          }
+        }
+      }
+    }
+    stage('Push Commits') {
+      // environment {
+      //   GIT_SSH = 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $RELEASE_SSH_KEY'
+      // }
+
+      steps {
+        // ssh has doesn't work when no user is associated to a uid like 1000, therefor I run git command from
+        // the jnlp container.
+        container('jnlp') {
+          // https://github.com/jenkinsci/kubernetes-plugin/pull/331
+          // therefor we use withCredentials instead of sshagent
+          // it's fine if used from the jnlp container
+          sshagent(['release-key']) {
+            // We want to only commit to the repository used by the jenkins job
+            // instead of jenkinsci/jenkins as defined in pom.xml
+            sh 'utils/release.sh --pushCommits'
+          }
+          // withCredentials([sshUserPrivateKey(credentialsId: 'release-key', keyFileVariable: 'RELEASE_SSH_KEY')]) {
+          //   sh 'utils/release.sh --pushCommits'
+          // }
+
+        }
+      }
+    }
+    stage('Stage Release') {
+      steps {
+        container('maven') {
+          sh '''
+            utils/release.sh --stageRelease
+          '''
+        }
+      }
+    }
+    stage('Verify artifacts') {
+      steps {
+        container('maven') {
+          sh '''
+            utils/release.sh --verifyGPGSignature
+          '''
+          sh '''
+            utils/release.sh --verifyCertificateSignature
+          '''
+        }
+      }
+    }
+  }
+  post {
+    failure {
+      input '''Can I delete the pod? '''
+    }
+  }
+}
