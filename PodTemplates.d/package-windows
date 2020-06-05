@@ -4,6 +4,8 @@ metadata:
   labels:
     jenkins: "slave"
     job: "package"
+    #Following label is required by the NetworkPolicy managed by stable/jenkins helm chart and configured from jenkins-infra/charts
+    jenkins/default-release-jenkins-jenkins-slave: true
 spec:
   containers:
   - args:
