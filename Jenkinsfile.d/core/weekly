@@ -10,9 +10,9 @@ pipeline {
     disableConcurrentBuilds()
   }
 
-  // Every Monday at 10:30:59 AM Coordinated Universal Time;
+  // Every Tuesday at 10:30:00 AM Coordinated Universal Time;
   triggers {
-    cron '30 10 * * 1'
+    cron '30 10 * * 2'
   }
 
   stages {
