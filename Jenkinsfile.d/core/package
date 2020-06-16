@@ -235,53 +235,6 @@ pipeline {
             }
           }
         }
-        stage('Windows') { 
-          stages {
-            stage('Build') {
-              // Windows requirement: Every steps need to be executed inside default jnlp 
-              // as the step 'container' is known to not be working
-              agent {
-                kubernetes {
-                  label 'packaging-windows'
-                  yamlFile 'PodTemplates.d/package-windows'
-                }
-              }
-              steps {
-                checkout scm
-                dir (WORKING_DIRECTORY){
-                  git branch: PACKAGING_GIT_BRANCH, credentialsId: 'release-key', url: PACKAGING_GIT_REPOSITORY
-
-                  unstash 'GPG'
-                  unstash 'WAR'
-                  unstash 'KEYSTORE'
-
-                  powershell '''
-                    Get-ChildItem env:
-                    $env:WAR=(Resolve-Path .\\jenkins.war).Path
-                    & .\\make.ps1
-                  '''
-                  // Don't archive the full path
-                  dir('msi\\build\\bin\\Release\\en-US') {
-                    archiveArtifacts '*.msi*'
-                  }
-
-                }
-              }
-            }
-            stage('Publish'){
-              steps {
-                container('packaging') {
-                  unarchive mapping: ['*.msi*': WORKING_DIRECTORY]
-                  sshagent(['pkgserver']) {
-                    sh '''
-                      ./utils/release.sh --packaging msi.publish
-                    '''
-                  }
-                }
-              }
-            }
-          }
-        }
       }
     }
     stage('Promote'){
