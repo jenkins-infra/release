@@ -247,24 +247,26 @@ pipeline {
                 }
               }
               steps {
-                checkout scm
-                dir (WORKING_DIRECTORY){
-                  git branch: PACKAGING_GIT_BRANCH, credentialsId: 'release-key', url: PACKAGING_GIT_REPOSITORY
+                container('dotnet') {
+                  checkout scm
+                  dir (WORKING_DIRECTORY){
+                    git branch: PACKAGING_GIT_BRANCH, credentialsId: 'release-key', url: PACKAGING_GIT_REPOSITORY
 
-                  unstash 'GPG'
-                  unstash 'WAR'
-                  unstash 'KEYSTORE'
+                    unstash 'GPG'
+                    unstash 'WAR'
+                    unstash 'KEYSTORE'
 
-                  powershell '''
-                    Get-ChildItem env:
-                    $env:WAR=(Resolve-Path .\\jenkins.war).Path
-                    & .\\make.ps1
-                  '''
-                  // Don't archive the full path
-                  dir('msi\\build\\bin\\Release\\en-US') {
-                    archiveArtifacts '*.msi*'
+                    powershell '''
+                      Get-ChildItem env:
+                      $env:WAR=(Resolve-Path .\\jenkins.war).Path
+                      & .\\make.ps1
+                    '''
+                    // Don't archive the full path
+                    dir('msi\\build\\bin\\Release\\en-US') {
+                      archiveArtifacts '*.msi*'
+                    }
+
                   }
-
                 }
               }
             }
