@@ -52,7 +52,7 @@ def getJenkinsVersion(metadataUrl, version):
         # Search in Maven repository for latest version of Jenkins
         # that satisfies X.Y which represents weekly version
         elif version == 'weekly':
-            result = root.find('versioning/release').text
+            result = root.find('versioning/latest').text
 
         # In this case we assume that we provided a valid version
         elif len(version.split('.')) > 0:
