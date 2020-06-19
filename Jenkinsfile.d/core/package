@@ -11,7 +11,9 @@ pipeline {
   parameters {
     choice(
       choices: [
-        'weekly'
+        'weekly',
+        'stable',
+        'security'
       ],
       description: 'Define which Jenkins Release we are packaging for. https://git.io/Jv7Nr',
       name: 'RELEASE_PROFILE'
