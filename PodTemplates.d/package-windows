@@ -31,7 +31,7 @@ spec:
         cpu: "1"
   - args:
       - -Command
-      - Start-Sleep -s 7776000 # We must be sure that the process used by the container doesn't stop before the Jenkins job
+      - Start-Sleep -s 2147483 # We must be sure that the process used by the container doesn't stop before the Jenkins job and second isn not greater than 2147483
     command:
       - "powershell.exe"
     image: "mcr.microsoft.com/dotnet/framework/sdk:3.5"
