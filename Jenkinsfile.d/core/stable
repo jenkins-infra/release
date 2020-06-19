@@ -21,7 +21,8 @@ pipeline {
     stage("Package"){
       steps {
         build job: 'core/package/master', parameters: [
-          string(name: "RELEASE_PROFILE", value: "stable")
+          string(name: "RELEASE_PROFILE", value: "stable"),
+          string(name: "JENKINS_VERSION", value: "stable")
         ]
       }
     }
