@@ -30,6 +30,10 @@ spec:
         memory: "4Gi"
         cpu: "1"
   - args:
+      - -Command
+      - Start-Sleep -s 7776000 # We must be sure that the process used by the container doesn't stop before the Jenkins job
+    command:
+      - "powershell.exe"
     image: "mcr.microsoft.com/dotnet/framework/sdk:3.5"
     imagePullPolicy: "Always"
     name: "dotnet"
