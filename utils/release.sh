@@ -42,6 +42,11 @@ source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
 : "${RELEASE_GIT_STAGING_BRANCH:=$RELEASE_GIT_BRANCH}"
 : "${RELEASE_GIT_PRODUCTION_REPOSITORY:=$RELEASE_GIT_REPOSITORY }"
 : "${RELEASE_GIT_PRODUCTION_BRANCH:=$RELEASE_GIT_BRANCH}"
+# Following line will copy every items from source to destination,
+# keeps in mind that it won't delete from source and override on destination if already exist!.
+# It's wise to disable delete permission on destination repository
+# as explained here https://www.jfrog.com/confluence/display/JFROG/Permissions#Permissions-RepositoryPermissions
+: "${PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS:=item --mode copy --source $MAVEN_REPOSITORY_NAME --destination $MAVEN_REPOSITORY_PRODUCTION_NAME --url $MAVEN_REPOSITORY_URL --username $MAVEN_REPOSITORY_USERNAME --password $MAVEN_REPOSITORY_PASSWORD --search '/org/jenkins-ci/main' $(./utils/getJenkinsVersion.py --version)}"
 
 export JENKINS_VERSION
 export JENKINS_DOWNLOAD_URL
@@ -432,9 +437,9 @@ EOF
 }
 
 function showPackagingPlan(){
-  "$WORKSPACE"/utils/plan.py --packaging
+
 cat <<-EOF
-    New Jenkins core packages will be generated for the $JENKINS_VERSION version 
+    New Jenkins core packages will be generated for version $(../utils/getJenkinsVersion.py --version)
 
     Those new packages will be generated based on a war file downloaded
     from $JENKINS_DOWNLOAD_URL
@@ -447,7 +452,7 @@ cat <<-EOF
     Git repository promotion is enabled
     Git commits will be promoted from:
         $RELEASE_GIT_STAGING_REPOSITORY:$RELEASE_GIT_STAGING_BRANCH to
-        $RELEASE_GIT_PRODUCTION_REPOSITORY:$RELEASE_GIT_PRODUCTION_BRANCH to
+        $RELEASE_GIT_PRODUCTION_REPOSITORY:$RELEASE_GIT_PRODUCTION_BRANCH
 EOF
   else
     echo Git Repository promotion is disabled
