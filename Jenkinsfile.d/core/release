@@ -95,6 +95,11 @@ pipeline {
         message 'Are you ok to proceed?'
       }
 
+      steps {
+        container('jnlp'){
+          sh 'echo Validated'
+        }
+      }
     }
     stage('Get Code Signing Certificate') {
       steps {

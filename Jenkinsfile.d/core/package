@@ -108,6 +108,13 @@ pipeline {
       input {
         message 'Are you ok to proceed?'
       }
+
+      steps {
+        container('jnlp'){
+          sh 'echo Validated'
+        }
+      }
+
     }
     stage('Get GPG key') {
 
@@ -117,7 +124,7 @@ pipeline {
           dir (WORKING_DIRECTORY){
             git branch: PACKAGING_GIT_BRANCH, credentialsId: 'release-key', url: PACKAGING_GIT_REPOSITORY
           }
-      
+
           sh '''
             ./utils/release.sh --getGPGKeyFromAzure
           '''
@@ -259,10 +266,10 @@ pipeline {
             }
           }
         }
-        stage('Windows') { 
+        stage('Windows') {
           stages {
             stage('Build') {
-              // Windows requirement: Every steps need to be executed inside default jnlp 
+              // Windows requirement: Every steps need to be executed inside default jnlp
               // as the step 'container' is known to not be working
               agent {
                 kubernetes {
