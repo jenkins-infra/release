@@ -89,7 +89,12 @@ function clean(){
 
     # Do not display transfer progress when downloading or uploading
     # https://maven.apache.org/ref/3.6.1/maven-embedder/cli.html
-    mvn -s settings-release.xml -B --no-transfer-progress -Darguments=--no-transfer-progress release:clean
+    # mvn -s settings-release.xml -B --no-transfer-progress -Darguments=--no-transfer-progress release:clean
+    # 2020-06-24: --no-transfer-progress doesn't seem to be fully suported in maven release plugin
+    # This workaround can be reverted once MRELEASE-1048 is fixed
+    # https://issues.apache.org/jira/browse/MRELEASE-1048
+
+    mvn -s settings-release.xml -B --no-transfer-progress -Darguments=-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn release:clean
 }
 
 function cloneReleaseGitRepository(){
@@ -387,11 +392,21 @@ function stageRelease(){
   printf "\\n Stage Jenkins Release\\n\\n"
   # Do not display transfer progress when downloading or uploading
   # https://maven.apache.org/ref/3.6.1/maven-embedder/cli.html
+  #mvn -B \
+  #  "-DstagingRepository=${MAVEN_REPOSITORY_NAME}::default::${MAVEN_REPOSITORY_URL}/${MAVEN_REPOSITORY_NAME}" \
+  #  -s settings-release.xml \
+  #  --no-transfer-progress \
+  #  -Darguments=--no-transfer-progress \
+  #  release:stage
+
+  # 2020-06-24: --no-transfer-progress doesn't seem to be fully suported in maven release plugin
+  # This workaround can be reverted once MRELEASE-1048 is fixed
+  # https://issues.apache.org/jira/browse/MRELEASE-1048
   mvn -B \
     "-DstagingRepository=${MAVEN_REPOSITORY_NAME}::default::${MAVEN_REPOSITORY_URL}/${MAVEN_REPOSITORY_NAME}" \
     -s settings-release.xml \
     --no-transfer-progress \
-    -Darguments=--no-transfer-progress \
+    -Darguments=-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
     release:stage
 }
 
@@ -401,10 +416,20 @@ function performRelease(){
   printf "\\n Perform Jenkins Release\\n\\n"
   # Do not display transfer progress when downloading or uploading
   # https://maven.apache.org/ref/3.6.1/maven-embedder/cli.html
+  # mvn -B \
+  #   -s settings-release.xml \
+  #   --no-transfer-progress \
+  #   -Darguments=--no-transfer-progress \
+  #   release:perform
+
+
+  # 2020-06-24: --no-transfer-progress doesn't seem to be fully suported in maven release plugin
+  # This workaround can be reverted once MRELEASE-1048 is fixed
+  # https://issues.apache.org/jira/browse/MRELEASE-1048
   mvn -B \
     -s settings-release.xml \
     --no-transfer-progress \
-    -Darguments=--no-transfer-progress \
+    -Darguments=-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
     release:perform
 }
 
