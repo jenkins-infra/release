@@ -37,6 +37,11 @@ pipeline {
       name: 'MAVEN_REPOSITORY_NAME',
       trim: false
     )
+    booleanParam(
+      defaultValue: true,
+      description: 'Define if we wait for validation after displaying the plan',
+      name: 'VALIDATION_ENABLED'
+    )
   }
 
   options {
@@ -72,6 +77,24 @@ pipeline {
           sh 'utils/release.sh --cleanRelease'
         }
       }
+    }
+    stage('Plan') {
+      steps {
+        container('maven') {
+          sh 'utils/release.sh --showReleasePlan'
+        }
+      }
+    }
+    stage('Validate') {
+      when {
+        environment name: 'VALIDATION_ENABLED', value: 'true'
+        beforeInput true
+      }
+
+      input {
+        message 'Are you ok to proceed?'
+      }
+
     }
     stage('Get Code Signing Certificate') {
       steps {

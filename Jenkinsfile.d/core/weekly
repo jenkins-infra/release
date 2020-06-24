@@ -19,6 +19,7 @@ pipeline {
     stage("Release"){
       steps {
         build job: 'core/release/master', parameters: [
+          booleanParam(name: "VALIDATION_ENABLED", value: false),
           string(name: "RELEASE_PROFILE", value: "weekly")
         ]
       }
@@ -27,6 +28,7 @@ pipeline {
     stage("Package"){
       steps {
         build job: 'core/package/master', parameters: [
+          booleanParam(name: "VALIDATION_ENABLED", value: false),
           string(name: "RELEASE_PROFILE", value: "weekly"),
           string(name: "JENKINS_VERSION", value: "weekly")
         ]

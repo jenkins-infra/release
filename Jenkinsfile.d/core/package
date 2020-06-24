@@ -52,6 +52,11 @@ pipeline {
       description: 'Enable Git repository promotion',
       name: 'GIT_STAGING_REPOSITORY_PROMOTION_ENABLED'
     )
+    booleanParam(
+      defaultValue: true,
+      description: 'Define if we wait for validation after displaying the plan or not',
+      name: 'VALIDATION_ENABLED'
+    )
   }
 
   options {
@@ -87,6 +92,23 @@ pipeline {
   }
 
   stages {
+    stage('Plan') {
+      steps {
+        container('packaging') {
+          sh 'utils/release.sh --showPackagingPlan'
+        }
+      }
+    }
+    stage('Validate') {
+      when {
+        environment name: 'VALIDATION_ENABLED', value: 'true'
+        beforeInput true
+      }
+
+      input {
+        message 'Are you ok to proceed?'
+      }
+    }
     stage('Get GPG key') {
 
       steps {

@@ -50,6 +50,18 @@ pipeline {
           }
         }
       }
+      stage('Plan') {
+        steps {
+          container('maven') {
+            sh 'utils/release.sh --showReleasePlan'
+          }
+        }
+      }
+      stage('Validate') {
+        input {
+          message 'Are you ok to proceed?'
+        }
+      }
       stage('Get Code Signing Certificate') {
         steps {
           container('azure-cli') {

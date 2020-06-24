@@ -36,6 +36,18 @@ source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
 
 : "${JENKINS_DOWNLOAD_URL:=$MAVEN_REPOSITORY_URL/$MAVEN_REPOSITORY_NAME/org/jenkins-ci/main/jenkins-war/}"
 
+# Promotion Settings
+: "${RELEASE_GIT_STAGING_REPOSITORY_PATH:=$WORKSPACE/stagingGitRepository}"
+: "${RELEASE_GIT_STAGING_REPOSITORY:=$RELEASE_GIT_REPOSITORY}"
+: "${RELEASE_GIT_STAGING_BRANCH:=$RELEASE_GIT_BRANCH}"
+: "${RELEASE_GIT_PRODUCTION_REPOSITORY:=$RELEASE_GIT_REPOSITORY }"
+: "${RELEASE_GIT_PRODUCTION_BRANCH:=$RELEASE_GIT_BRANCH}"
+# Following line will copy every items from source to destination,
+# keeps in mind that it won't delete from source and override on destination if already exist!.
+# It's wise to disable delete permission on destination repository
+# as explained here https://www.jfrog.com/confluence/display/JFROG/Permissions#Permissions-RepositoryPermissions
+: "${PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS:=item --mode copy --source $MAVEN_REPOSITORY_NAME --destination $MAVEN_REPOSITORY_PRODUCTION_NAME --url $MAVEN_REPOSITORY_URL --username $MAVEN_REPOSITORY_USERNAME --password $MAVEN_REPOSITORY_PASSWORD --search '/org/jenkins-ci/main' $(./utils/getJenkinsVersion.py --version)}"
+
 export JENKINS_VERSION
 export JENKINS_DOWNLOAD_URL
 export MAVEN_REPOSITORY_USERNAME
@@ -331,14 +343,6 @@ function promoteStagingMavenArtifacts(){
 
 function promoteStagingGitRepository(){
 
-  : "${RELEASE_GIT_STAGING_REPOSITORY_PATH:=$WORKSPACE/stagingGitRepository}"
-
-  : "${RELEASE_GIT_STAGING_REPOSITORY:=$RELEASE_GIT_REPOSITORY}"
-  : "${RELEASE_GIT_STAGING_BRANCH:=$RELEASE_GIT_BRANCH}"
-
-  : "${RELEASE_GIT_PRODUCTION_REPOSITORY:?Required remote origin like git@github.com:jenkinsci/jenkins.git }"
-  : "${RELEASE_GIT_PRODUCTION_BRANCH:=$RELEASE_GIT_BRANCH}"
-
   # Ensure we always work from a clean environment
   if [ -d "$RELEASE_GIT_STAGING_REPOSITORY_PATH" ];then
     rm -Rf "$RELEASE_GIT_STAGING_REPOSITORY_PATH"
@@ -418,6 +422,55 @@ function verifyCertificateSignature(){
   jarsigner -verbose -verify -certs -strict "$JENKINS_WAR"
 }
 
+function showReleasePlan(){
+
+cat <<-EOF
+    A new $RELEASE_PROFILE release will be generated.
+
+    This new release will use the git repository: $RELEASE_GIT_REPOSITORY,
+    using branch $RELEASE_GIT_BRANCH then push commits to the same location.
+
+    Artifacts will be pushed to the maven repository named "$MAVEN_REPOSITORY_NAME"
+    located on "$MAVEN_REPOSITORY_URL" authenticated as "$MAVEN_REPOSITORY_USERNAME"
+EOF
+
+}
+
+function showPackagingPlan(){
+
+cat <<-EOF
+    New Jenkins core packages will be generated for version $(../utils/getJenkinsVersion.py --version)
+
+    Those new packages will be generated based on a war file downloaded
+    from $JENKINS_DOWNLOAD_URL
+
+    Once built, packages will be pushed to $PKGSERVER
+EOF
+
+  if $GIT_STAGING_REPOSITORY_PROMOTION_ENABLED -eq "true"; then
+cat <<-EOF
+    Git repository promotion is enabled
+    Git commits will be promoted from:
+        $RELEASE_GIT_STAGING_REPOSITORY:$RELEASE_GIT_STAGING_BRANCH to
+        $RELEASE_GIT_PRODUCTION_REPOSITORY:$RELEASE_GIT_PRODUCTION_BRANCH
+EOF
+  else
+    echo Git Repository promotion is disabled
+  fi
+
+  if $MAVEN_STAGING_REPOSITORY_PROMOTION_ENABLED -eq "true"; then
+
+cat <<-EOF
+    Maven artifacts promotion is enabled
+    Artifacts will be promoted from repository $MAVEN_REPOSITORY_NAME to $MAVEN_REPOSITORY_PRODUCTION_NAME
+    located on artifactory at $MAVEN_REPOSITORY_URL
+EOF
+
+  else
+    echo "Maven repository promotion is disabled"
+  fi
+}
+
 function syncMirror(){
 
   PKGSERVER_SSH_OPTS=($PKGSERVER_SSH_OPTS)
@@ -454,6 +507,8 @@ function main(){
             --performRelease) echo "Perform Release" && performRelease ;;
             --prepareRelease) echo "Prepare Release" && generateSettingsXml && prepareRelease ;;
             --pushCommits) echo "Push commits on $RELEASE_GIT_BRANCH" && pushCommits ;;
+            --showReleasePlan) echo "Show Release Plan" && showReleasePlan ;;
+            --showPackagingPlan) echo "Show Packaging Plan" && showPackagingPlan ;;
             --promoteStagingMavenArtifacts) echo "Promote Staging Maven Artifacts" && promoteStagingMavenArtifacts ;;
             --promoteStagingGitRepository) echo "Promote Staging Git Repository" && promoteStagingGitRepository ;;
             --rollback) echo "Rollback release $RELEASE_SCM_TAG" && rollblack ;;
