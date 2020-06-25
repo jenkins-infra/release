@@ -334,7 +334,12 @@ function prepareRelease(){
 
   # Do not display transfer progress when downloading or uploading
   # https://maven.apache.org/ref/3.6.1/maven-embedder/cli.html
-  mvn -B -s settings-release.xml --no-transfer-progress -Darguments=--no-transfer-progress release:prepare
+  #mvn -B -s settings-release.xml --no-transfer-progress -Darguments=--no-transfer-progress release:prepare
+
+  # 2020-06-24: --no-transfer-progress doesn't seem to be fully suported in maven release plugin
+  # This workaround can be reverted once MRELEASE-1048 is fixed
+  # https://issues.apache.org/jira/browse/MRELEASE-1048
+  mvn -B -s settings-release.xml --no-transfer-progress -Darguments=-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn release:prepare
 }
 
 function promoteStagingMavenArtifacts(){
