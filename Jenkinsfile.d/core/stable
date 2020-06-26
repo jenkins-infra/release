@@ -13,14 +13,14 @@ pipeline {
   stages {
     stage("Release"){
       steps {
-        build job: 'core/release/master', parameters: [
+        build job: "core/release/${ BRANCH_NAME }", parameters: [
           string(name: "RELEASE_PROFILE", value: "stable")
         ]
       }
     }
     stage("Package"){
       steps {
-        build job: 'core/package/master', parameters: [
+        build job: "core/package/${ BRANCH_NAME }", parameters: [
           string(name: "RELEASE_PROFILE", value: "stable"),
           string(name: "JENKINS_VERSION", value: "stable")
         ]
