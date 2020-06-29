@@ -212,7 +212,7 @@ The first part that we mention by using the term the *release*, is when we creat
 The second part that we name *packaging* is when we retrieve from a Maven repository, the version we want to package. Then we build distribution packages, publish them, promote artifacts between staging and production environment if needed and finally we ensure that our mirrors are up to date.
 
 ==== Required
-In order to triggered new release, you must fulfill following requirements:
+In order to trigger a new release, you must fulfil following requirements:
 
 - [x] https://github.com/jenkins-infra/openvpn[Jenkins VPN Access] access
 - [x] Being part of LDAP group 'release-core'
