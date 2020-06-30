@@ -292,7 +292,7 @@ While it isn't required to trigger a release type job, it increases visibility a
 
 === Weekly
 
-The weekly release is the default release. It happened automatically every Tuesday as defined by this link:https://github.com/jenkins-infra/release/blob/19685def608c641496e6e2de3d40c275ca5e913d/Jenkinsfile.d/core/weekly#L15[cron].
+The weekly release is the default release. It is scheduled every Tuesday as defined by this link:https://github.com/jenkins-infra/release/blob/19685def608c641496e6e2de3d40c275ca5e913d/Jenkinsfile.d/core/weekly#L15[cron].
 It uses parameters defined in this link:https://github.com/jenkins-infra/release/blob/master/profile.d/weekly[file]
 
 It releases using the repository https://github.com/jenkinsci/jenkins[jenkinsci/jenkins] from the branch master. Artifacts are pushed to the default maven repository 'Releases'.
