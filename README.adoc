@@ -100,7 +100,7 @@ More information in https://github.com/jenkins-infra/release/blob/master/utils/g
 | x
 
 | `RELEASE_GIT_PRODUCTION_BRANCH`
-| Defines the branch used as the production branch used during promotion.
+| Defines the branch used as the production branch during promotion.
 |
 | x
 
