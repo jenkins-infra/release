@@ -320,9 +320,9 @@ It uses parameters defined in this link:https://github.com/jenkins-infra/release
 Before triggering a new stable release, some steps are required:
 
 . Prepare `jenkinsci/jenkins` repository -> missing documentation link.
-. Create a branch on jenkins-infra/release with a branch name that match the release branch from jenkinsci/jenkins like `stable-2.135`
+. Create a branch on jenkins-infra/release with a branch name that match the release branch from jenkinsci/jenkins like `stable-2.235`
 . Review and update the stable environment https://github.com/jenkins-infra/release/blob/master/profile.d/stable[file] with:
-.. `RELEASE_GIT_BRANCH` set to the `jenkinsci/jenkins` release branch like `stable-2.135`
+.. `RELEASE_GIT_BRANCH` set to the `jenkinsci/jenkins` release branch like `stable-2.235`
 .. `JENKINS_VERSION` set to the final release version that will be packaged. If set to 'stable' then the packaging job will try to guess the version based on what was pushed to the maven repository. cfr settings.
 .. `PACKAGING_GIT_BRANCH` set to the appropriated `jenkinsci/packaging` branch
 . Trigger the stable link:https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Fstable%2Frelease/branches/[job]
