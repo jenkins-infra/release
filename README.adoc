@@ -55,7 +55,7 @@ The release process implies following Git repository:
 | x
 
 | `JENKINS_ASC`
-| Defines the jenkins signature file name.
+| Defines the Jenkins signature file name.
 |
 | x
 
