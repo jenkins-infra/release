@@ -90,7 +90,7 @@ More information in https://github.com/jenkins-infra/release/blob/master/utils/g
 | x
 
 | `RELEASE_GIT_REPOSITORY`
-| Defines the Jenkins git repository used by release, to release from. It also where generated generated commits and new tags will be pushed.
+| Defines the Jenkins git repository read by the build. It is also the repository where generated commits and new tags will be pushed.
 | x
 | x
 
