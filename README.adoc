@@ -313,7 +313,8 @@ You can re-trigger individually the two downstream jobs, release and packaging.
 ====
 
 === Stable
-A stable release is a manually triggered release that happened around once a month.
+A stable release is a manually triggered release that happens around once a month.
+Refer to link:https://www.jenkins.io/download/lts/[LTS Release Line] for more detailed information.
 It uses parameters defined in this link:https://github.com/jenkins-infra/release/blob/master/profile.d/stable[file].
 
 Before triggering a new stable release, some steps are required:
