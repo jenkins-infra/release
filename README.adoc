@@ -50,7 +50,7 @@ The release process implies following Git repository:
 | x
 
 | `GPG_VAULT_NAME`
-| Define the Azure key vault containg the gpg key.
+| Define the Azure key vault containing the gpg key.
 | x
 | x
 
