@@ -285,9 +285,9 @@ At the moment we identify four release type
 
 [NOTE]
 ====
-link:https://release.ci.jenkins.io[release.ci.jenkins.io] is designed in a way that we have two generic jobs, one for release and a second one for packaging.
-Then we have one job per release type which triggered the two generic Jenkins jobs with different parameters.
-While it isn't required to trigger a release type job, it just increase visibility and reduce human error factor.
+link:https://release.ci.jenkins.io[release.ci.jenkins.io] has two generic jobs, one for release and a second one for packaging.
+One job per release type triggers the two generic jobs with different parameters.
+While it isn't required to trigger a release type job, it increases visibility and reduces the risk of human error.
 ====
 
 === Weekly
