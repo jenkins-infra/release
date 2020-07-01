@@ -3,137 +3,360 @@
 
 == Introduction
 
-This repository contains everything needed to release https://github.com/jenkinsci/jenkins[Jenkins core]:
+This repository contains everything needed to release https://github.com/jenkinsci/jenkins[Jenkins core] or some Jenkins components libraries.
+
+This includes:
 
 * Jenkinsfiles for Releasing and Packaging.
-* Kubernetes POD templates definition for releasing and packaging on Linux and Windows environments.
+* Kubernetes POD templates definition for releasing and packaging environments on Linux and Windows operating systems.
 * Any configuration or utility scripts
 
 The release process implies following Git repository:
 
 * https://github.com/jenkinsci/jenkins[jenkinsci/jenkins] or any other git repository containing the Jenkins code to be released.
 * https://github.com/jenkinsci/packaging[jenkinsci/packaging] contains tools and configuration to package Jenkins for OS distribution [Debian, Red Hat, SUSE, MSI, WAR]
-* https://github.com/jenkins-infra/chart[jenkins-infra/chart] contains Helm chart used to deploy release.ci.jenkins.io on top of Kubernetes.
+* https://github.com/jenkins-infra/chart[jenkins-infra/chart] contains the Helm chart used to deploy link:https://release.ci.jenkins.io/[release.ci.jenkins.io] on top of Kubernetes.
 * https://github.com/jenkins-infra/azure[jenkins-infra/azure] contains the terraform code used to provision infrastructure needed by the release environment
 
-== Release
+== Settings
 
-The release process uses the maven release plugin to do everything needed to generate a release and then publishes generated artifacts on a Maven repository. It involves signing with a GPG key and a code signing certificate.
-
-Remark: It's important to notice that we do not use the maven release plugin to checkout our Jenkins repository neither to push changes as we want to be able to use a different git repository than the one defined in the Jenkins pom.xml
-
-=== Required
-
-- [x] https://github.com/jenkins-infra/openvpn[Jenkins VPN Access]
-- [x] Being part of LDAP group 'release-core'
-- [x] Access to https://release.ci.jenkins.io[release.ci.jenkins.io]
-
-=== Settings
-
-Those are the most important settings defined in your release profile that will impact your release:
-
-[cols="1,3", options="header"]
-.Settings
+[cols="1,3a,0,0", options="header"]
 |===
-| Variable | Description
+| Variable | Description | Release | Packaging
+
+| `GIT_EMAIL`
+| Defines git email used in git commits.
+| x
+| x
+
+| `GIT_NAME`
+| Defines git name used in git commits.
+| x
+| x
+
+| `GIT_SSH_COMMAND`
+| Defines options that can be passed to every git commands used in release scripts.
+| x
+| x
+
+| `GPG_KEYNAME`
+| Define the GPG key name that will  be used to sign artifacts.
+| x
+| x
+
+| `GPG_FILE`
+| Define the GPG file name that will  be used to import gpg key into keyring.
+| x
+| x
+
+| `GPG_VAULT_NAME`
+| Define the Azure key vault containing the gpg key.
+| x
+| x
+
+| `JENKINS_ASC`
+| Defines the Jenkins signature file name.
+|
+| x
+
+| `JENKINS_DOWNLOAD_URL`
+| Define the url used to download jenkins.war.
+|
+| x
+
+| `JENKINS_VERSION`
+| Define which version of Jenkins will be downloaded for packaging.
+
+It accepts following values:
+
+- `weekly`, fetches the latest version available on a maven repository based on the maven-metada.xml.
+- `stable`, fetches the latest version that matches pattern X.Y.Z.
+- `version`, a valid version.
+
+More information in https://github.com/jenkins-infra/release/blob/master/utils/getJenkinsVersion.py[getJenkinsVersion.py]
+
+[IMPORTANT]
+====
+ . Versions available depends on the maven repository defined by `MAVEN_REPOSITORY_NAME`
+ . `JENKINS_VERSION` is totally independent of `RELEASE_PROFILE` explained below
+
+====
+|
+| x
+
+| `JENKINS_WAR`
+| Defines the jenkins.war file name downloaded from a maven repository using `getJenkinsVersion.py`.
+|
+| x
 
 | `RELEASE_GIT_REPOSITORY`
-| Defines the Jenkins git repository used by release, to release from and then push generated commits.
+| Defines the Jenkins git repository read by the build. It is also the repository where generated commits and new tags will be pushed.
+| x
+| x
 
 | `RELEASE_GIT_BRANCH`
 | Defines the Jenkins branch used to checkout and then pushes commits related to the release.
+| x
+| x
+
+| `RELEASE_GIT_PRODUCTION_BRANCH`
+| Defines the branch used as the production branch during promotion.
+|
+| x
+
+| `RELEASE_GIT_PRODUCTION_REPOSITORY`
+| Defines the git repository used as the production git repository during promotion.
+|
+| x
+
+| `RELEASE_GIT_STAGING_BRANCH`
+| Defines the branch used as the staging git branch used to promote to the production one.
+|
+| x
+
+| `RELEASE_GIT_STAGING_REPOSITORY`
+| Defines the git repository used as the staging git repository during promotion.
+|
+| x
+
+| `RELEASE_GIT_STAGING_REPOSITORY_PATH`
+| Defines path where staging git repository will be be checkout.
+|
+| x
+
 
 |`MAVEN_REPOSITORY_URL`
-| Defines the maven repository URL where it pushes generated artifacts
+| Defines the maven repository URL where is pushed generated artifacts.
+| x
+| x
 
 |`MAVEN_REPOSITORY_NAME`
-| Defines the maven repository name where it pushes generated artifacts
+| Defines the maven repository name where is pushed generated artifacts.
+| x
+| x
+
+|`MAVEN_REPOSITORY_PASSWORD`
+| Defines the maven repository password.
+| x
+| x
+
+
+|`MAVEN_REPOSITORY_USERNAME`
+| Defines the maven repository username.
+| x
+| x
+
+
+|`MAVEN_REPOSITORY_PRODCUTION_NAME`
+| Defines the production maven repository name used during maven promotion.
+|
+| x
+
+| `PKGSERVER`
+| Defines where the different packages will be published.
+|
+| x
+
+| `PKGSERVER_SSH_OPTS`
+| Defines custom ssh options used to connect to `PKGSERVER`.
+|
+| x
+
+| `PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS`
+| Defines parameters used by `promoteMavenArtifacts.py`.   
+
+Default value is set to `item --mode copy --source $MAVEN_REPOSITORY_NAME --destination $MAVEN_REPOSITORY_PRODUCTION_NAME --url $MAVEN_REPOSITORY_URL --username $MAVEN_REPOSITORY_USERNAME --password $MAVEN_REPOSITORY_PASSWORD --search '/org/jenkins-ci/main' $(./utils/getJenkinsVersion.py --version)}"`
+
+|
+| x
+
+| `RELEASELINE`
+| Define the release line used by packaging scripts in https://github.com/jenkinsci/packaging[jenkinsci/packaging].
+|
+| x
+
+| `RELEASE_PROFILE`
+| Define a file containing environment variables specific to a release, located in the profile.d directory.
+| x
+| x
+
+| `SIGN_ALIAS`
+| Define code signing certificate name.
+| x
+| x
+
+| `SIGN_KEYSTORE_FILENAME`
+| Define code signing certificate file name.
+| x
+| x
+
+| `SIGN_KEYSTORE`
+| Define signing keystore.
+| x
+| x
+
+| `SIGN_CERTIFICATE`
+| Define code signing certificate file name.
+| x
+| x
 
 |===
 
-=== Steps
+== Process
+
+=== Introduction
+
+The release process is divided in two categories.
+The first part that we mention by using the term the *release*, is when we create a new java code release. It relies on the Maven Release Plugin to perform the release. It involves signing with a GPG key and a code signing certificate. At the end of this operation signed maven artifacts are pushed to a Maven repository.
+
+The second part that we name *packaging* is when we retrieve from a Maven repository, the version we want to package. Then we build distribution packages, publish them, promote artifacts between staging and production environment if needed and finally we ensure that our mirrors are up to date.
+
+==== Required
+In order to trigger a new release, you must fulfil following requirements:
+
+- [x] https://github.com/jenkins-infra/openvpn[Jenkins VPN Access] access
+- [x] Being part of LDAP group 'release-core'
+- [x] https://release.ci.jenkins.io[release.ci.jenkins.io] access
+
+=== Release
+At this stage, we are going to retrieve the Java code, release a new version using the maven release plugin and then publish artifacts on a maven repository.
+
+It's important to notice that we do not use the maven release plugin to checkout git repositories neither to push changes. This allow us to release from a different git repository than the one defined in the pom.xml. We also need to be able to push commits to a different repository than the one defined in the pom.xml.
+
+. link:http://maven.apache.org/maven-release/maven-release-plugin/perform-mojo.html#localCheckout[localCheckout] must be set to true
+. link:http://maven.apache.org/maven-release/maven-release-plugin/prepare-mojo.html#pushChanges[puchChanges] must be set to false
+
+
+==== Steps
 
 Estimated time +- 1h30
 
-. Connect to the Jenkins VPN
-. Open your favorite browser to https://release.ci.jenkins.io
-. Trigger the release job on the master branch. https://release.ci.jenkins.io/blue/organizations/jenkins/core-release/branches[Link]
-. Once triggered, it asks you which release line you want to do. It's important to know that the release line matches one of the profiles defined https://github.com/jenkins-infra/release/tree/master/profile.d[here], so please carefully review the settings and be sure that is what you are looking for.
-. At the end of the job, several git commit and maven artifacts will be pushed on their respective locations
+. Connect to the Jenkins VPN.
+. Open your favorite browser to https://release.ci.jenkins.io.
+. Trigger the release job on the master branch. https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Frelease/branches/[Link].
+. Once triggered, it asks you which release line you want to do. It's important to know that the release line matches one of the profiles file defined https://github.com/jenkins-infra/release/tree/master/profile.d[here], so please carefully review the settings and be sure that it does what you are looking for.
+. At the end of the job, git commits and maven artifacts will be pushed to their respective locations.
 
-=== Validate
-To validate that the release went well, except by having a green build, you can double-check that your artifacts have been correctly pushed on your Maven repository located on `$MAVEN_REPOSITORY_URL/$MAVEN_REPOSITORY_NAME/org/jenkins-ci/main/jenkins-war/` and also that running `jarsigner -verify <your generated artifact>` is correct.
+==== Validate
+To validate that the release went well, excepted by having a green build, you can double-check that your artifacts have been correctly pushed to Maven repository located on `$MAVEN_REPOSITORY_URL/$MAVEN_REPOSITORY_NAME/org/jenkins-ci/main/jenkins-war/`. You could also run `jarsigner -verify <your generated artifact>` is correct.
 
-=== Stage
-Currently, we do not provide an automated way to promote a release but you can still stage a release by specifying a staging git repository and/or a different maven repository. Then you have to promote manually your release.
+==== Stage
+In order to have private maven releases, you can modify `RELEASE_GIT_REPOSITORY` or `MAVEN_REPOSITORY_NAME`, to respectively use code from a private git repository and then push artifacts to a private maven repository.
 
-To promote your git repository, you have to open a pull request from your git repository to https://github.com/jenkinsci/jenkins/compare?expand=1[jenkinsci/jenkins] on the appropriated branch.
+Artifact promotion is done in the next stage 'packaging'.
 
-To promote your maven artifacts, you have to manually move them to the right location.
+=== Packaging
+
+The packaging process looks after the latest Jenkins version published on a Maven repository and then build and publish artifacts for Debian, Red Hat, SUSE, Windows. It also republishes the War file on the package server.
+If enabled, then it promotes git commits between git repository, promotes maven artifacts between maven repository.
+
+NOTE: Packages are not re-published if they already exist, only package website is overridden so it's safe to re-trigger the job.
 
 
-== Package
-
-The packaging process looks after the latest Jenkins version published on a Maven repository and then build and publish artifacts for Debian, Red Hat, SUSE, Windows and also republishes the War file on the package server.
-
-Remark: Packages are not published if a similar version was already published.
-
-=== Required
-
-- [x] https://github.com/jenkins-infra/openvpn[Jenkins VPN Access]
-- [x] Being part of LDAP group 'release-core'
-- [x] Access to https://release.ci.jenkins.io[release.ci.jenkins.io]
-
-=== Settings
-
-Those are the most important settings defined in your release profile that will impact the packaging process:
-
-[cols="1,3a", options="header"]
-.Settings
-|===
-| Variable | Description
-
-| JENKINS_VERSION
-| Define which version of Jenkins will be downloaded where version accept following value:
-
-* `weekly`, fetches the latest version available on a maven repository.
-* `stable`, fetches the latest version that matches pattern X.Y.Z
-* `version`, a valid version
-
-https://github.com/jenkins-infra/release/blob/master/utils/getJenkinsVersion.py[getJenkinsVersion.py]
-
-| MAVEN_REPOSITORY_URL
-| Defines the maven repository URL used to download the jenkins.war
-
-| MAVEN_REPOSITORY_NAME
-| Defines the maven repository name used to download the jenkins.war
-
-| PKGSERVER
-| Defines where the different packages will be published
-
-| RELEASELINE
-| Define the release line used by packaging scripts in https://github.com/jenkinsci/packaging[jenkinsci/packaging]
-
-|===
-
-=== Steps
+==== Steps
 
 Estimated time +- 30min
 
 . Connect to the Jenkins VPN
 . Open your favorite browser to https://release.ci.jenkins.io[release.ci.jenkins.io]
-. Trigger the packaging job on the master branch. https://release.ci.jenkins.io/blue/organizations/jenkins/core-package/branches[Link]
+. Trigger the packaging job on the master branch. https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Fpackage/branches/[Link]
 . Once triggered, it asks you which release line you want to package for. The release line matches one of the profile defines in https://github.com/jenkins-infra/release/tree/master/profile.d[profile.d], so please carefully review those settings in order to validate that's what you are looking for.
 
-Once the job is done, every package will be published and then mirror synced
+Once the job is done, every package will be published and then mirror synchronized.
 
-=== Validate
+==== Validate
 Ensure that packages are correctly published on pkg.jenkins.io and correctly signed.
 
-=== Stage
-Staging packages is not supported.
+==== Stage
+Staging packages is not yet fully supported, more information on link:https://issues.jenkins-ci.org/browse/INFRA-1363[INFRA-1363] and link:https://issues.jenkins-ci.org/browse/INFRA-2608[INFRA-2608]
+
+== Profile
+The release profile is used to identify the kind of release we are going to do. They are mainly influenced by following elements:
+
+. Do we want to releases based on different repository branch?
+. Do we want to release based on different git repository?
+
+At the moment we identify four release type
+
+. Weekly
+. Stable
+. Security
+. Lts security
+
+[NOTE]
+====
+link:https://release.ci.jenkins.io[release.ci.jenkins.io] has two generic jobs, one for release and a second one for packaging.
+One job per release type triggers the two generic jobs with different parameters.
+While it isn't required to trigger a release type job, it increases visibility and reduces the risk of human error.
+====
+
+=== Weekly
+
+The weekly release is the default release. It is scheduled every Tuesday as defined by this link:https://github.com/jenkins-infra/release/blob/19685def608c641496e6e2de3d40c275ca5e913d/Jenkinsfile.d/core/weekly#L15[cron].
+It uses parameters defined in this link:https://github.com/jenkins-infra/release/blob/master/profile.d/weekly[file]
+
+It releases using the repository https://github.com/jenkinsci/jenkins[jenkinsci/jenkins] from the branch master. Artifacts are pushed to the default maven repository 'Releases'.
+
+If for some reason the release job needs to be re-triggered, you can:
+
+. Connect to the Jenkins VPN
+. Open your favorite browser to link:https://release.ci.jenkins.io[release.ci.jenkins.io]
+. Review the weekly environment https://github.com/jenkins-infra/release/blob/master/profile.d/weekly[file]:
+. Trigger the weekly link:https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Fweekly%2Frelease/branches/[job]
+
+[NOTE]
+====
+You can re-trigger individually the two downstream jobs, release and packaging.
+
+- Re-triggering the release will do a version bump then push new artifacts.
+- Re-triggering the packaging job won't published artifacts if they already exist but it will update website html.
+====
+
+=== Stable
+A stable release is a manually triggered release that happens around once a month.
+Refer to link:https://www.jenkins.io/download/lts/[LTS Release Line] for more detailed information.
+It uses parameters defined in this link:https://github.com/jenkins-infra/release/blob/master/profile.d/stable[file].
+
+Before triggering a new stable release, some steps are required:
+
+. Prepare `jenkinsci/jenkins` repository -> missing documentation link.
+. Create a branch on jenkins-infra/release with a branch name that match the release branch from jenkinsci/jenkins like `stable-2.235`
+. Review and update the stable environment https://github.com/jenkins-infra/release/blob/master/profile.d/stable[file] with:
+.. `RELEASE_GIT_BRANCH` set to the `jenkinsci/jenkins` release branch like `stable-2.235`
+.. `JENKINS_VERSION` set to the final release version that will be packaged. If set to 'stable' then the packaging job will try to guess the version based on what was pushed to the maven repository. cfr settings.
+.. `PACKAGING_GIT_BRANCH` set to the appropriated `jenkinsci/packaging` branch
+. Trigger the stable link:https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Fstable%2Frelease/branches/[job]
+
+[NOTE]
+====
+You can re-trigger individually the two downstream jobs, release and packaging.
+
+- Re-triggering the release will do a version bump then push new artifacts.
+- Re-triggering the packaging job won't published artifacts if they already exist but it will update website html.
+====
+
+=== Security
+The security release follows the same process as the stable one except that it also promotes git commits from a private repository to the public one and also promotes maven artifacts from a private maven repository to the public one.
+
+. Prepare jenkinsci-cert/jenkins repository -> missing documentation link
+. Create a branch on jenkins-infra/release with a branch name that match the release branch from jenkinsci/jenkins like `stable-2.135`
+. Review and update the security environment https://github.com/jenkins-infra/release/blob/master/profile.d/security[file] with:
+.. `RELEASE_GIT_BRANCH` set to the `jenkinsci-cert/jenkins` release branch like `stable-2.135`
+.. `JENKINS_VERSION` set to the final release version that will be packaged. If set to 'stable' or 'weekly' then the packaging job will try to guess the version based on what was pushed to the maven repository. cfr settings.
+.. `PACKAGING_GIT_BRANCH` set to the appropriated jenkinsci/packaging branch
+.. `MAVEN_REPOSITORY_NAME` set to the maven repository name where we are going to publish staging maven artifacts. This is also the source location used by the packaging job to build distribution packages
+. Trigger the security link:https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Fsecurity%2Frelease/branches/[job]
+
+[NOTE]
+====
+You can re-trigger individually the two downstream jobs, release and packaging.
+
+- Re-triggering the release will do a version bump then push new artifacts.
+- Re-triggering the packaging job won't published artifacts if they already exist but it will update website html.
+====
 
 == Certificate
+
 The Jenkins project uses a Digicert account provided by CDF to request code signing certificate.
 The release environment is designed to download a pkcs12 certificate from Azure key vault.
 
@@ -179,7 +402,7 @@ Show pkcs12 information
 
 == Core Maintainers
 
-More information about Jenkins Core maintainers and the different roles can be found in https://github.com/jenkinsci/jenkins/blob/master/docs/MAINTAINERS.adoc[MAINTAINERS]
+More information about Jenkins Core maintainers and the different roles can be found in https://github.com/jenkinsci/jenkins/blob/master/docs/MAINTAINERS.adoc[MAINTAINERS].
 
 == Miscellaneous
 
