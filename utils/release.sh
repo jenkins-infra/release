@@ -280,6 +280,12 @@ cat <<EOT> settings-release.xml
       <username>$MAVEN_REPOSITORY_USERNAME</username>
       <password>$MAVEN_REPOSITORY_PASSWORD</password>
     </server>
+    <!--This server id is used by jenkinsci/remoting -->
+    <server>
+      <id>maven.jenkins-ci.org</id>
+      <username>$MAVEN_REPOSITORY_USERNAME</username>
+      <password>$MAVEN_REPOSITORY_PASSWORD</password>
+    </server>
   </servers>
   <activeProfiles>
     <activeProfile>release</activeProfile>
