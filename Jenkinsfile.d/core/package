@@ -317,6 +317,7 @@ pipeline {
         }
       }
     }
+
     stage('Promote'){
       failFast true
       parallel {
@@ -344,6 +345,18 @@ pipeline {
               sshagent(['pkgserver']) {
                 sh '''
                   ./utils/release.sh --promoteStagingGitRepository
+                '''
+              }
+            }
+          }
+        }
+        stage('Pkg Server Data') {
+          steps {
+            container('packaging'){
+              sshagent(['pkgserver']) {
+                sh '''
+                  ./utils/release.sh --promoteMirrorData debian opensuse redhat war windows
+                  ./utils/release.sh --promotePkgServerData debian opensuse redhat war windows
                 '''
               }
             }

@@ -44,6 +44,9 @@ source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
 : "${RELEASE_GIT_PRODUCTION_REPOSITORY:=$RELEASE_GIT_REPOSITORY }"
 : "${RELEASE_GIT_PRODUCTION_BRANCH:=$RELEASE_GIT_BRANCH}"
 
+
+PKGSERVER_SSH_OPTS=($PKGSERVER_SSH_OPTS)
+
 export JENKINS_VERSION
 export JENKINS_DOWNLOAD_URL
 export MAVEN_REPOSITORY_USERNAME
@@ -384,6 +387,50 @@ function promoteStagingGitRepository(){
 
 }
 
+function promotePkgServerData(){
+
+  for DISTRIBUTION in "$@"; do
+
+    STAGING_DIRECTORY="/var/www/pkg.jenkins.io.staging/$DISTRIBUTION$RELEASELINE/"
+    PRODUCTION_DIRECTORY="/var/www/pkg.jenkins.io.staging/$DISTRIBUTION$RELEASELINE/"
+
+    echo "Promoting pkg server data from Staging to Production for $DISTRIBUTION"
+    rsync \
+      --archive \
+      --compress \
+      --verbose \
+      --ignore-existing \
+      --progress \
+       -e "ssh ${PKGSERVER_SSH_OPTS[*]}" \
+      --omit-dir-times \
+      --exclude=.htaccess \
+      --exclude=\*.key \
+      --exclude=jenkins.repo \
+      "$PKGSERVER:$STAGING_DIRECTORY" "$PKGSERVER:$PRODUCTION_DIRECTORY"
+  done;
+}
+
+function promoteDistributionPackages(){
+
+
+  for PACKAGE in "$@"; do
+
+    STAGING_DIRECTORY="/srv/releases/jenkins.staging/$DISTRIBUTION$RELEASELINE/"
+    PRODUCTION_DIRECTORY="/srv/releases/jenkins/$DISTRIBUTION$RELEASELINE/"
+
+    echo "Promoting pkg server data from Staging to Production for $DISTRIBUTION"
+    rsync \
+      --archive \
+      --compress \
+      --verbose \
+      --ignore-existing \
+      --progress \
+       -e "ssh ${PKGSERVER_SSH_OPTS[*]}" \
+      --omit-dir-times \
+      "$PKGSERVER:$STAGING_DIRECTORY" "$PKGSERVER:$PRODUCTION_DIRECTORY"
+  done;
+}
+
 function pushCommits(){
   : "${RELEASE_SCM_TAG:?RELEASE_SCM_TAG not definded}"
 
@@ -511,7 +558,6 @@ EOF
 
 function syncMirror(){
 
-  PKGSERVER_SSH_OPTS=($PKGSERVER_SSH_OPTS)
   ssh "${PKGSERVER_SSH_OPTS[@]}" "$PKGSERVER" /srv/releases/sync.sh
 }
 
@@ -549,6 +595,8 @@ function main(){
             --showPackagingPlan) echo "Show Packaging Plan" && showPackagingPlan ;;
             --promoteStagingMavenArtifacts) echo "Promote Staging Maven Artifacts" && promoteStagingMavenArtifacts ;;
             --promoteStagingGitRepository) echo "Promote Staging Git Repository" && promoteStagingGitRepository ;;
+            --promoteStagingPkgServer) echo "Promote Staging pkg server metadata" && promoteStagingPkgServer "$@";;
+            --promoteDistributionPackages) echo "Promote Distribution Packages" && promoteDistributionPackages "$@";;
             --rollback) echo "Rollback release $RELEASE_SCM_TAG" && rollblack ;;
             --stageRelease) echo "Stage Release" && stageRelease ;;
             --packaging) echo 'Execute packaging makefile, quote required around Makefile target' && packaging "$2";;

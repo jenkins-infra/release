@@ -345,6 +345,7 @@ The security release follows the same process as the stable one except that arti
 .. `JENKINS_VERSION` set to the final release version that will be packaged. If set to 'stable' or 'weekly' then the packaging job will try to guess the version based on what was pushed to the maven repository. cfr settings.
 .. `PACKAGING_GIT_BRANCH` set to the appropriated jenkinsci/packaging branch
 .. `MAVEN_REPOSITORY_NAME` set to the maven repository name where we are going to publish staging maven artifacts. This is also the source location used by the packaging job to build distribution packages
+<<<<<<< HEAD
 . Trigger the generic Release link:https://release.ci.jenkins.io/job/core/job/release/[job] from the appropriated branch like `security-stable-2.235`
 .. Force repository scan
 .. Trigger the first build to have access to job parameter and immediately abort it
@@ -362,6 +363,10 @@ The security release follows the same process as the stable one except that arti
 ... `MAVEN_STAGING_REPOSITORY_PROMOTION_ENABLED` set to true
 ... `GIT_STAGING_REPOSITORY_PROMOTION_ENABLED` set to false as we prefer to do it manually once everything is done
 ... `VALIDATION_ENABLED` set to true
+=======
+.. `RELEASELINE` set the releaseline '-stable' for stable releases and nothing for weekly
+. Trigger the security link:https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Fsecurity%2Frelease/branches/[job]
+>>>>>>> Add pkgServer promotion mechanism
 
 [NOTE]
 ====
