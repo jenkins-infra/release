@@ -26,3 +26,8 @@ RELEASE_GIT_PRODUCTION_BRANCH=master
 #         as retrieved from ./utils/getJenkinsVersion.py
 
 MAVEN_REPOSITORY_PRODUCTION_NAME=releases
+
+RELEASE_GIT_BRANCH=security-master
+JENKINS_VERSION=2.245
+MAVEN_REPOSITORY_NAME=connor-weekly
+
