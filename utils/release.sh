@@ -392,7 +392,7 @@ function promotePkgServerData(){
   for DISTRIBUTION in "$@"; do
 
     STAGING_DIRECTORY="/var/www/pkg.jenkins.io.staging/$DISTRIBUTION$RELEASELINE/"
-    PRODUCTION_DIRECTORY="/var/www/pkg.jenkins.io.staging/$DISTRIBUTION$RELEASELINE/"
+    PRODUCTION_DIRECTORY="/var/www/pkg.jenkins.io/$DISTRIBUTION$RELEASELINE/"
 
     echo "Promoting pkg server data from Staging to Production for $DISTRIBUTION"
     rsync \
