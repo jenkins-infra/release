@@ -347,7 +347,7 @@ The security release follows the same process as the stable one except that arti
 .. `MAVEN_REPOSITORY_NAME` set to the maven repository name where we are going to publish staging maven artifacts. This is also the source location used by the packaging job to build distribution packages
 . Trigger the generic Release link:https://release.ci.jenkins.io/job/core/job/release/[job] from the appropriated branch like `security-stable-2.235`
 .. Force repository scan
-.. Trigger the first build to have access to job parameter
+.. Trigger the first build to have access to job parameter and immediately abort it
 .. Trigger a job with the correct parameters
 ... `RELEASE_PROFILE` set to `security`
 ... `RELEASE_GIT_BRANCH` set to `unused` as we already define it in the release profile file, which overrides the job parameter
