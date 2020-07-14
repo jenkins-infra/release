@@ -353,7 +353,7 @@ The security release follows the same process as the stable one except that arti
 ... `RELEASE_GIT_BRANCH` set to `unused` as we already define it in the release profile file, which overrides the job parameter
 ... `MAVEN_REPOSITORY_NAME` set to `unused` as we already define it in the release profile file, which overrides the job parameter
 ... `VALIDATION_ENABLED` set to true in to have a validation stage
-.. Trigger the generic Packaging job link:https://release.ci.jenkins.io/job/core/job/package/[job] from the appropriated branch like `security-stable-2.235` with correct parameters
+.. Trigger the generic Packaging job link:https://release.ci.jenkins.io/job/core/job/package/[job] from the appropriate branch like `security-stable-2.235` with correct parameters
 ... `RELEASE_PROFILE` set to `security`
 ... `JENKINS_VERSION` set to the final version you are going to release for like `2.235`
 ... `RELEASE_GIT_BRANCH`  set to `unused` same reason that earlier
