@@ -339,7 +339,7 @@ You can re-trigger individually the two downstream jobs, release and packaging.
 The security release follows the same process as the stable one except that artifacts are published in private. So we need promote git commits from a private repository to the public one then promote maven artifacts from a private maven repository to the public one.
 
 . Prepare jenkinsci-cert/jenkins repository -> missing documentation link
-. Create a branch on jenkins-infra/release with a branch name that match the release branch from jenkinsci/jenkins like `security-stable-2.135`
+. Create a branch on jenkins-infra/release with a branch name that match the release branch from jenkins-cert/jenkins like `security-stable-2.135`
 . Review and update the security environment https://github.com/jenkins-infra/release/blob/master/profile.d/security[file] with:
 .. `RELEASE_GIT_BRANCH` set to the `jenkinsci-cert/jenkins` release branch like `security-stable-2.135`
 .. `JENKINS_VERSION` set to the final release version that will be packaged. If set to 'stable' or 'weekly' then the packaging job will try to guess the version based on what was pushed to the maven repository. cfr settings.
