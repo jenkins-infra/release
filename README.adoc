@@ -336,23 +336,39 @@ You can re-trigger individually the two downstream jobs, release and packaging.
 ====
 
 === Security
-The security release follows the same process as the stable one except that it also promotes git commits from a private repository to the public one and also promotes maven artifacts from a private maven repository to the public one.
+The security release follows the same process as the stable one except that artifacts are published in private. So we need to promote git commits from a private repository to the public one then promote maven artifacts from a private maven repository to the public one.
 
 . Prepare jenkinsci-cert/jenkins repository -> missing documentation link
-. Create a branch on jenkins-infra/release with a branch name that match the release branch from jenkinsci/jenkins like `stable-2.135`
+. Create a branch on jenkins-infra/release with a branch name that match the release branch from jenkins-cert/jenkins like `security-stable-2.135`
 . Review and update the security environment https://github.com/jenkins-infra/release/blob/master/profile.d/security[file] with:
-.. `RELEASE_GIT_BRANCH` set to the `jenkinsci-cert/jenkins` release branch like `stable-2.135`
+.. `RELEASE_GIT_BRANCH` set to the `jenkinsci-cert/jenkins` release branch like `security-stable-2.135`
 .. `JENKINS_VERSION` set to the final release version that will be packaged. If set to 'stable' or 'weekly' then the packaging job will try to guess the version based on what was pushed to the maven repository. cfr settings.
 .. `PACKAGING_GIT_BRANCH` set to the appropriated jenkinsci/packaging branch
 .. `MAVEN_REPOSITORY_NAME` set to the maven repository name where we are going to publish staging maven artifacts. This is also the source location used by the packaging job to build distribution packages
-. Trigger the security link:https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Fsecurity%2Frelease/branches/[job]
+. Trigger the generic Release link:https://release.ci.jenkins.io/job/core/job/release/[job] from the appropriated branch like `security-stable-2.235`
+.. Force repository scan
+.. Trigger the first build to have access to job parameter and immediately abort it
+.. Trigger a job with the correct parameters
+... `RELEASE_PROFILE` set to `security`
+... `RELEASE_GIT_BRANCH` set to `unused` as we already define it in the release profile file, which overrides the job parameter
+... `MAVEN_REPOSITORY_NAME` set to `unused` as we already define it in the release profile file, which overrides the job parameter
+... `VALIDATION_ENABLED` set to true if the validation stage should run
+.. Trigger the generic Packaging job link:https://release.ci.jenkins.io/job/core/job/package/[job] from the appropriate branch like `security-stable-2.235` with correct parameters
+... `RELEASE_PROFILE` set to `security`
+... `JENKINS_VERSION` set to the final version you are going to release for like `2.235`
+... `RELEASE_GIT_BRANCH`  set to `unused` same reason as before
+... `MAVEN_REPOSITORY_NAME` set to `unused` same reason as before
+... `MAVEN_REPOSITORY_PRODUCTION_NAME` set to `unused`
+... `MAVEN_STAGING_REPOSITORY_PROMOTION_ENABLED` set to true
+... `GIT_STAGING_REPOSITORY_PROMOTION_ENABLED` set to false as we prefer to do it manually once everything is done
+... `VALIDATION_ENABLED` set to true
 
 [NOTE]
 ====
-You can re-trigger individually the two downstream jobs, release and packaging.
+You can re-trigger individually the two downstream jobs, release, and packaging.
 
 - Re-triggering the release will do a version bump then push new artifacts.
-- Re-triggering the packaging job won't published artifacts if they already exist but it will update website html.
+- Re-triggering the packaging job won't publish artifacts if they already exist but it will update website html.
 ====
 
 == Certificate
