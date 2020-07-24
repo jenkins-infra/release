@@ -57,6 +57,11 @@ pipeline {
       description: 'Define if we wait for validation after displaying the plan or not',
       name: 'VALIDATION_ENABLED'
     )
+    booleanParam(
+      defaultValue: false,
+      description: 'Enable Windows Packaging',
+      name: 'WINDOWS_PACKAGING_ENABLED'
+    )
   }
 
   options {
@@ -267,6 +272,9 @@ pipeline {
           }
         }
         stage('Windows') {
+          when {
+            environment name: 'WINDOWS_PACKAGING_ENABLED', value: 'true'
+          }
           stages {
             stage('Build') {
               // Windows requirement: Every steps need to be executed inside default jnlp
