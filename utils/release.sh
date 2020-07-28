@@ -298,7 +298,7 @@ EOT
 
 function invalidateFastlyCache(){
   : "${FASTLY_API_TOKEN:?Require FASTLY_API_TOKEN env variable}"
-  : "${FASTLY_SERVICE_ID:=2HkujsIHUSzEn4ZTVzxGQs}"
+  : "${FASTLY_SERVICE_ID:?Require FASTLY_SERVICE_ID env variable}"
 
   curl \
     -X POST \
