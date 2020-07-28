@@ -371,6 +371,21 @@ pipeline {
         }
       }
     }
+    stage('Invalidate Fastly Cache'){
+      environment {
+        FASTLY_API_TOKEN = credentials('fastly-api-token')
+        FASTLY_SERVICE_ID = credentials('fastly_pkgserver_service_id')
+      }
+      steps{
+        container('packaging'){
+          sshagent(['pkgserver']) {
+            sh '''
+              ./utils/release.sh --invalidateFastlyCache
+            '''
+          }
+        }
+      }
+    }
   }
     post {
       failure {

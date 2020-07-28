@@ -296,6 +296,19 @@ cat <<EOT> settings-release.xml
 EOT
 }
 
+function invalidateFastlyCache(){
+  : "${FASTLY_API_TOKEN:?Require FASTLY_API_TOKEN env variable}"
+  : "${FASTLY_SERVICE_ID:?Require FASTLY_SERVICE_ID env variable}"
+
+  curl \
+    -X POST \
+    -H "Fastly-Key: $FASTLY_API_TOKEN" \
+    -H "Accept: application/json" \
+    -H "Fastly-Soft-Purge:1" \
+    "https://api.fastly.com/service/$FASTLY_SERVICE_ID/purge_all"
+
+}
+
 function configurePackagingEnv(){
 
   requireGPGPassphrase
@@ -539,6 +552,7 @@ function main(){
             --downloadAzureKeyvaultSecret) echo "Download Azure Key Vault Secret" && downloadAzureKeyvaultSecret ;;
             --downloadJenkins) echo "Download Jenkins from maven repository" && downloadJenkinsWar ;;
             --getGPGKeyFromAzure) echo "Download GPG Key from Azure" && getGPGKeyFromAzure ;;
+            --invalidateFastlyCache) echo "Invalidating Fastly cache" && invalidateFastlyCache ;;
             --validateKeystore) echo "Validate Keystore"  && validateKeystore ;;
             --verifyGPGSignature) echo "Verify GPG Signature" && verifyGPGSignature ;;
             --verifyCertificateSignature) echo "Verify certificate signature" && verifyCertificateSignature ;;
