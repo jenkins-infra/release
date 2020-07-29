@@ -58,7 +58,7 @@ pipeline {
       name: 'VALIDATION_ENABLED'
     )
     booleanParam(
-      defaultValue: false,
+      defaultValue: true,
       description: 'Enable Windows Packaging',
       name: 'WINDOWS_PACKAGING_ENABLED'
     )
