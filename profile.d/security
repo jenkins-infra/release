@@ -1,11 +1,11 @@
 #
 # WARNING: Any variables defined here, override those defined from the Jenkinsfile
 #
-# RELEASE_GIT_BRANCH is provided at run time
+RELEASE_GIT_BRANCH=security-master
 #
 RELEASE_GIT_REPOSITORY=git@github.com:jenkinsci-cert/jenkins.git
 #
-# JENKINS_VERSION is provided at run time
+JENKINS_VERSION=2.252
 #
 GIT_EMAIL=66998184+jenkins-release-bot@users.noreply.github.com
 GIT_NAME="Jenkins Release Bot"
@@ -15,14 +15,4 @@ MAVEN_REPOSITORY_URL=https://repo.jenkins-ci.org
 MAVEN_PUBLIC_JENKINS_REPOSITORY_MIRROR_URL='http://nexus/repository/jenkins-public/'
 SIGN_ALIAS=jenkins
 
-### Git Staging Promotion Settings
-#
-RELEASE_GIT_PRODUCTION_REPOSITORY=git@github.com:jenkinsci/jenkins.git
-RELEASE_GIT_PRODUCTION_BRANCH=master
-
-### Maven Staging Promotion Settings
-#
-# Remark: Version to be promoted will be the latest version pushed to the maven repository
-#         as retrieved from ./utils/getJenkinsVersion.py
-
-MAVEN_REPOSITORY_PRODUCTION_NAME=releases
+MAVEN_REPOSITORY_NAME=carlos
