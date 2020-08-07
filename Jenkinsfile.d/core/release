@@ -63,6 +63,13 @@ pipeline {
 
   stages {
     stage('Clone Release Git Repository') {
+      when {
+        not {
+          environment name: 'BUILD_NUMBER', value: '1'
+        }
+        beforeAgent true
+      }
+
       steps {
         container('jnlp') {
           sshagent(['release-key']) {
@@ -72,6 +79,13 @@ pipeline {
       }
     }
     stage('Clean Release') {
+      when {
+        not {
+          environment name: 'BUILD_NUMBER', value: '1'
+        }
+        beforeAgent true
+      }
+
       steps {
         container('maven') {
           sh 'utils/release.sh --cleanRelease'
@@ -79,6 +93,13 @@ pipeline {
       }
     }
     stage('Plan') {
+      when {
+        not {
+          environment name: 'BUILD_NUMBER', value: '1'
+        }
+        beforeAgent true
+      }
+
       steps {
         container('maven') {
           sh 'utils/release.sh --showReleasePlan'
@@ -86,6 +107,13 @@ pipeline {
       }
     }
     stage('Validate') {
+      when {
+        not {
+          environment name: 'BUILD_NUMBER', value: '1'
+        }
+        beforeAgent true
+      }
+
       when {
         environment name: 'VALIDATION_ENABLED', value: 'true'
         beforeInput true
@@ -102,6 +130,13 @@ pipeline {
       }
     }
     stage('Get Code Signing Certificate') {
+      when {
+        not {
+          environment name: 'BUILD_NUMBER', value: '1'
+        }
+        beforeAgent true
+      }
+
       steps {
         container('azure-cli') {
           sh '''
@@ -112,6 +147,13 @@ pipeline {
       }
     }
     stage('Get GPG key') {
+      when {
+        not {
+          environment name: 'BUILD_NUMBER', value: '1'
+        }
+        beforeAgent true
+      }
+
       steps {
         container('azure-cli') {
           sh '''
@@ -121,6 +163,13 @@ pipeline {
       }
     }
     stage('Prepare Release') {
+      when {
+        not {
+          environment name: 'BUILD_NUMBER', value: '1'
+        }
+        beforeAgent true
+      }
+
       steps {
         container('maven') {
           // Maven Release requires gpg key with password password and a certificate key with password
@@ -138,6 +187,13 @@ pipeline {
       }
     }
     stage('Push Commits') {
+      when {
+        not {
+          environment name: 'BUILD_NUMBER', value: '1'
+        }
+        beforeAgent true
+      }
+
       // environment {
       //   GIT_SSH = 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $RELEASE_SSH_KEY'
       // }
@@ -162,6 +218,13 @@ pipeline {
       }
     }
     stage('Stage Release') {
+      when {
+        not {
+          environment name: 'BUILD_NUMBER', value: '1'
+        }
+        beforeAgent true
+      }
+
       steps {
         container('maven') {
           sh '''
@@ -171,6 +234,13 @@ pipeline {
       }
     }
     stage('Verify artifacts') {
+      when {
+        not {
+          environment name: 'BUILD_NUMBER', value: '1'
+        }
+        beforeAgent true
+      }
+
       steps {
         container('maven') {
           sh '''

@@ -98,6 +98,13 @@ pipeline {
 
   stages {
     stage('Plan') {
+      when {
+        not {
+          environment name: 'BUILD_NUMBER', value: '1'
+        }
+        beforeAgent true
+      }
+
       steps {
         container('packaging') {
           sh 'utils/release.sh --showPackagingPlan'
@@ -107,6 +114,9 @@ pipeline {
     stage('Validate') {
       when {
         environment name: 'VALIDATION_ENABLED', value: 'true'
+        not {
+          environment name: 'BUILD_NUMBER', value: '1'
+        }
         beforeInput true
       }
 
@@ -122,6 +132,12 @@ pipeline {
 
     }
     stage('Get GPG key') {
+      when {
+        not {
+          environment name: 'BUILD_NUMBER', value: '1'
+        }
+        beforeAgent true
+      }
 
       steps {
         container('azure-cli') {
@@ -146,6 +162,12 @@ pipeline {
     }
 
     stage('Get Code Signing Certificate') {
+      when {
+        not {
+          environment name: 'BUILD_NUMBER', value: '1'
+        }
+        beforeAgent true
+      }
 
       steps {
         container('azure-cli') {
@@ -160,6 +182,13 @@ pipeline {
     }
 
     stage('Download WAR archive to package'){
+      when {
+        not {
+          environment name: 'BUILD_NUMBER', value: '1'
+        }
+        beforeAgent true
+      }
+
       steps{
         container('packaging'){
           sh '''
@@ -173,6 +202,13 @@ pipeline {
       }
     }
     stage('Package'){
+      when {
+        not {
+          environment name: 'BUILD_NUMBER', value: '1'
+        }
+        beforeAgent true
+      }
+
       failFast false
       parallel {
         stage('WAR') {
@@ -326,6 +362,12 @@ pipeline {
       }
     }
     stage('Promote'){
+      when {
+        not {
+          environment name: 'BUILD_NUMBER', value: '1'
+        }
+        beforeAgent true
+      }
       failFast true
       parallel {
         stage('Maven Repository') {
@@ -361,6 +403,12 @@ pipeline {
     }
     // Force mirror synchronization
     stage('Synchronize mirror'){
+      when {
+        not {
+          environment name: 'BUILD_NUMBER', value: '1'
+        }
+        beforeAgent true
+      }
       steps{
         container('packaging'){
           sshagent(['pkgserver']) {
@@ -372,6 +420,12 @@ pipeline {
       }
     }
     stage('Invalidate Fastly Cache'){
+      when {
+        not {
+          environment name: 'BUILD_NUMBER', value: '1'
+        }
+        beforeAgent true
+      }
       environment {
         FASTLY_API_TOKEN = credentials('fastly-api-token')
         FASTLY_SERVICE_ID = credentials('fastly_pkgserver_service_id')
