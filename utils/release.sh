@@ -476,7 +476,7 @@ function verifyCertificateSignature(){
 function showReleasePlan(){
 
 cat <<-EOF
-    A new $RELEASE_PROFILE release will be generated.
+    A new $RELEASE_PROFILE release will be generated for the "${RELEASELINE:-weekly}" release).
 
     This new release will use the git repository: $RELEASE_GIT_REPOSITORY,
     using branch $RELEASE_GIT_BRANCH then push commits to the same location.
@@ -490,7 +490,7 @@ EOF
 function showPackagingPlan(){
 
 cat <<-EOF
-    New Jenkins core packages will be generated for version $(../utils/getJenkinsVersion.py --version)
+    New Jenkins core packages will be generated for version $(../utils/getJenkinsVersion.py --version) for the "${RELEASELINE:-weekly}" release
 
     Those new packages will be generated based on a war file downloaded
     from $JENKINS_DOWNLOAD_URL

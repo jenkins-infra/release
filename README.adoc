@@ -345,6 +345,7 @@ The security release follows the same process as the stable one except that arti
 .. `JENKINS_VERSION` set to the final release version that will be packaged. If set to 'stable' or 'weekly' then the packaging job will try to guess the version based on what was pushed to the maven repository. cfr settings.
 .. `PACKAGING_GIT_BRANCH` set to the appropriated jenkinsci/packaging branch
 .. `MAVEN_REPOSITORY_NAME` set to the maven repository name where we are going to publish staging maven artifacts. This is also the source location used by the packaging job to build distribution packages
+.. `RELEASELINE` set to '-stable' for a lts release otherwise leave empty
 . Trigger the generic Release link:https://release.ci.jenkins.io/job/core/job/release/[job] from the appropriated branch like `security-stable-2.235`
 .. Force repository scan
 .. Trigger the first build to have access to job parameter and immediately abort it
