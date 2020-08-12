@@ -2,6 +2,8 @@
 
 set -euxo pipefail
 
+guessGitBranchInformation
+
 : "${RELEASE_PROFILE:?Release profile required}"
 
 source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
@@ -19,7 +21,7 @@ source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
 : "${GPG_KEYNAME:=test-jenkins-release}"
 : "${GPG_FILE:=gpg-test-jenkins-release.gpg}"
 : "${GPG_VAULT_NAME:=gpg-test-jenkins-release-gpg}"
-: "${JENKINS_VERSION:=weekly}"
+: "${JENKINS_VERSION:=latest}"
 : "${JENKINS_WAR:=$WORKSPACE/$WORKING_DIRECTORY/war/target/jenkins.war}"
 : "${JENKINS_ASC:=$WORKSPACE/$WORKING_DIRECTORY/war/target/jenkins.war.asc}"
 : "${PKGSERVER:=mirrorbrain@pkg.origin.jenkins.io}"
@@ -185,8 +187,7 @@ function downloadAzureKeyvaultSecret(){
 }
 
 # JENKINS_VERSION: Define which version will be package where:
-# * \'stable\' means the latest stable version that satifies version pattern X.Y.Z
-# * \'weekly\' means the latest weekly version that satisfies version pattern X.Y
+# * \'latest\' means the latest version available
 # * <version> represents any valid existing version like 2.176.3 available at JENKINS_DOWNLOAD_URL
 # JENKINS_DOWNLOAD_URL: Specify the endpoint to use for downloading jenkins.war
 function downloadJenkinsWar(){
@@ -295,6 +296,63 @@ cat <<EOT> settings-release.xml
 </settings>
 EOT
 }
+
+# guessGitBranchInformation tries to guesss PROFILE, RELEASELINE, and JENKINS_VERSION based on the git branch
+# where security releases match pattern <security>-<RELEASELINE>-<JENKINS_VERSION>
+# where stable release match pattern <stable>-<JENKINS_VERSION>
+# where weekly release match pattern <master>
+function guessGitBranchInformation(){
+  #BRANCH_NAME="security-stable-2.235"
+  #BRANCH_NAME="stable-2.235"
+  #BRANCH_NAME="master"
+
+  "${BRANCH_NAME:=$(git rev-parse --abbrev-ref HEAD)}"
+
+  array=(${BRANCH_NAME//-/ })
+
+  if [[ "${#array[@]}" == 3 ]] ; then
+    echo "Based on branch $BRANCH_NAME, expect a security release"
+    if [[ "${array[0]}" != "security" ]]; then
+      echo "Wrong branch name '${array[0]}', you probably want 'security-{stable|weekly}-<JENKINS_VERSION>"
+      exit 1
+    fi
+    if [[ "${array[1]}" != "stable" && "${array[1]}" != "weekly" ]]; then
+      echo "Wrong release line '${array[0]}', you probably want 'security-{stable|weekly}-<JENKINS_VERSION>"
+      exit 1
+    fi
+
+    RELEASE_PROFILE="${RELEASE_PROFILE:=${array[0]}}"
+    RELEASELINE="${RELEASELINE:=-${array[1]}}"
+    JENKINS_VERSION="${JENKINS_VERSION:=${array[2]}}"
+  fi
+
+  if [[ "${#array[@]}" == 2 ]] ; then
+    echo "Based on branch $BRANCH_NAME, expect a stable release"
+    if [[ "${array[0]}" != "stable" ]]; then
+      echo "Wrong branch name '${array[0]}', you probably want 'stable-<JENKINS_VERSION>"
+      exit 1
+    fi
+    RELEASE_PROFILE="${RELEASE_PROFILE:=stable}"
+    RELEASELINE="${RELEASELINE:=-${array[0]}}"
+    JENKINS_VERSION="${JENKINS_VERSION:=${array[1]}}"
+  fi
+
+  if [[ "${#array[@]}" == 1 ]] ; then
+    echo "Based on branch $BRANCH_NAME, expect a weekly release"
+    if [[ "${array[0]}" != "master" ]]; then
+      echo "Wrong branch name '${array[0]}', you probably want to use 'master'"
+      exit 1
+    fi
+    RELEASE_PROFILE="${RELEASE_PROFILE:=weekly}"
+    RELEASELINE="${RELEASELINE:=}"
+    JENKINS_VERSION="${JENKINS_VERSION:=latest}"
+  fi
+
+  echo "PROFILE: $RELEASE_PROFILE"
+  echo "RELEASELINE: $RELEASELINE"
+  echo "JENKINS_VERSION $JENKINS_VERSION"
+}
+
 
 function invalidateFastlyCache(){
   : "${FASTLY_API_TOKEN:?Require FASTLY_API_TOKEN env variable}"
