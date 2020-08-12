@@ -16,3 +16,4 @@ MAVEN_PUBLIC_JENKINS_REPOSITORY_MIRROR_URL='http://nexus/repository/jenkins-publ
 SIGN_ALIAS=jenkins
 
 MAVEN_REPOSITORY_NAME=carlos
+RELEASELINE=-stable
