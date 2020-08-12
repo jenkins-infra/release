@@ -42,21 +42,27 @@ def getJenkinsVersion(metadataUrl, version):
         # Search in Maven repository for latest version of Jenkins
         # that satisfies X.Y.Z which represents stable version
 
-        if version == 'stable':
-            versions = root.findall('versioning/versions/version')
-
-            for version in versions:
-                if len(version.text.split('.')) == 3:
-                    result = version.text
-
-        # Search in Maven repository for latest version of Jenkins
-        # that satisfies X.Y which represents weekly version
-        elif version == 'weekly':
+        if version == 'latest':
             result = root.find('versioning/latest').text
 
         # In this case we assume that we provided a valid version
         elif len(version.split('.')) > 0:
             result = version
+            versions = root.findall('versioning/versions/version')
+
+            found = []
+
+            for version in versions:
+                if result in version.text:
+                    found.append(version.text)
+
+            found.sort(key=str.lower, reverse=True)
+
+            if len(found) == 0:
+                print("No version found based on {}".format(result))
+                sys.exit(1)
+
+            result = found[0]
 
         else:
             print("Something went wrong with version: {}".format(version))
@@ -99,7 +105,7 @@ def downloadJenkins(version):
 
 VERSION = getJenkinsVersion(
     URL + 'maven-metadata.xml',
-    os.environ.get('JENKINS_VERSION', 'weekly')
+    os.environ.get('JENKINS_VERSION', 'latest')
     )
 
 
