@@ -13,17 +13,12 @@ pipeline {
   stages {
     stage("Release"){
       steps {
-        build job: "core/release/${ BRANCH_NAME }", parameters: [
-          string(name: "RELEASE_PROFILE", value: "stable")
-        ]
+        build job: "core/release/${ BRANCH_NAME }"
       }
     }
     stage("Package"){
       steps {
-        build job: "core/package/${ BRANCH_NAME }", parameters: [
-          string(name: "RELEASE_PROFILE", value: "stable"),
-          string(name: "JENKINS_VERSION", value: "stable")
-        ]
+        build job: "core/package/${ BRANCH_NAME }"
       }
     }
   }
