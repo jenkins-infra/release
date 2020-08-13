@@ -297,7 +297,7 @@ cat <<EOT> settings-release.xml
 EOT
 }
 
-# guessGitBranchInformation tries to guesss PROFILE, RELEASELINE, and JENKINS_VERSION based on the git branch
+# guessGitBranchInformation tries to guess PROFILE, RELEASELINE, and JENKINS_VERSION based on the git branch
 # where security releases match pattern <security>-<RELEASELINE>-<JENKINS_VERSION>
 # where stable release match pattern <stable>-<JENKINS_VERSION>
 # where weekly release match pattern <master>
