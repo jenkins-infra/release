@@ -5,7 +5,7 @@ RELEASE_GIT_BRANCH=security-stable-2.235
 #
 RELEASE_GIT_REPOSITORY=git@github.com:jenkinsci-cert/jenkins.git
 #
-JENKINS_VERSION=2.235.4
+JENKINS_VERSION=2.235.5
 #
 GIT_EMAIL=66998184+jenkins-release-bot@users.noreply.github.com
 GIT_NAME="Jenkins Release Bot"
@@ -15,5 +15,5 @@ MAVEN_REPOSITORY_URL=https://repo.jenkins-ci.org
 MAVEN_PUBLIC_JENKINS_REPOSITORY_MIRROR_URL='http://nexus/repository/jenkins-public/'
 SIGN_ALIAS=jenkins
 
-MAVEN_REPOSITORY_NAME=carlos
+MAVEN_REPOSITORY_NAME=cage
 RELEASELINE=-stable
