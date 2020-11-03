@@ -362,10 +362,6 @@ The security release follows the same process as the stable one except that arti
 ... `MAVEN_STAGING_REPOSITORY_PROMOTION_ENABLED` set to true
 ... `GIT_STAGING_REPOSITORY_PROMOTION_ENABLED` set to false as we prefer to do it manually once everything is done
 ... `VALIDATION_ENABLED` set to true
-=======
-.. `RELEASELINE` set the releaseline '-stable' for stable releases and nothing for weekly
-. Trigger the security link:https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Fsecurity%2Frelease/branches/[job]
->>>>>>> Add pkgServer promotion mechanism
 
 [NOTE]
 ====
