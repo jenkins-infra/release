@@ -9,26 +9,29 @@ import argparse
 import sys
 
 
-USERNAME = os.environ.get('MAVEN_REPOSITORY_USERNAME', '')
-PASSWORD = os.environ.get('MAVEN_REPOSITORY_PASSWORD', '')
+def get_latest_version(versions):
+    '''Return the new version from a list of versions'''
+    versions.sort(key=str.lower, reverse=True)
+
+    if len(versions) == 0:
+        print("Empty versions list")
+        sys.exit(1)
+
+    return versions[0]
 
 
-PATH = os.environ.get('WAR', '/tmp/jenkins.war')
-
-# URL = 'https://repo.jenkins-ci.org/releases/org/jenkins-ci/main/jenkins-war/'
-URL = os.environ.get(
-    'JENKINS_DOWNLOAD_URL',
-    'https://release.repo.jenkins.io/repository/maven-releases/org/jenkins-ci/main/jenkins-war/')
-
-
-def getJenkinsVersion(metadataUrl, version):
+def get_jenkins_version(metadata_url, version_identifier, username, password):
+    '''
+        getJenkinsVersion retrieves a Jenkins version number
+        from a maven repository
+    '''
 
     try:
-        request = urllib.request.Request(metadataUrl)
+        request = urllib.request.Request(metadata_url)
 
-        if USERNAME != "":
+        if username != "":
             base64string = base64.b64encode(
-                bytes('%s:%s' % (USERNAME, PASSWORD), 'ascii'))
+                bytes('%s:%s' % (username, password), 'ascii'))
 
             request.add_header(
                 "Authorization", "Basic %s" % base64string.decode('utf-8'))
@@ -42,12 +45,12 @@ def getJenkinsVersion(metadataUrl, version):
         # Search in Maven repository for latest version of Jenkins
         # that satisfies X.Y.Z which represents stable version
 
-        if version == 'latest':
+        if version_identifier == 'latest':
             result = root.find('versioning/latest').text
 
         # In this case we assume that we provided a valid version
-        elif len(version.split('.')) > 0:
-            result = version
+        elif len(version_identifier.split('.')) > 0:
+            result = version_identifier
             versions = root.findall('versioning/versions/version')
 
             found = []
@@ -71,22 +74,24 @@ def getJenkinsVersion(metadataUrl, version):
         return result
 
     except URLError as error:
-        msg = 'Something went wrong while retrieving stable version: {}'
+        msg = 'Something went wrong while retrieving Jenkins version: {}'
         print(msg.format(error))
         sys.exit(1)
 
 
-def downloadJenkins(version):
-    download_url = URL + f'{version}/jenkins-war-{version}.war'
+def download_jenkins(url, username, password, version, path):
+    ''' download_jenkins download locally a jenkins.war'''
+
+    download_url = url + f'{version}/jenkins-war-{version}.war'
 
     print("Downloading version {} from {} ".format(version, download_url))
 
     try:
         request = urllib.request.Request(download_url)
 
-        if USERNAME != "":
+        if username != "":
             base64string = base64.b64encode(
-                bytes('%s:%s' % (USERNAME, PASSWORD), 'ascii'))
+                bytes('%s:%s' % (username, password), 'ascii'))
 
             request.add_header(
                 "Authorization", "Basic %s" % base64string.decode('utf-8'))
@@ -94,22 +99,35 @@ def downloadJenkins(version):
         response = urllib.request.urlopen(request)
         content = response.read()
 
-        open(PATH, 'wb').write(content)
+        open(path, 'wb').write(content)
 
-        print("War downloaded to {}".format(PATH))
+        print("War downloaded to {}".format(path))
 
     except URLError as err:
         print(type(err))
         sys.exit(1)
 
 
-VERSION = getJenkinsVersion(
-    URL + 'maven-metadata.xml',
-    os.environ.get('JENKINS_VERSION', 'latest')
-    )
 
 
 def main():
+
+    username = os.environ.get('MAVEN_REPOSITORY_USERNAME', '')
+    password = os.environ.get('MAVEN_REPOSITORY_PASSWORD', '')
+
+    path = os.environ.get('WAR', '/tmp/jenkins.war')
+
+    url = os.environ.get(
+        'JENKINS_DOWNLOAD_URL',
+        'https://repo.jenkins-ci.org/releases/org/jenkins-ci/main/jenkins-war/')
+
+    version = get_jenkins_version(
+        url + 'maven-metadata.xml',
+        os.environ.get('JENKINS_VERSION', 'latest'),
+        username,
+        password
+        )
+
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-v",
@@ -120,12 +138,10 @@ def main():
     args = parser.parse_args()
 
     if args.version:
-        print(f"{VERSION}")
+        print(f"{version}")
         sys.exit(0)
 
-    print("VERSION: " + VERSION)
-    print("Downloaded from: " + URL)
-    downloadJenkins(VERSION)
+    download_jenkins(url, username, password, version, path)
 
 
 if __name__ == "__main__":
