@@ -59,13 +59,7 @@ def get_jenkins_version(metadata_url, version_identifier, username, password):
                 if result in version.text:
                     found.append(version.text)
 
-            found.sort(key=str.lower, reverse=True)
-
-            if len(found) == 0:
-                print("No version found based on {}".format(result))
-                sys.exit(1)
-
-            result = found[0]
+            result = get_latest_version(found)
 
         else:
             print("Something went wrong with version: {}".format(version))
