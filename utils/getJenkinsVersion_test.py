@@ -20,7 +20,6 @@ class TestGetJenkinsVersion(unittest.TestCase):
         'all_versions': [
             "1", "1.10", "1.11", "1.10.1", "1.10.2", "1.11.0", "1.11.2",
             "2", "2.10", "2.11", "2.10.1", "2.10.2", "2.11.0", "2.11.2",
-
             "2.99", "2.249", "2.265", "2.279"
         ],
         'url': "https://repo.jenkins-ci.org/releases/org/jenkins-ci/main/jenkins-war/maven-metadata.xml",
