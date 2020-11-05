@@ -1,5 +1,5 @@
 #!/bin/bash
-# set -euxo pipefail
+set -euxo pipefail
 
 function requireRepositoryPassword(){
   : "${MAVEN_REPOSITORY_PASSWORD:?Repository Password Missing}"
