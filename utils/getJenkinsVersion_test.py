@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 
-# Test getJenkinsVersion.py
-
 import unittest
 import os
 
-# import getJenkinsVersion
 from getJenkinsVersion import get_latest_version, get_jenkins_version
 
 USERNAME = os.environ.get('MAVEN_REPOSITORY_USERNAME', '')
@@ -19,14 +16,19 @@ class TestGetJenkinsVersion(unittest.TestCase):
     data_set = {
         'all_versions': [
             "1", "1.10", "1.11", "1.10.1", "1.10.2", "1.11.0", "1.11.2",
+            "1.999",
             "2", "2.10", "2.11", "2.10.1", "2.10.2", "2.11.0", "2.11.2",
-            "2.99", "2.249", "2.265", "2.279"
+            "2.99", "2.249", "2.249.1", "2.265", "2.265.3"
         ],
         'url': "https://repo.jenkins-ci.org/releases/org/jenkins-ci/main/jenkins-war/maven-metadata.xml",
         'versions': [
             {
                 'name': 'latest',
                 'expected': '2.265'
+            },
+            {
+                'name': '1',
+                'expected': '1.658'
             },
             {
                 'name': '2',
@@ -46,7 +48,7 @@ class TestGetJenkinsVersion(unittest.TestCase):
         '''Test that we correclty get Jenkins version value'''
 
         result = get_latest_version(self.data_set["all_versions"])
-        self.assertEqual("2.279", result)
+        self.assertEqual("2.265.3", result)
 
     def test_result(self):
         '''Test that we correclty get Jenkins version value'''
