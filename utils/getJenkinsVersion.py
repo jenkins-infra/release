@@ -10,14 +10,29 @@ import sys
 
 
 def get_latest_version(versions):
-    '''Return the new version from a list of versions'''
-    versions.sort(key=str.lower, reverse=True)
 
-    if len(versions) == 0:
-        print("Empty versions list")
-        sys.exit(1)
+    results = []
+    for i in range(10):
+        solutions = []
+        for version in versions:
+            values = version.split('.')
 
-    return versions[0]
+            str_results = [str(x) for x in results]
+
+            if len(results) < len(values) and str_results[0:len(results)] == values[0:len(results)]:
+                try:
+                    if int(values[i]) not in solutions:
+                        solutions.append(int(values[i]))
+                except Exception as e:
+                    print("Ignoring version {}".format(values[i]))
+
+        if not solutions:
+            break
+
+        results.append(int(sorted(solutions)[-1]))
+
+    str_results = [str(x) for x in results]
+    return '.'.join(str_results)
 
 
 def get_jenkins_version(metadata_url, version_identifier, username, password):
@@ -56,8 +71,11 @@ def get_jenkins_version(metadata_url, version_identifier, username, password):
             found = []
 
             for version in versions:
-                if result in version.text:
-                    found.append(version.text)
+                result_array = result.split('.')
+                version_array = version.text.split('.')
+                if len(version_array) >= len(result_array):
+                    if result_array[:] == version_array[0:len(result_array)] and len(result_array) > 0:
+                        found.append(version.text)
 
             result = get_latest_version(found)
 
