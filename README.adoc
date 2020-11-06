@@ -69,7 +69,7 @@ The release process implies following Git repository:
 
 It accepts following values:
 
-- `latest`, fetches the latest version available on a maven repository based on the maven-metada.xml.
+- `latest`, fetches the latest version available in a maven repository based on the maven-metadata.xml.
 - `version`, search the latest version available based on version.
 
 More information in https://github.com/jenkins-infra/release/blob/master/utils/getJenkinsVersion.py[getJenkinsVersion.py]
