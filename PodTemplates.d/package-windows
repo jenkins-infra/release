@@ -40,10 +40,8 @@ spec:
       - name: core-packages
         mountPath: 'C:/Packages'
     volumeMounts:
-# This file storage is currently broken, we have an open issue with Azure
-# so I am disabling it until find a solution
-#      - name: binary-core-packages
-#        mountPath: /Packages/binary
+      - name: binary-core-packages
+        mountPath: /Packages/binary
       - name: website-core-packages
         mountPath: /Packages/web
   affinity:
@@ -66,6 +64,8 @@ spec:
 #    - name: binary-core-packages
 #      persistentVolumeClaim:
 #        claimName: binary-core-packages
+    - name: binary-core-packages
+      emptyDir: {}
     - name: website-core-packages
       persistentVolumeClaim:
         claimName: website-core-packages
