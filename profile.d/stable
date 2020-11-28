@@ -15,6 +15,6 @@ SIGN_ALIAS=jenkins
 RELEASELINE=-stable
 
 # Custom Parameters
-RELEASE_GIT_BRANCH=stable-2.249
+RELEASE_GIT_BRANCH=stable-2.263
 MAVEN_REPOSITORY_NAME=releases
-JENKINS_VERSION=2.249.3 # Only create packages for version 2.249.3
+JENKINS_VERSION=2.263.1 # Only create packages for version 2.263.1
