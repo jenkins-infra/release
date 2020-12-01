@@ -27,10 +27,8 @@ spec:
       runAsGroup: 1000
     tty: true
     volumeMounts:
-# This file storage is currently broken, we have an open issue with Azure
-# so I am disabling it until find a solution
-#      - name: binary-core-packages
-#        mountPath: /srv/releases/jenkins
+      - name: binary-core-packages
+        mountPath: /srv/releases/jenkins
       - name: website-core-packages
         mountPath: /var/www/pkg.jenkins.io.staging/
   - command:
@@ -54,10 +52,8 @@ spec:
       runAsGroup: 1000
     tty: true
     volumeMounts:
-# This file storage is currently broken, we have an open issue with Azure
-# so I am disabling it until find a solution
-#      - name: binary-core-packages
-#        mountPath: /srv/releases/jenkins
+      - name: binary-core-packages
+        mountPath: /srv/releases/jenkins
       - name: website-core-packages
         mountPath: /var/www/pkg.jenkins.io.staging/
   affinity:
@@ -71,11 +67,9 @@ spec:
               - linux
   restartPolicy: "Never"
   volumes:
-# This file storage is currently broken, we have an open issue with Azure
-# so I am disabling it until find a solution
-#    - name: binary-core-packages
-#      persistentVolumeClaim:
-#        claimName: binary-core-packages
+    - name: binary-core-packages
+      persistentVolumeClaim:
+        claimName: binary-core-packages
     - name: website-core-packages
       persistentVolumeClaim:
         claimName: website-core-packages
