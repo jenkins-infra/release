@@ -8,7 +8,7 @@ metadata:
     jenkins/default-release-jenkins-agent: true
 spec:
   containers:
-  - image: "jenkins/inbound-agent:windowsservercore-1809"
+  - image: "jenkins/inbound-agent:4.3-9-windowsservercore-1809"
     imagePullPolicy: "Always"
     name: "jnlp"
     resources:
@@ -59,9 +59,13 @@ spec:
       value: "windows"
       effect: "NoSchedule"
   volumes:
+# This file storage is currently broken, we have an open issue with Azure
+# so I am disabling it until find a solution
+#    - name: binary-core-packages
+#      persistentVolumeClaim:
+#        claimName: binary-core-packages
     - name: binary-core-packages
-      persistentVolumeClaim:
-        claimName: binary-core-packages
+      emptyDir: {}
     - name: website-core-packages
       persistentVolumeClaim:
         claimName: website-core-packages
