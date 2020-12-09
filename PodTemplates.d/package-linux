@@ -67,13 +67,9 @@ spec:
               - linux
   restartPolicy: "Never"
   volumes:
-# This file storage is currently broken, we have an open issue with Azure
-# so I am disabling it until find a solution
-#    - name: binary-core-packages
-#      persistentVolumeClaim:
-#        claimName: binary-core-packages
     - name: binary-core-packages
-      emptyDir: {}
+      persistentVolumeClaim:
+        claimName: binary-core-packages
     - name: website-core-packages
       persistentVolumeClaim:
         claimName: website-core-packages
