@@ -16,6 +16,27 @@ pipeline {
   }
 
   parameters {
+    choice(
+      choices: [
+        'security',
+        'stable',
+        'weekly'
+      ],
+      description: 'Define which release profile we are going to use. https://git.io/Jv7Nr',
+      name: 'RELEASE_PROFILE'
+    )
+    string(
+      defaultValue: '',
+      description: 'Define which branch we are going to release from and commit changes',
+      name: 'RELEASE_GIT_BRANCH',
+      trim: false
+    )
+    string(
+      defaultValue: '',
+      description: 'Define which maven repository to use to push Maven artifacts',
+      name: 'MAVEN_REPOSITORY_NAME',
+      trim: false
+    )
     booleanParam(
       defaultValue: true,
       description: 'Define if we wait for validation after displaying the plan',

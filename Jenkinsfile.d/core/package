@@ -9,10 +9,37 @@ pipeline {
   }
 
   parameters {
+    choice(
+      choices: [
+        'weekly',
+        'stable',
+        'security'
+      ],
+      description: 'Define which Jenkins Release we are packaging for. https://git.io/Jv7Nr',
+      name: 'RELEASE_PROFILE'
+    )
     string(
       defaultValue: '',
       description: 'Define which Jenkins Version to package',
       name: 'JENKINS_VERSION',
+      trim: false
+    )
+    string(
+      defaultValue: '',
+      description: 'Define staging git branch uses for promotion',
+      name: 'RELEASE_GIT_BRANCH',
+      trim: false
+    )
+    string(
+      defaultValue: '',
+      description: 'Define which maven repository to use for packaging and promotion',
+      name: 'MAVEN_REPOSITORY_NAME',
+      trim: false
+    )
+    string(
+      defaultValue: '',
+      description: 'Define which maven repository to promote to if MAVEN_STAGING_REPOSITORY_PROMOTION_ENABLED set to true',
+      name: 'MAVEN_REPOSITORY_PRODUCTION_NAME',
       trim: false
     )
     booleanParam(
