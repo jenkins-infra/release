@@ -38,4 +38,5 @@ function testGuessGitBranchInformation {
 testGuessGitBranchInformation "stable-2.235" "stable" "-stable" "2.235"
 testGuessGitBranchInformation "master" "weekly" "" "latest"
 testGuessGitBranchInformation "security-stable-2.235" "security" "-stable" "2.235"
+# Following test is commented out as I am not sure what the branch format should look like
 #testGuessGitBranchInformation "security-2.235" "security" "" "latest"
