@@ -231,6 +231,7 @@ EOT
 # where security releases match pattern <security>-<RELEASELINE>-<JENKINS_VERSION>
 # where stable release match pattern <stable>-<JENKINS_VERSION>
 # where weekly release match pattern <master>
+# ! It only sets the variables if they are not yet defined
 function guessGitBranchInformation(){
   #BRANCH_NAME="security-stable-2.235"
   #BRANCH_NAME="stable-2.235"
