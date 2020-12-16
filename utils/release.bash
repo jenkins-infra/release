@@ -1,73 +1,5 @@
 #!/bin/bash
-
 set -euxo pipefail
-
-: "${RELEASE_PROFILE:?Release profile required}"
-
-source ""$(dirname "$(dirname "$0")")"/profile.d/$RELEASE_PROFILE"
-
-# https://maven.apache.org/maven-release/maven-release-plugin/perform-mojo.html
-# mvn -Prelease help:active-profiles
-
-: "${WORKSPACE:=$PWD}" # Normally defined from Jenkins environment
-
-: "${RELEASE_GIT_BRANCH:=experimental}"
-: "${WORKING_DIRECTORY:=release}"
-: "${GIT_EMAIL:=jenkins-bot@example.com}"
-: "${GIT_NAME:=jenkins-bot}"
-: "${GIT_SSH_COMMAND:=/usr/bin/ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null}"
-: "${GPG_KEYNAME:=test-jenkins-release}"
-: "${GPG_FILE:=gpg-test-jenkins-release.gpg}"
-: "${GPG_VAULT_NAME:=gpg-test-jenkins-release-gpg}"
-: "${JENKINS_VERSION:=weekly}"
-: "${JENKINS_WAR:=$WORKSPACE/$WORKING_DIRECTORY/war/target/jenkins.war}"
-: "${JENKINS_ASC:=$WORKSPACE/$WORKING_DIRECTORY/war/target/jenkins.war.asc}"
-: "${PKGSERVER:=mirrorbrain@pkg.origin.jenkins.io}"
-: "${SIGN_ALIAS:=jenkins}"
-: "${SIGN_KEYSTORE_FILENAME:=jenkins.pfx}"
-: "${SIGN_KEYSTORE:=${WORKSPACE}/${SIGN_KEYSTORE_FILENAME}}"
-: "${SIGN_CERTIFICATE:=$SIGN_KEYSTORE_FILENAME}"
-: "${MAVEN_REPOSITORY_USERNAME:=jenkins-bot}"
-: "${MAVEN_REPOSITORY_URL:=http://nexus/repository}"
-: "${MAVEN_REPOSITORY_NAME:=maven-releases}"
-: "${MAVEN_REPOSITORY_PRODUCTION_NAME:=maven-releases}"
-: "${MAVEN_REPOSITORY_SNAPSHOT_NAME:=maven-snapshots}"
-: "${MAVEN_PUBLIC_JENKINS_REPOSITORY_MIRROR_URL:=http://nexus/repository/jenkins-public/}"
-: "${PKGSERVER_SSH_OPTS:=-p 22}"
-
-: "${JENKINS_DOWNLOAD_URL:=$MAVEN_REPOSITORY_URL/$MAVEN_REPOSITORY_NAME/org/jenkins-ci/main/jenkins-war/}"
-
-# Promotion Settings
-: "${RELEASE_GIT_STAGING_REPOSITORY_PATH:=$WORKSPACE/stagingGitRepository}"
-: "${RELEASE_GIT_STAGING_REPOSITORY:=$RELEASE_GIT_REPOSITORY}"
-: "${RELEASE_GIT_STAGING_BRANCH:=$RELEASE_GIT_BRANCH}"
-: "${RELEASE_GIT_PRODUCTION_REPOSITORY:=$RELEASE_GIT_REPOSITORY }"
-: "${RELEASE_GIT_PRODUCTION_BRANCH:=$RELEASE_GIT_BRANCH}"
-
-export JENKINS_VERSION
-export JENKINS_DOWNLOAD_URL
-export MAVEN_REPOSITORY_USERNAME
-export MAVEN_REPOSITORY_PASSWORD
-export WAR
-export BRAND
-export RELEASELINE
-export ORGANIZATION
-export BUILDENV
-export CREDENTIAL
-export GPG_PASSPHRASE_FILE
-export GPG_KEYNAME
-
-# Following line will copy every items from source to destination,
-# keeps in mind that it won't delete from source and override on destination if already exist!.
-# It's wise to disable delete permission on destination repository
-# as explained here https://www.jfrog.com/confluence/display/JFROG/Permissions#Permissions-RepositoryPermissions
-: "${PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS:=item --mode copy --source $MAVEN_REPOSITORY_NAME --destination $MAVEN_REPOSITORY_PRODUCTION_NAME --url $MAVEN_REPOSITORY_URL --username $MAVEN_REPOSITORY_USERNAME --password $MAVEN_REPOSITORY_PASSWORD --search '/org/jenkins-ci/main' $(./utils/getJenkinsVersion.py --version)}"
-
-if [ ! -d "$WORKING_DIRECTORY" ]; then
-  mkdir -p "$WORKING_DIRECTORY"
-fi
-
-pushd $WORKING_DIRECTORY
 
 function requireRepositoryPassword(){
   : "${MAVEN_REPOSITORY_PASSWORD:?Repository Password Missing}"
@@ -185,8 +117,7 @@ function downloadAzureKeyvaultSecret(){
 }
 
 # JENKINS_VERSION: Define which version will be package where:
-# * \'stable\' means the latest stable version that satifies version pattern X.Y.Z
-# * \'weekly\' means the latest weekly version that satisfies version pattern X.Y
+# * \'latest\' means the latest version available
 # * <version> represents any valid existing version like 2.176.3 available at JENKINS_DOWNLOAD_URL
 # JENKINS_DOWNLOAD_URL: Specify the endpoint to use for downloading jenkins.war
 function downloadJenkinsWar(){
@@ -296,6 +227,63 @@ cat <<EOT> settings-release.xml
 EOT
 }
 
+# guessGitBranchInformation tries to guess PROFILE, RELEASELINE, and JENKINS_VERSION based on the git branch
+# where security releases match pattern <security>-<RELEASELINE>-<JENKINS_VERSION>
+# where stable release match pattern <stable>-<JENKINS_VERSION>
+# where weekly release match pattern <master>
+# ! It only sets the variables if they are not yet defined
+function guessGitBranchInformation(){
+  #BRANCH_NAME="security-stable-2.235"
+  #BRANCH_NAME="stable-2.235"
+  #BRANCH_NAME="master"
+
+
+  : "${BRANCH_NAME:=$(git rev-parse --abbrev-ref HEAD)}"
+
+  array=(${BRANCH_NAME//-/ })
+
+  if [[ "${#array[@]}" == 3 ]] ; then
+    echo "Based on branch $BRANCH_NAME, expect a security release"
+    if [[ "${array[0]}" != "security" ]]; then
+      echo "Wrong branch name '${array[0]}', you probably want 'security-{stable|weekly}-<JENKINS_VERSION>"
+      exit 1
+    fi
+    if [[ "${array[1]}" != "stable" && "${array[1]}" != "weekly" ]]; then
+      echo "Wrong release line '${array[0]}', you probably want 'security-{stable|weekly}-<JENKINS_VERSION>"
+      exit 1
+    fi
+
+    RELEASE_PROFILE="${RELEASE_PROFILE:=${array[0]}}"
+    RELEASELINE="${RELEASELINE:=-${array[1]}}"
+    JENKINS_VERSION="${JENKINS_VERSION:=${array[2]}}"
+  fi
+
+  if [[ "${#array[@]}" == 2 ]] ; then
+    echo "Based on branch $BRANCH_NAME, expect a stable release"
+    if [[ "${array[0]}" != "stable" ]]; then
+      echo "Wrong branch name '${array[0]}', you probably want 'stable-<JENKINS_VERSION>"
+      exit 1
+    fi
+    RELEASE_PROFILE="${RELEASE_PROFILE:=stable}"
+    RELEASELINE="${RELEASELINE:=-${array[0]}}"
+    JENKINS_VERSION="${JENKINS_VERSION:=${array[1]}}"
+
+  fi
+
+
+  if [[ "${#array[@]}" == 1 ]] ; then
+    echo "Based on branch $BRANCH_NAME, expect a weekly release"
+    if [[ "${array[0]}" != "master" ]]; then
+      echo "Wrong branch name '${array[0]}', you probably want to use 'master'"
+      exit 1
+    fi
+    RELEASE_PROFILE="${RELEASE_PROFILE:=weekly}"
+    RELEASELINE="${RELEASELINE:=}"
+    JENKINS_VERSION="${JENKINS_VERSION:=latest}"
+  fi
+}
+
+
 function invalidateFastlyCache(){
   : "${FASTLY_API_TOKEN:?Require FASTLY_API_TOKEN env variable}"
   : "${FASTLY_SERVICE_ID:?Require FASTLY_SERVICE_ID env variable}"
@@ -339,7 +327,7 @@ function packaging(){
   # Still function need an access to this Makefile
   # https://github.com/jenkinsci/packaging/blob/master/Makefile
   # if more than parameter is needed then they have to be quoted
-  # example: `utils/release.sh --packaging "deb rpm suse"`
+  # example: `utils/release.bash --packaging "deb rpm suse"`
 
   configurePackagingEnv
   make "$@"
@@ -576,5 +564,83 @@ function main(){
     done
   fi
 }
+
+#######################################################################################################################
+
+guessGitBranchInformation
+
+: "${RELEASE_PROFILE:?Release profile required}"
+
+: "${ROOT_DIR:=$(dirname "$(dirname "$0")")}"
+
+source "${ROOT_DIR}/profile.d/$RELEASE_PROFILE"
+
+# https://maven.apache.org/maven-release/maven-release-plugin/perform-mojo.html
+# mvn -Prelease help:active-profiles
+
+: "${WORKSPACE:=$PWD}" # Normally defined from Jenkins environment
+
+: "${RELEASE_GIT_BRANCH:=experimental}"
+: "${WORKING_DIRECTORY:=release}"
+: "${GIT_EMAIL:=jenkins-bot@example.com}"
+: "${GIT_NAME:=jenkins-bot}"
+: "${GIT_SSH_COMMAND:=/usr/bin/ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null}"
+: "${GPG_KEYNAME:=test-jenkins-release}"
+: "${GPG_FILE:=gpg-test-jenkins-release.gpg}"
+: "${GPG_VAULT_NAME:=gpg-test-jenkins-release-gpg}"
+: "${JENKINS_VERSION:=latest}"
+: "${JENKINS_WAR:=$WORKSPACE/$WORKING_DIRECTORY/war/target/jenkins.war}"
+: "${JENKINS_ASC:=$WORKSPACE/$WORKING_DIRECTORY/war/target/jenkins.war.asc}"
+: "${PKGSERVER:=mirrorbrain@pkg.origin.jenkins.io}"
+: "${SIGN_ALIAS:=jenkins}"
+: "${SIGN_KEYSTORE_FILENAME:=jenkins.pfx}"
+: "${SIGN_KEYSTORE:=${WORKSPACE}/${SIGN_KEYSTORE_FILENAME}}"
+: "${SIGN_CERTIFICATE:=$SIGN_KEYSTORE_FILENAME}"
+: "${MAVEN_REPOSITORY_USERNAME:=jenkins-bot}"
+: "${MAVEN_REPOSITORY_URL:=http://nexus/repository}"
+: "${MAVEN_REPOSITORY_NAME:=maven-releases}"
+: "${MAVEN_REPOSITORY_PRODUCTION_NAME:=maven-releases}"
+: "${MAVEN_REPOSITORY_SNAPSHOT_NAME:=maven-snapshots}"
+: "${MAVEN_PUBLIC_JENKINS_REPOSITORY_MIRROR_URL:=http://nexus/repository/jenkins-public/}"
+: "${PKGSERVER_SSH_OPTS:=-p 22}"
+
+: "${JENKINS_DOWNLOAD_URL:=$MAVEN_REPOSITORY_URL/$MAVEN_REPOSITORY_NAME/org/jenkins-ci/main/jenkins-war/}"
+
+# Promotion Settings
+: "${RELEASE_GIT_STAGING_REPOSITORY_PATH:=$WORKSPACE/stagingGitRepository}"
+: "${RELEASE_GIT_STAGING_REPOSITORY:=$RELEASE_GIT_REPOSITORY}"
+: "${RELEASE_GIT_STAGING_BRANCH:=$RELEASE_GIT_BRANCH}"
+: "${RELEASE_GIT_PRODUCTION_REPOSITORY:=$RELEASE_GIT_REPOSITORY }"
+: "${RELEASE_GIT_PRODUCTION_BRANCH:=$RELEASE_GIT_BRANCH}"
+
+export JENKINS_VERSION
+export JENKINS_DOWNLOAD_URL
+export MAVEN_REPOSITORY_USERNAME
+export MAVEN_REPOSITORY_PASSWORD
+export WAR
+export BRAND
+export RELEASELINE
+export ORGANIZATION
+export BUILDENV
+export CREDENTIAL
+export GPG_PASSPHRASE_FILE
+export GPG_KEYNAME
+
+export RELEASE_PROFILE
+export RELEASELINE
+export JENKINS_VERSION
+
+# Following line will copy every items from source to destination,
+# keeps in mind that it won't delete from source and override on destination if already exist!.
+# It's wise to disable delete permission on destination repository
+# as explained here https://www.jfrog.com/confluence/display/JFROG/Permissions#Permissions-RepositoryPermissions
+: "${PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS:=item --mode copy --source $MAVEN_REPOSITORY_NAME --destination $MAVEN_REPOSITORY_PRODUCTION_NAME --url $MAVEN_REPOSITORY_URL --username $MAVEN_REPOSITORY_USERNAME --password $MAVEN_REPOSITORY_PASSWORD --search '/org/jenkins-ci/main' $($ROOT_DIR/utils/getJenkinsVersion.py --version)}"
+
+if [ ! -d "$WORKING_DIRECTORY" ]; then
+  mkdir -p "$WORKING_DIRECTORY"
+fi
+
+pushd $WORKING_DIRECTORY
+
 
 main "$@"

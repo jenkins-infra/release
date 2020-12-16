@@ -69,9 +69,8 @@ The release process implies following Git repository:
 
 It accepts following values:
 
-- `weekly`, fetches the latest version available on a maven repository based on the maven-metada.xml.
-- `stable`, fetches the latest version that matches pattern X.Y.Z.
-- `version`, a valid version.
+- `latest`, fetches the latest version available in a maven repository based on the maven-metadata.xml.
+- `version`, search the latest version available based on version.
 
 More information in https://github.com/jenkins-infra/release/blob/master/utils/getJenkinsVersion.py[getJenkinsVersion.py]
 
@@ -320,7 +319,7 @@ It uses parameters defined in this link:https://github.com/jenkins-infra/release
 Before triggering a new stable release, some steps are required:
 
 . Prepare `jenkinsci/jenkins` repository -> missing documentation link.
-. Create a branch on jenkins-infra/release with a branch name that match the release branch from jenkinsci/jenkins like `stable-2.235`
+. Create a branch on jenkins-infra/release with a branch name that match the release branch from jenkinsci/jenkins like `stable-<jenkins_version>`.
 . Review and update the stable environment https://github.com/jenkins-infra/release/blob/master/profile.d/stable[file] with:
 .. `RELEASE_GIT_BRANCH` set to the `jenkinsci/jenkins` release branch like `stable-2.235`
 .. `JENKINS_VERSION` set to the final release version that will be packaged. If set to 'stable' then the packaging job will try to guess the version based on what was pushed to the maven repository. cfr settings.
@@ -342,9 +341,9 @@ The security release follows the same process as the stable one except that arti
 . Create a branch on jenkins-infra/release with a branch name that match the release branch from jenkins-cert/jenkins like `security-stable-2.135`
 . Review and update the security environment https://github.com/jenkins-infra/release/blob/master/profile.d/security[file] with:
 .. `RELEASE_GIT_BRANCH` set to the `jenkinsci-cert/jenkins` release branch like `security-stable-2.135`
-.. `JENKINS_VERSION` set to the final release version that will be packaged. If set to 'stable' or 'weekly' then the packaging job will try to guess the version based on what was pushed to the maven repository. cfr settings.
 .. `PACKAGING_GIT_BRANCH` set to the appropriated jenkinsci/packaging branch
 .. `MAVEN_REPOSITORY_NAME` set to the maven repository name where we are going to publish staging maven artifacts. This is also the source location used by the packaging job to build distribution packages
+.. `JENKINS_VERSION` set to the final release version that will be packaged. If set to 'stable' or 'latest' then the packaging job will try to guess the version based on what was pushed to the maven repository. cfr settings.
 .. `RELEASELINE` set to '-stable' for a lts release otherwise leave empty
 . Trigger the generic Release link:https://release.ci.jenkins.io/job/core/job/release/[job] from the appropriated branch like `security-stable-2.235`
 .. Force repository scan
@@ -356,7 +355,6 @@ The security release follows the same process as the stable one except that arti
 ... `VALIDATION_ENABLED` set to true if the validation stage should run
 .. Trigger the generic Packaging job link:https://release.ci.jenkins.io/job/core/job/package/[job] from the appropriate branch like `security-stable-2.235` with correct parameters
 ... `RELEASE_PROFILE` set to `security`
-... `JENKINS_VERSION` set to the final version you are going to release for like `2.235`
 ... `RELEASE_GIT_BRANCH`  set to `unused` same reason as before
 ... `MAVEN_REPOSITORY_NAME` set to `unused` same reason as before
 ... `MAVEN_REPOSITORY_PRODUCTION_NAME` set to `unused`
