@@ -1,0 +1,22 @@
+#
+# WARNING: Any variables defined here, override those defined from the Jenkinsfile
+#
+#
+RELEASE_GIT_BRANCH=master
+RELEASE_GIT_REPOSITORY=git@github.com:jenkinsci/jenkins.git
+GIT_EMAIL=66998184+jenkins-release-bot@users.noreply.github.com
+GIT_NAME="Jenkins Release Bot"
+GPG_KEYNAME="62A9756BFD780C377CF24BA8FCEF32E745F2C3D5"
+GPG_VAULT_NAME="jenkins-release-pgp"
+MAVEN_REPOSITORY_URL='https://repo.jenkins-ci.org'
+MAVEN_REPOSITORY_NAME=snapshots
+SIGN_ALIAS=jenkins
+
+# Using JENKINS_VERSION set to latest, means that we won't try to parse every versions available from the repository
+# but instead looking at the value for metadata.versioning.latest from the maven-metadata.xml
+# this approach doesn't allow to use the same maven-repository than weekly releases.
+#
+JENKINS_VERSION=latest 
+
+# Used by jenkinsci/packaging
+RELEASELINE=-stable-rc

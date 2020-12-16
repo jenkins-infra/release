@@ -13,6 +13,7 @@ pipeline {
       choices: [
         'weekly',
         'stable',
+        'stable-rc',
         'security'
       ],
       description: 'Define which Jenkins Release we are packaging for. https://git.io/Jv7Nr',
@@ -100,7 +101,7 @@ pipeline {
     stage('Plan') {
       steps {
         container('packaging') {
-          sh 'utils/release.sh --showPackagingPlan'
+          sh 'utils/release.bash --showPackagingPlan'
         }
       }
     }
@@ -131,7 +132,7 @@ pipeline {
           }
 
           sh '''
-            ./utils/release.sh --getGPGKeyFromAzure
+            ./utils/release.bash --getGPGKeyFromAzure
           '''
 
           dir (WORKING_DIRECTORY){
@@ -140,7 +141,7 @@ pipeline {
         }
 
         container('packaging'){
-          sh './utils/release.sh --configureGPG'
+          sh './utils/release.bash --configureGPG'
         }
       }
     }
@@ -150,8 +151,8 @@ pipeline {
       steps {
         container('azure-cli') {
           sh '''
-            utils/release.sh --downloadAzureKeyvaultSecret
-            utils/release.sh --configureKeystore
+            utils/release.bash --downloadAzureKeyvaultSecret
+            utils/release.bash --configureKeystore
           '''
         }
 
@@ -163,7 +164,7 @@ pipeline {
       steps{
         container('packaging'){
           sh '''
-            ./utils/release.sh --downloadJenkins
+            ./utils/release.bash --downloadJenkins
           '''
           dir (WORKING_DIRECTORY){
             stash includes: WAR_FILENAME, name: "WAR"
@@ -182,7 +183,7 @@ pipeline {
                 container('packaging'){
                   sshagent(['pkgserver']) {
                     sh '''
-                      ./utils/release.sh --packaging war.publish
+                      ./utils/release.bash --packaging war.publish
                     '''
                   }
                 }
@@ -196,7 +197,7 @@ pipeline {
               steps {
                 container('packaging'){
                   sh '''
-                    ./utils/release.sh --packaging deb
+                    ./utils/release.bash --packaging deb
                   '''
                   dir (WORKING_DIRECTORY){
                     archiveArtifacts artifacts: "target/debian/*.deb"
@@ -209,7 +210,7 @@ pipeline {
                 container('packaging'){
                   sshagent(['pkgserver']) {
                     sh '''
-                      ./utils/release.sh --packaging deb.publish
+                      ./utils/release.bash --packaging deb.publish
                     '''
                   }
                 }
@@ -223,7 +224,7 @@ pipeline {
               steps {
                 container('packaging'){
                   sh '''
-                    ./utils/release.sh --packaging rpm
+                    ./utils/release.bash --packaging rpm
                   '''
                   dir (WORKING_DIRECTORY){
                     archiveArtifacts artifacts: "target/rpm/*.rpm"
@@ -236,7 +237,7 @@ pipeline {
                 container('packaging'){
                   sshagent(['pkgserver']) {
                     sh '''
-                      ./utils/release.sh --packaging rpm.publish
+                      ./utils/release.bash --packaging rpm.publish
                     '''
                   }
                 }
@@ -250,7 +251,7 @@ pipeline {
               steps {
                 container('packaging'){
                   sh '''
-                    ./utils/release.sh --packaging suse
+                    ./utils/release.bash --packaging suse
                   '''
                   dir (WORKING_DIRECTORY){
                     archiveArtifacts artifacts: "target/suse/*.rpm"
@@ -263,7 +264,7 @@ pipeline {
                 container('packaging'){
                   sshagent(['pkgserver']) {
                     sh '''
-                      ./utils/release.sh --packaging suse.publish
+                      ./utils/release.bash --packaging suse.publish
                     '''
                   }
                 }
@@ -315,7 +316,7 @@ pipeline {
                   unarchive mapping: ['*.msi*': WORKING_DIRECTORY]
                   sshagent(['pkgserver']) {
                     sh '''
-                      ./utils/release.sh --packaging msi.publish
+                      ./utils/release.bash --packaging msi.publish
                     '''
                   }
                 }
@@ -337,7 +338,7 @@ pipeline {
             container('packaging'){
               sshagent(['pkgserver']) {
                 sh '''
-                  ./utils/release.sh --promoteStagingMavenArtifacts
+                  ./utils/release.bash --promoteStagingMavenArtifacts
                 '''
               }
             }
@@ -351,7 +352,7 @@ pipeline {
             container('packaging'){
               sshagent(['pkgserver']) {
                 sh '''
-                  ./utils/release.sh --promoteStagingGitRepository
+                  ./utils/release.bash --promoteStagingGitRepository
                 '''
               }
             }
@@ -365,7 +366,7 @@ pipeline {
         container('packaging'){
           sshagent(['pkgserver']) {
             sh '''
-              ./utils/release.sh --syncMirror
+              ./utils/release.bash --syncMirror
             '''
           }
         }
@@ -380,7 +381,7 @@ pipeline {
         container('packaging'){
           sshagent(['pkgserver']) {
             sh '''
-              ./utils/release.sh --invalidateFastlyCache
+              ./utils/release.bash --invalidateFastlyCache
             '''
           }
         }

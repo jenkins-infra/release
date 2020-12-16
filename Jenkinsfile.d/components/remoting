@@ -38,7 +38,7 @@ pipeline {
         steps {
           container('jnlp') {
             sshagent(['release-key']) {
-              sh 'utils/release.sh --cloneReleaseGitRepository'
+              sh 'utils/release.bash --cloneReleaseGitRepository'
             }
           }
         }
@@ -46,14 +46,14 @@ pipeline {
       stage('Clean Release') {
         steps {
           container('maven') {
-            sh 'utils/release.sh --cleanRelease'
+            sh 'utils/release.bash --cleanRelease'
           }
         }
       }
       stage('Plan') {
         steps {
           container('maven') {
-            sh 'utils/release.sh --showReleasePlan'
+            sh 'utils/release.bash --showReleasePlan'
           }
         }
       }
@@ -74,8 +74,8 @@ pipeline {
         steps {
           container('azure-cli') {
             sh '''
-              utils/release.sh --downloadAzureKeyvaultSecret
-              utils/release.sh --configureKeystore
+              utils/release.bash --downloadAzureKeyvaultSecret
+              utils/release.bash --configureKeystore
             '''
           }
         }
@@ -84,7 +84,7 @@ pipeline {
         steps {
           container('azure-cli') {
             sh '''
-              utils/release.sh --getGPGKeyFromAzure
+              utils/release.bash --getGPGKeyFromAzure
             '''
           }
         }
@@ -94,9 +94,9 @@ pipeline {
           container('maven') {
             // Maven Release requires gpg key with password password and a certificate key with password
             sh '''
-              utils/release.sh --configureGPG
-              utils/release.sh --configureGit
-              utils/release.sh --prepareRelease
+              utils/release.bash --configureGPG
+              utils/release.bash --configureGit
+              utils/release.bash --prepareRelease
             '''
 
             script {
@@ -110,7 +110,7 @@ pipeline {
         steps {
           container('jnlp') {
             sshagent(['release-key']) {
-              sh 'utils/release.sh --pushCommits'
+              sh 'utils/release.bash --pushCommits'
             }
 
           }
@@ -120,7 +120,7 @@ pipeline {
         steps {
           container('maven') {
             sh '''
-              utils/release.sh --performRelease
+              utils/release.bash --performRelease
             '''
           }
         }
