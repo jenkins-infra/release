@@ -311,6 +311,28 @@ You can re-trigger individually the two downstream jobs, release and packaging.
 - Re-triggering the packaging job won't published artifacts if they already exist but it will update website html.
 ====
 
+=== Stable Release Candidate
+A stable release-candidate is a manually triggered release that happens around once a month.
+It uses parameters defined in this link:https://github.com/jenkins-infra/release/blob/master/profile.d/stable-rc[file].
+
+Before triggering a new stable release candidatae release, some steps are required:
+
+. Prepare `jenkinsci/jenkins` repository -> missing documentation link.
+. Create a branch on jenkins-infra/release with a branch name that match the release branch from jenkinsci/jenkins like `rc-stable-<jenkins_version>`.
+. Review and update the stable environment https://github.com/jenkins-infra/release/blob/master/profile.d/stable[file] with:
+.. `RELEASE_GIT_BRANCH` set to the `jenkinsci/jenkins` release branch like `stable-2.235`
+.. `PACKAGING_GIT_BRANCH` set to the appropriated `jenkinsci/packaging` branch
+. Trigger the stable link:https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Fstable%2Frelease/branches/[job]
+
+[NOTE]
+====
+You can re-trigger individually the two downstream jobs, release and packaging.
+
+- Re-triggering the release will do a version bump then push new artifacts.
+- Re-triggering the packaging job won't published artifacts if they already exist but it will update website html.
+====
+
+
 === Stable
 A stable release is a manually triggered release that happens around once a month.
 Refer to link:https://www.jenkins.io/download/lts/[LTS Release Line] for more detailed information.

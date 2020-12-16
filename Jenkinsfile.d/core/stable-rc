@@ -1,0 +1,29 @@
+pipeline {
+
+  agent {
+    kubernetes {
+      label 'release-stable'
+    }
+  }
+
+  options {
+    disableConcurrentBuilds()
+  }
+
+  stages {
+    stage("Release"){
+      steps {
+        build job: "core/release/${ BRANCH_NAME }", parameters: [
+          string(name: "RELEASE_PROFILE", value: "stable-rc")
+        ]
+      }
+    }
+    stage("Package"){
+      steps {
+        build job: "core/package/${ BRANCH_NAME }", parameters: [
+          string(name: "RELEASE_PROFILE", value: "stable-rc"),
+        ]
+      }
+    }
+  }
+}
