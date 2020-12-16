@@ -20,7 +20,7 @@ pipeline {
       choices: [
         'security',
         'stable',
-        'stable-rc'
+        'stable-rc',
         'weekly'
       ],
       description: 'Define which release profile we are going to use. https://git.io/Jv7Nr',
