@@ -51,12 +51,15 @@ This role should rotate between LTS releases
 
 - [ ] Create or update packaging branch in [jenkinsci/packaging]([jenkinsci/packaging](https://github.com/jenkinsci/packaging)), e.g. `stable-2.263`
 
-- [ ] Run job on [release.ci.jenkins.io](https://release.ci.jenkins.io/job/Core/) # TODO update url
+- [ ] Run job on [release.ci.jenkins.io](https://release.ci.jenkins.io/job/core/job/stable-rc)
 
 - [ ] Publish [Github release](https://github.com/jenkinsci/jenkins/releases) using the GitHub changelog draft
 
 - [ ] Send announcement email
 
+- [ ] Check with security team that no security update is planned.  If a security update is planned, revise the checklist after the public pre-announcement to the [jenkinsci-advisories mailing list](https://groups.google.com/g/jenkinsci-advisories)
+
+- [ ] Create draft changelog and draft upgrade guide as a jenkins.io pull request
 ## LTS release
 
 - [ ] Check [LTS changelog](https://www.jenkins.io/changelog-stable/) status
@@ -65,7 +68,7 @@ This role should rotate between LTS releases
 
 - [ ] Run job on [release.ci.jenkins.io](https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Fstable%2Frelease/branches/)
 
-- [ ] Publish changelog
+- [ ] Publish changelog (one day prior to the release in case of a security update)
 
 - [ ] Publish GitHub release pointing to LTS changelog
 
