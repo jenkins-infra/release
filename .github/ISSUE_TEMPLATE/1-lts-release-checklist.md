@@ -71,8 +71,3 @@ This role should rotate between LTS releases
 - [ ] Publish changelog (one day prior to the release in case of a security update)
 
 - [ ] Publish GitHub release pointing to LTS changelog
-
-<!--
-Put an `x` into the [ ] to show you have filled the information below
-Describe your issue below
--->
