@@ -27,7 +27,7 @@ This role should rotate between LTS releases
 
 - [ ] Create or update release branch in [jenkinsci/packaging](https://github.com/jenkinsci/packaging), e.g. `stable-2.263`
 
-- [ ] Create pull request to update bom to new release line (strike this out for new point release)
+- [ ] Create pull request to update [bom](https://github.com/jenkinsci/bom) to new release line (strike this out for new point release)
 
 - [ ] Create pull request to update configuration-as-code integration tests to new release line (strike this out for new point release)
 
@@ -59,15 +59,21 @@ This role should rotate between LTS releases
 
 - [ ] Check with security team that no security update is planned.  If a security update is planned, revise the checklist after the public pre-announcement to the [jenkinsci-advisories mailing list](https://groups.google.com/g/jenkinsci-advisories)
 
-- [ ] Create draft changelog and draft upgrade guide as a jenkins.io pull request
 ## LTS release
 
 - [ ] Check [LTS changelog](https://www.jenkins.io/changelog-stable/) status
 
-- [ ] Create or update release branch in jenkins-infra/release, e.g. `stable-2.263`
 
 - [ ] Run job on [release.ci.jenkins.io](https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Fstable%2Frelease/branches/)
 
 - [ ] Publish changelog (one day prior to the release in case of a security update)
 
-- [ ] Publish GitHub release pointing to LTS changelog
+- [ ] Publish [GitHub release](https://github.com/jenkinsci/jenkins/releases) pointing to LTS changelog
+
+- [ ] Confirm [Datadog checks](https://p.datadoghq.com/sb/0Igb9a-e6849e5e019250ef5aaea3589297fe8b) are passing
+
+- [ ] Confirm the [Debian installer acceptance test](https://ci.jenkins.io/job/Infra/job/acceptance-tests/job/install-lts-debian-package/) is passing
+
+- [ ] Confirm the [Red Hat installer acceptance test](https://ci.jenkins.io/job/Infra/job/acceptance-tests/job/install-lts-redhat-rpm/) is passing
+
+- [ ] Adjust state of all [Jira issues](https://issues.jenkins.io/) fixed in the release (see the [changelog](https://www.jenkins.io/changelog-stable) for issue links)
