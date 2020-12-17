@@ -61,7 +61,7 @@ This role should rotate between LTS releases
 
 ## LTS release
 
-- [ ] Check [LTS changelog](https://www.jenkins.io/changelog-stable/) status
+- [ ] Check [LTS changelog](https://www.jenkins.io/changelog-stable/) is visible on the downloads site
 
 
 - [ ] Run job on [release.ci.jenkins.io](https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Fstable%2Frelease/branches/)
