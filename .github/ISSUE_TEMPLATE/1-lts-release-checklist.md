@@ -1,5 +1,5 @@
 ---
-name: "🥇 New LTS release checklist"
+name: "🚤 New LTS release checklist"
 labels: lts
 about: Track work required for a new LTS release
 ---
