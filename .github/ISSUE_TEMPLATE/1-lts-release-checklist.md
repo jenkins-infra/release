@@ -31,11 +31,15 @@ This role should rotate between LTS releases
 
 - [ ] Create pull request to update configuration-as-code integration tests to new release line (strike this out for new point release)
 
-- [ ] Backporting announcement email
+- [ ] Review Jira and GitHub pull requests for additional LTS candidates, adding the 'lts-candidate' label, and ensure that all tickets are resolved in jira
 
-- [ ] Review Jira and GitHub pull requests for additional candidates
+- [ ] Backporting announcement email - [script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/generate-backporting-announcement)
 
-- [ ] Open backporting PR with into-lts label and summary of changes in description from script
+- [ ] Update jira labels with the selected issues, e.g. `2.263.2-fixed`, `2.263.2-rejected`
+
+- [ ] Backport changes, create a local branch in jenkinsci/jenkins, run the [script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/list-issue-commits) to locate commits via jira ID, some manual work is required to locate them if the issue ID wasn't present at merge time, backport with `git cherry-pick -x $commit`
+
+- [ ] Open backporting PR with into-lts label and summary of changes in description from [script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/lts-candidate-stats)
 
 - [ ] Review ATH, bom and configuration-as-code integration tests results
 
@@ -53,7 +57,7 @@ This role should rotate between LTS releases
 
 - [ ] Run job on [release.ci.jenkins.io](https://release.ci.jenkins.io/job/core/job/stable-rc)
 
-- [ ] Publish [Github release](https://github.com/jenkinsci/jenkins/releases) using the GitHub changelog draft
+- [ ] Publish a pre-release [Github release](https://github.com/jenkinsci/jenkins/releases), currently we don't have a changelog for RCs
 
 - [ ] Send announcement email
 
@@ -61,12 +65,11 @@ This role should rotate between LTS releases
 
 ## LTS release
 
-- [ ] Check [LTS changelog](https://www.jenkins.io/changelog-stable/) is visible on the downloads site
-
+- [ ] Publish changelog (one day prior to the release in case of a security update)
 
 - [ ] Run job on [release.ci.jenkins.io](https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Fstable%2Frelease/branches/)
 
-- [ ] Publish changelog (one day prior to the release in case of a security update)
+- [ ] Check [LTS changelog](https://www.jenkins.io/changelog-stable/) is visible on the downloads site
 
 - [ ] Publish [GitHub release](https://github.com/jenkinsci/jenkins/releases) pointing to LTS changelog
 
