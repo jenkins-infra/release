@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
   - name: "❓ IRC"
-    url: irc://chat.freenode.net:6667/#jenkins-release
+    url: https://kiwiirc.com/nextclient/irc.freenode.net/?#jenkins-release
     about: Please ask and answer questions here.
