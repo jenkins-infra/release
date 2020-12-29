@@ -27,9 +27,9 @@ This role should rotate between LTS releases
 
 - [ ] Create or update release branch in [jenkinsci/packaging](https://github.com/jenkinsci/packaging), e.g. `stable-2.263`
 
-- [ ] Create pull request to update [bom](https://github.com/jenkinsci/bom) to new release line (strike this out for new point release)
+- [ ] Create pull request to update [bom](https://github.com/jenkinsci/bom) to the weekly version that will be the base of the release line (strike this out for new point release)
 
-- [ ] Create pull request to update configuration-as-code integration tests to new release line (strike this out for new point release)
+- [ ] Create pull request to update [configuration-as-code integration tests](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/integrations/pom.xml) to the weekly version that will be the base of the release line (strike this out for new point release)
 
 - [ ] Review Jira and GitHub pull requests for additional LTS candidates, adding the 'lts-candidate' label, and ensure that all tickets are resolved in jira
 
@@ -80,3 +80,8 @@ This role should rotate between LTS releases
 - [ ] Confirm the [Red Hat installer acceptance test](https://ci.jenkins.io/job/Infra/job/acceptance-tests/job/install-lts-redhat-rpm/) is passing
 
 - [ ] Adjust state of all [Jira issues](https://issues.jenkins.io/) fixed in the release (see the [changelog](https://www.jenkins.io/changelog-stable) for issue links)
+
+- [ ] Create pull request to update [bom](https://github.com/jenkinsci/bom) to the newly released version
+
+- [ ] Create pull request to update [configuration-as-code integration tests](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/integrations/pom.xml) to the newly released version
+
