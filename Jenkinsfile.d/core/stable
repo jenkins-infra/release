@@ -22,7 +22,6 @@ pipeline {
       steps {
         build job: "core/package/${ BRANCH_NAME }", parameters: [
           string(name: "RELEASE_PROFILE", value: "stable"),
-          string(name: "JENKINS_VERSION", value: "stable")
         ]
       }
     }
