@@ -37,7 +37,7 @@ def get_latest_version(versions):
                     if int(values[i]) not in solutions:
                         solutions.append(int(values[i]))
                 except Exception:
-                    print("Ignoring version {}".format(values[i]))
+                    continue
 
         if not solutions:
             break
