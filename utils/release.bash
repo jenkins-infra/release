@@ -567,7 +567,7 @@ function main(){
 
 #######################################################################################################################
 
-guessGitBranchInformation
+# guessGitBranchInformation
 
 : "${RELEASE_PROFILE:?Release profile required}"
 
