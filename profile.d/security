@@ -26,3 +26,5 @@ RELEASE_GIT_PRODUCTION_BRANCH=master
 #         as retrieved from ./utils/getJenkinsVersion.py
 
 MAVEN_REPOSITORY_PRODUCTION_NAME=releases
+MAVEN_REPOSITORY_NAME=chakri
+RELEASE_GIT_BRANCH=security-stable-2.263
