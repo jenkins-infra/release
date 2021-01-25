@@ -17,4 +17,4 @@ RELEASELINE=-stable
 # Custom Parameters
 RELEASE_GIT_BRANCH=stable-2.263
 MAVEN_REPOSITORY_NAME=releases
-JENKINS_VERSION=2.263.3 # Only create packages for version 2.263.3
+JENKINS_VERSION=2.263.4 # Only create packages for version 2.263.4
