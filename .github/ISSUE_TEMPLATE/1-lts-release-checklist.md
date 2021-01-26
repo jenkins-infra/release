@@ -85,6 +85,6 @@ This role should rotate between LTS releases
 
 - [ ] Create pull request to update [configuration-as-code integration tests](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/integrations/pom.xml) to the newly released version
 
-- [ ] Run trusted.ci.jenkins.io Docker image creation job ("Containers" -> "Core Release Containers" -> "master")
+- [ ] Run trusted.ci.jenkins.io [Docker image creation job](https://trusted.ci.jenkins.io:1443/job/Containers/job/Core%20Release%20Containers/job/master/)
 
-- [ ] [Update ci.jenkins.io](https://github.com/jenkins-infra/runbooks/tree/master/ci#upgrading-jenkins) to the new LTS release
+- [ ] [Update ci.jenkins.io](https://github.com/jenkins-infra/runbooks/tree/master/ci#upgrading-jenkins) to the new LTS release (note: repo is private, requires infra team membership)
