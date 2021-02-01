@@ -121,7 +121,7 @@ function downloadAzureKeyvaultSecret(){
 # * <version> represents any valid existing version like 2.176.3 available at JENKINS_DOWNLOAD_URL
 # JENKINS_DOWNLOAD_URL: Specify the endpoint to use for downloading jenkins.war
 function downloadJenkinsWar(){
-  jv dowload
+  jv download
 }
 
 function getGPGKeyFromAzure(){
