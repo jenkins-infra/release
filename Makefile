@@ -2,7 +2,7 @@
 
 test:
 	docker run \
-		-v "$PWD:/bats" \
+		-v "${PWD}:/bats" \
 		-e "ROOT_DIR=/bats" \
 		-e "BRANCH_NAME=master" \
 		-e "MAVEN_REPOSITORY_URL=mock" \

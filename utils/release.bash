@@ -121,7 +121,7 @@ function downloadAzureKeyvaultSecret(){
 # * <version> represents any valid existing version like 2.176.3 available at JENKINS_DOWNLOAD_URL
 # JENKINS_DOWNLOAD_URL: Specify the endpoint to use for downloading jenkins.war
 function downloadJenkinsWar(){
-  "$WORKSPACE"/utils/getJenkinsVersion.py
+  jv download
 }
 
 function getGPGKeyFromAzure(){
@@ -480,7 +480,7 @@ EOF
 function showPackagingPlan(){
 
 cat <<-EOF
-    New Jenkins core packages will be generated for version $(../utils/getJenkinsVersion.py --version) for the "${RELEASELINE:-weekly}" release
+    New Jenkins core packages will be generated for version $(jv get) for the "${RELEASELINE:-weekly}" release
 
     Those new packages will be generated based on a war file downloaded
     from $JENKINS_DOWNLOAD_URL
@@ -634,7 +634,7 @@ export JENKINS_VERSION
 # keeps in mind that it won't delete from source and override on destination if already exist!.
 # It's wise to disable delete permission on destination repository
 # as explained here https://www.jfrog.com/confluence/display/JFROG/Permissions#Permissions-RepositoryPermissions
-: "${PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS:=item --mode copy --source $MAVEN_REPOSITORY_NAME --destination $MAVEN_REPOSITORY_PRODUCTION_NAME --url $MAVEN_REPOSITORY_URL --username $MAVEN_REPOSITORY_USERNAME --password $MAVEN_REPOSITORY_PASSWORD --search '/org/jenkins-ci/main' $($ROOT_DIR/utils/getJenkinsVersion.py --version)}"
+: "${PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS:=item --mode copy --source $MAVEN_REPOSITORY_NAME --destination $MAVEN_REPOSITORY_PRODUCTION_NAME --url $MAVEN_REPOSITORY_URL --username $MAVEN_REPOSITORY_USERNAME --password $MAVEN_REPOSITORY_PASSWORD --search '/org/jenkins-ci/main' $(jv get)}"
 
 if [ ! -d "$WORKING_DIRECTORY" ]; then
   mkdir -p "$WORKING_DIRECTORY"
