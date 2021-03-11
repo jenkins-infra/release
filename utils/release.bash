@@ -48,7 +48,8 @@ function configureGPG(){
   requireGPGPassphrase
   if ! gpg --fingerprint "${GPG_KEYNAME}"; then
     if [ ! -f "${GPG_FILE}" ]; then
-      exit "${GPG_KEYNAME} or ${GPG_FILE} cannot be found"
+      echo "${GPG_KEYNAME} or ${GPG_FILE} cannot be found"
+      exit 1
     else
       gpg --list-keys
       if [ ! -f "$HOME/.gnupg/gpg.conf" ]; then touch "$HOME/.gnupg/gpg.conf"; fi
@@ -69,7 +70,8 @@ function configureKeystore(){
   requireKeystorePass
 
   if [ ! -f "${SIGN_CERTIFICATE}" ]; then
-      exit "${SIGN_CERTIFICATE} not found"
+      echo "${SIGN_CERTIFICATE} not found"
+      exit 1
   fi
 
   case "$SIGN_CERTIFICATE" in
@@ -83,7 +85,7 @@ function configureKeystore(){
     *.pfx )
       # pfx file download from azure key vault are not password protected, which is required for maven release plugin
       # so we need to add a new password
-      openssl pkcs12 -in ${SIGN_CERTIFICATE} -out tmpjenkins.pem -nodes -passin pass:""
+      openssl pkcs12 -in "${SIGN_CERTIFICATE}" -out tmpjenkins.pem -nodes -passin pass:""
       openssl pkcs12 -export \
         -out "$SIGN_KEYSTORE" \
         -in tmpjenkins.pem \
@@ -237,10 +239,14 @@ function guessGitBranchInformation(){
   #BRANCH_NAME="stable-2.235"
   #BRANCH_NAME="master"
 
+  ## If needed, set BRANCH_NAME
+  if [ -z "$BRANCH_NAME" ];then
+    DEFAULT_BRANCH_NAME="$(git rev-parse --abbrev-ref HEAD)"
+    : "${BRANCH_NAME:=$DEFAULT_BRANCH_NAME}"
+  fi
 
-  : "${BRANCH_NAME:=$(git rev-parse --abbrev-ref HEAD)}"
-
-  array=(${BRANCH_NAME//-/ })
+  BRANCH_NAME="${BRANCH_NAME//-/ }"
+  IFS=" " read -r -a array <<< "$BRANCH_NAME"
 
   if [[ "${#array[@]}" == 3 ]] ; then
     echo "Based on branch $BRANCH_NAME, expect a security release"
@@ -353,7 +359,16 @@ function prepareRelease(){
 function promoteStagingMavenArtifacts(){
   printf "\\n Promote Maven Artifacts\\n\\n"
 
-  PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS=($PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS)
+  # Following line will copy every items from source to destination,
+  # keeps in mind that it won't delete from source and override on destination if already exist!.
+  # It's wise to disable delete permission on destination repository
+  # as explained here https://www.jfrog.com/confluence/display/JFROG/Permissions#Permissions-RepositoryPermissions
+  DEFAULT_PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS="item --mode copy --source $MAVEN_REPOSITORY_NAME --destination $MAVEN_REPOSITORY_PRODUCTION_NAME --url $MAVEN_REPOSITORY_URL --username $MAVEN_REPOSITORY_USERNAME --password $MAVEN_REPOSITORY_PASSWORD --search '/org/jenkins-ci/main' $(jv get)}"
+
+  : "${PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS:=$DEFAULT_PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS}"
+
+  # Convert to array
+  IFS=" " read -r -a PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS <<< "PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS"
 
   ../utils/promoteMavenArtifacts.py "${PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS[@]}"
 
@@ -371,7 +386,7 @@ function promoteStagingGitRepository(){
   pushd "$RELEASE_GIT_STAGING_REPOSITORY_PATH"
 
   # Clone production repository on a specific branch
-  git clone --branch $RELEASE_GIT_PRODUCTION_BRANCH "$RELEASE_GIT_PRODUCTION_REPOSITORY" .
+  git clone --branch "$RELEASE_GIT_PRODUCTION_BRANCH" "$RELEASE_GIT_PRODUCTION_REPOSITORY" .
 
   # Fetch commits from staging repository
   git fetch "$RELEASE_GIT_STAGING_REPOSITORY" "$RELEASE_GIT_STAGING_BRANCH"
@@ -514,7 +529,8 @@ EOF
 
 function syncMirror(){
 
-  PKGSERVER_SSH_OPTS=($PKGSERVER_SSH_OPTS)
+  # Convert PKGSERVER_SSH_OPTS to an array
+  IFS=" " read -r -a PKGSERVER_SSH_OPTS <<< "PKGSERVER_SSH_OPTS"
   ssh "${PKGSERVER_SSH_OPTS[@]}" "$PKGSERVER" /srv/releases/sync.sh
 }
 
@@ -573,6 +589,8 @@ function main(){
 
 : "${ROOT_DIR:=$(dirname "$(dirname "$0")")}"
 
+# disable shellcheck warning
+# shellcheck source=/dev/null
 source "${ROOT_DIR}/profile.d/$RELEASE_PROFILE"
 
 # https://maven.apache.org/maven-release/maven-release-plugin/perform-mojo.html
@@ -630,11 +648,6 @@ export RELEASE_PROFILE
 export RELEASELINE
 export JENKINS_VERSION
 
-# Following line will copy every items from source to destination,
-# keeps in mind that it won't delete from source and override on destination if already exist!.
-# It's wise to disable delete permission on destination repository
-# as explained here https://www.jfrog.com/confluence/display/JFROG/Permissions#Permissions-RepositoryPermissions
-: "${PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS:=item --mode copy --source $MAVEN_REPOSITORY_NAME --destination $MAVEN_REPOSITORY_PRODUCTION_NAME --url $MAVEN_REPOSITORY_URL --username $MAVEN_REPOSITORY_USERNAME --password $MAVEN_REPOSITORY_PASSWORD --search '/org/jenkins-ci/main' $(jv get)}"
 
 if [ ! -d "$WORKING_DIRECTORY" ]; then
   mkdir -p "$WORKING_DIRECTORY"
