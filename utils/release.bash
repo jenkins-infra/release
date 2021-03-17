@@ -240,10 +240,8 @@ function guessGitBranchInformation(){
   #BRANCH_NAME="master"
 
   ## If needed, set BRANCH_NAME
-  if [ -z "$BRANCH_NAME" ];then
-    DEFAULT_BRANCH_NAME="$(git rev-parse --abbrev-ref HEAD)"
-    : "${BRANCH_NAME:=$DEFAULT_BRANCH_NAME}"
-  fi
+  DEFAULT_BRANCH_NAME="$(git rev-parse --abbrev-ref HEAD || echo 'master')"
+  : "${BRANCH_NAME:=$DEFAULT_BRANCH_NAME}"
 
   BRANCH_NAME="${BRANCH_NAME//-/ }"
   IFS=" " read -r -a array <<< "$BRANCH_NAME"
