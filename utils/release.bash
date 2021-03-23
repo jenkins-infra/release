@@ -366,7 +366,7 @@ function promoteStagingMavenArtifacts(){
   : "${PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS:=$DEFAULT_PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS}"
 
   # Convert to array
-  IFS=" " read -r -a PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS <<< "PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS"
+  IFS=" " read -r -a PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS <<< "$PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS"
 
   ../utils/promoteMavenArtifacts.py "${PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS[@]}"
 
@@ -528,7 +528,7 @@ EOF
 function syncMirror(){
 
   # Convert PKGSERVER_SSH_OPTS to an array
-  IFS=" " read -r -a PKGSERVER_SSH_OPTS <<< "PKGSERVER_SSH_OPTS"
+  IFS=" " read -r -a PKGSERVER_SSH_OPTS <<< "$PKGSERVER_SSH_OPTS"
   ssh "${PKGSERVER_SSH_OPTS[@]}" "$PKGSERVER" /srv/releases/sync.sh
 }
 
