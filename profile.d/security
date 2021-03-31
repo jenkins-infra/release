@@ -17,12 +17,12 @@ SIGN_ALIAS=jenkins
 
 ### Git Staging Promotion Settings
 #
-RELEASE_GIT_PRODUCTION_REPOSITORY=git@github.com:jenkinsci/jenkins.git
-RELEASE_GIT_PRODUCTION_BRANCH=master
+RELEASE_GIT_PRODUCTION_REPOSITORY=git@github.com:jenkinsci-cert/jenkins.git
+RELEASE_GIT_PRODUCTION_BRANCH=security-stable-2.277
 
 ### Maven Staging Promotion Settings
 #
 # Remark: Version to be promoted will be the latest version pushed to the maven repository
 #         as retrieved from ./utils/getJenkinsVersion.py
 
-MAVEN_REPOSITORY_PRODUCTION_NAME=releases
+MAVEN_REPOSITORY_PRODUCTION_NAME=cassie
