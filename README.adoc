@@ -363,7 +363,6 @@ The security release follows the same process as the stable one except that arti
 . Create a branch on jenkins-infra/release with a branch name that match the release branch from jenkins-cert/jenkins like `security-stable-2.135`
 . Review and update the security environment https://github.com/jenkins-infra/release/blob/master/profile.d/security[file] with:
 .. `RELEASE_GIT_BRANCH` set to the `jenkinsci-cert/jenkins` release branch like `security-stable-2.135`
-.. `PACKAGING_GIT_BRANCH` set to the appropriated jenkinsci/packaging branch
 .. `MAVEN_REPOSITORY_NAME` set to the maven repository name where we are going to publish staging maven artifacts. This is also the source location used by the packaging job to build distribution packages
 .. `JENKINS_VERSION` set to the final release version that will be packaged. If set to 'stable' or 'latest' then the packaging job will try to guess the version based on what was pushed to the maven repository. cfr settings.
 .. `RELEASELINE` set to '-stable' for a lts release otherwise leave empty
