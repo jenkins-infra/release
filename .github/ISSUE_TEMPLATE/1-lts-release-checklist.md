@@ -79,7 +79,7 @@ This role should rotate between LTS releases
 
 - [ ] Confirm the [Red Hat installer acceptance test](https://ci.jenkins.io/job/Infra/job/acceptance-tests/job/install-lts-redhat-rpm/) is passing
 
-- [ ] Adjust state of all [Jira issues](https://issues.jenkins.io/) fixed in the release (see the [changelog](https://www.jenkins.io/changelog-stable) for issue links)
+- [ ] Adjust state of [Jira issues](https://issues.jenkins.io/) fixed in the release (see the [changelog](https://www.jenkins.io/changelog-stable) for issue links) and remove the `lts-candidate` label from [Jira issues resolved in the release](https://issues.jenkins.io/issues/?jql=labels%20%3D%20lts-candidate%20and%20status%20in%20(closed%2C%20resolved)%20ORDER%20BY%20status%20DESC%2C%20key%20ASC)
 
 - [ ] Create pull request to update [bom](https://github.com/jenkinsci/bom) to the newly released version
 
