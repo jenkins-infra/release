@@ -53,7 +53,7 @@ This role should rotate between LTS releases
 
 - [ ] Create or update release branch in [jenkins-infra/release](https://github.com/jenkins-infra/release), e.g. `stable-2.263`.
 
-- [ ] Create or update packaging branch in [jenkinsci/packaging]([jenkinsci/packaging](https://github.com/jenkinsci/packaging)), e.g. `stable-2.263`
+- [ ] Create or update packaging branch in [jenkinsci/packaging](https://github.com/jenkinsci/packaging), e.g. `stable-2.263`
 
 - [ ] Run job on [release.ci.jenkins.io](https://release.ci.jenkins.io/job/core/job/stable-rc)
 
