@@ -21,11 +21,11 @@ This role should rotate between LTS releases
 
 - [ ] LTS baseline discussed and selected in the [Jenkins developers mailing list](https://groups.google.com/g/jenkinsci-dev)
 
-- [ ] Create or update release branch in [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins), e.g. `stable-2.263`
+- [ ] Create or update release branch in [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins), e.g. `stable-2.277`
 
-- [ ] Create or update release branch in [jenkins-infra/release](https://github.com/jenkins-infra/release), e.g. `stable-2.263`
+- [ ] Create or update release branch in [jenkins-infra/release](https://github.com/jenkins-infra/release), e.g. `stable-2.277`
 
-- [ ] Create or update release branch in [jenkinsci/packaging](https://github.com/jenkinsci/packaging), e.g. `stable-2.263`
+- [ ] Create or update release branch in [jenkinsci/packaging](https://github.com/jenkinsci/packaging), e.g. `stable-2.277`
 
 - [ ] Create pull request to update [bom](https://github.com/jenkinsci/bom) to the weekly version that will be the base of the release line (strike this out for new point release)
 
@@ -35,7 +35,7 @@ This role should rotate between LTS releases
 
 - [ ] Backporting announcement email - [generate-backporting-announcement script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/generate-backporting-announcement)
 
-- [ ] Update jira labels with the selected issues, e.g. `2.263.2-fixed`, `2.263.2-rejected`
+- [ ] Update jira labels with the selected issues, e.g. `2.277.2-fixed`, `2.277.2-rejected`
 
 - [ ] Backport changes, create a local branch in jenkinsci/jenkins, run the [list-issue-commits script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/list-issue-commits) to locate commits via jira ID, some manual work is required to locate them if the issue ID wasn't present at merge time, backport with `git cherry-pick -x $commit`
 
@@ -51,9 +51,9 @@ This role should rotate between LTS releases
 
 - [ ] Merge backporting PR in jenkinci/jenkins using a merge commit (do not squash)
 
-- [ ] Create or update release branch in [jenkins-infra/release](https://github.com/jenkins-infra/release), e.g. `stable-2.263`.
+- [ ] Create or update release branch in [jenkins-infra/release](https://github.com/jenkins-infra/release), e.g. `stable-2.277`.
 
-- [ ] Create or update packaging branch in [jenkinsci/packaging](https://github.com/jenkinsci/packaging), e.g. `stable-2.263`
+- [ ] Create or update packaging branch in [jenkinsci/packaging](https://github.com/jenkinsci/packaging), e.g. `stable-2.277`
 
 - [ ] Run job on [release.ci.jenkins.io](https://release.ci.jenkins.io/job/core/job/stable-rc)
 
