@@ -33,13 +33,13 @@ This role should rotate between LTS releases
 
 - [ ] Review Jira and GitHub pull requests for additional LTS candidates, adding the 'lts-candidate' label, and ensure that all tickets are resolved in jira
 
-- [ ] Backporting announcement email - [script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/generate-backporting-announcement)
+- [ ] Backporting announcement email - [generate-backporting-announcement script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/generate-backporting-announcement)
 
 - [ ] Update jira labels with the selected issues, e.g. `2.263.2-fixed`, `2.263.2-rejected`
 
-- [ ] Backport changes, create a local branch in jenkinsci/jenkins, run the [script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/list-issue-commits) to locate commits via jira ID, some manual work is required to locate them if the issue ID wasn't present at merge time, backport with `git cherry-pick -x $commit`
+- [ ] Backport changes, create a local branch in jenkinsci/jenkins, run the [list-issue-commits script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/list-issue-commits) to locate commits via jira ID, some manual work is required to locate them if the issue ID wasn't present at merge time, backport with `git cherry-pick -x $commit`
 
-- [ ] Open backporting PR with into-lts label and summary of changes in description from [script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/lts-candidate-stats) and the selected [Jira lts-candidates](https://issues.jenkins-ci.org/issues/?filter=12146)
+- [ ] Open backporting PR with into-lts label and summary of changes in description from [lts-candidate-stats script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/lts-candidate-stats) and the selected [Jira lts-candidates](https://issues.jenkins-ci.org/issues/?filter=12146)
 
 - [ ] Review ATH, bom and configuration-as-code integration tests results
 
