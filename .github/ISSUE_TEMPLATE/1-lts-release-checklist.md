@@ -21,11 +21,11 @@ This role should rotate between LTS releases
 
 - [ ] LTS baseline discussed and selected in the [Jenkins developers mailing list](https://groups.google.com/g/jenkinsci-dev)
 
-- [ ] Create or update release branch in [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins), e.g. `stable-2.263`
+- [ ] Create or update release branch in [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins), e.g. `stable-2.277`
 
-- [ ] Create or update release branch in [jenkins-infra/release](https://github.com/jenkins-infra/release), e.g. `stable-2.263`
+- [ ] Create or update release branch in [jenkins-infra/release](https://github.com/jenkins-infra/release), e.g. `stable-2.277`
 
-- [ ] Create or update release branch in [jenkinsci/packaging](https://github.com/jenkinsci/packaging), e.g. `stable-2.263`
+- [ ] Create or update release branch in [jenkinsci/packaging](https://github.com/jenkinsci/packaging), e.g. `stable-2.277`
 
 - [ ] Create pull request to update [bom](https://github.com/jenkinsci/bom) to the weekly version that will be the base of the release line (strike this out for new point release)
 
@@ -33,13 +33,13 @@ This role should rotate between LTS releases
 
 - [ ] Review Jira and GitHub pull requests for additional LTS candidates, adding the 'lts-candidate' label, and ensure that all tickets are resolved in jira
 
-- [ ] Backporting announcement email - [script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/generate-backporting-announcement)
+- [ ] Backporting announcement email - [generate-backporting-announcement script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/generate-backporting-announcement)
 
-- [ ] Update jira labels with the selected issues, e.g. `2.263.2-fixed`, `2.263.2-rejected`
+- [ ] Update jira labels with the selected issues, e.g. `2.277.2-fixed`, `2.277.2-rejected`
 
-- [ ] Backport changes, create a local branch in jenkinsci/jenkins, run the [script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/list-issue-commits) to locate commits via jira ID, some manual work is required to locate them if the issue ID wasn't present at merge time, backport with `git cherry-pick -x $commit`
+- [ ] Backport changes, create a local branch in jenkinsci/jenkins, run the [list-issue-commits script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/list-issue-commits) to locate commits via jira ID, some manual work is required to locate them if the issue ID wasn't present at merge time, backport with `git cherry-pick -x $commit`
 
-- [ ] Open backporting PR with into-lts label and summary of changes in description from [script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/lts-candidate-stats)
+- [ ] Open backporting PR with into-lts label and summary of changes in description from [lts-candidate-stats script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/lts-candidate-stats) and the selected [Jira lts-candidates](https://issues.jenkins-ci.org/issues/?filter=12146)
 
 - [ ] Review ATH, bom and configuration-as-code integration tests results
 
@@ -51,9 +51,9 @@ This role should rotate between LTS releases
 
 - [ ] Merge backporting PR in jenkinci/jenkins using a merge commit (do not squash)
 
-- [ ] Create or update release branch in [jenkins-infra/release](https://github.com/jenkins-infra/release), e.g. `stable-2.263`.
+- [ ] Create or update release branch in [jenkins-infra/release](https://github.com/jenkins-infra/release), e.g. `stable-2.277`.
 
-- [ ] Create or update packaging branch in [jenkinsci/packaging]([jenkinsci/packaging](https://github.com/jenkinsci/packaging)), e.g. `stable-2.263`
+- [ ] Create or update packaging branch in [jenkinsci/packaging](https://github.com/jenkinsci/packaging), e.g. `stable-2.277`
 
 - [ ] Run job on [release.ci.jenkins.io](https://release.ci.jenkins.io/job/core/job/stable-rc)
 
@@ -79,7 +79,7 @@ This role should rotate between LTS releases
 
 - [ ] Confirm the [Red Hat installer acceptance test](https://ci.jenkins.io/job/Infra/job/acceptance-tests/job/install-lts-redhat-rpm/) is passing
 
-- [ ] Adjust state of all [Jira issues](https://issues.jenkins.io/) fixed in the release (see the [changelog](https://www.jenkins.io/changelog-stable) for issue links)
+- [ ] Adjust state of [Jira issues](https://issues.jenkins.io/) fixed in the release (see the [changelog](https://www.jenkins.io/changelog-stable) for issue links) and remove the `lts-candidate` label from [Jira issues resolved in the release](https://issues.jenkins.io/issues/?jql=labels%20%3D%20lts-candidate%20and%20status%20in%20(closed%2C%20resolved)%20ORDER%20BY%20status%20DESC%2C%20key%20ASC)
 
 - [ ] Create pull request to update [bom](https://github.com/jenkinsci/bom) to the newly released version
 
