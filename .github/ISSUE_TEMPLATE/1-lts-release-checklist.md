@@ -59,7 +59,7 @@ This role should rotate between LTS releases
 
 - [ ] Publish a pre-release [Github release](https://github.com/jenkinsci/jenkins/releases), currently we don't have a changelog for RCs
 
-- [ ] Send announcement email
+- [ ] Send announcement email, [example](https://groups.google.com/g/jenkinsci-dev/c/ox6SCyOQLuE/m/C-dsLZ4vBwAJ)
 
 - [ ] Check with security team that no security update is planned.  If a security update is planned, revise the checklist after the public pre-announcement to the [jenkinsci-advisories mailing list](https://groups.google.com/g/jenkinsci-advisories)
 
