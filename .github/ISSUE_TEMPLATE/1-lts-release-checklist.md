@@ -55,7 +55,7 @@ This role should rotate between LTS releases
 
 - [ ] Create or update packaging branch in [jenkinsci/packaging](https://github.com/jenkinsci/packaging), e.g. `stable-2.277`
 
-- [ ] Run job on [release.ci.jenkins.io](https://release.ci.jenkins.io/job/core/job/stable-rc)
+- [ ] Deploy a release candidate built from your local machine, `mvn -e clean deploy -DskipTests=true`
 
 - [ ] Publish a pre-release [Github release](https://github.com/jenkinsci/jenkins/releases), currently we don't have a changelog for RCs
 
