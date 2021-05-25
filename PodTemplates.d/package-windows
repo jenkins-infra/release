@@ -37,12 +37,10 @@ spec:
       privileged: false
     tty: false
     volumeMounts:
-      - name: core-packages
-        mountPath: 'C:/Packages'
       - name: binary-core-packages
-        mountPath: /Packages/binary
+        mountPath: 'C:\Packages\binary'
       - name: website-core-packages
-        mountPath: /Packages/web
+        mountPath: 'C:\Packages\web'
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
