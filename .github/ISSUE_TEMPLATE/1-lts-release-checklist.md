@@ -21,7 +21,7 @@ This role should rotate between LTS releases
 
 - [ ] LTS baseline discussed and selected in the [Jenkins developers mailing list](https://groups.google.com/g/jenkinsci-dev)
 
-- [ ] Create or update release branch in [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins), e.g. `stable-2.277`
+- [ ] Create or update release branch in [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins), e.g. `stable-2.277`, use the [init-lts-line](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/init-lts-line) script
 
 - [ ] Create or update release branch in [jenkins-infra/release](https://github.com/jenkins-infra/release), e.g. `stable-2.277`
 
@@ -55,11 +55,11 @@ This role should rotate between LTS releases
 
 - [ ] Create or update packaging branch in [jenkinsci/packaging](https://github.com/jenkinsci/packaging), e.g. `stable-2.277`
 
-- [ ] Run job on [release.ci.jenkins.io](https://release.ci.jenkins.io/job/core/job/stable-rc)
+- [ ] Deploy a release candidate built from your local machine, `mvn -e clean deploy -DskipTests=true`
 
 - [ ] Publish a pre-release [Github release](https://github.com/jenkinsci/jenkins/releases), currently we don't have a changelog for RCs
 
-- [ ] Send announcement email
+- [ ] Send announcement email, [example](https://groups.google.com/g/jenkinsci-dev/c/ox6SCyOQLuE/m/C-dsLZ4vBwAJ)
 
 - [ ] Check with security team that no security update is planned.  If a security update is planned, revise the checklist after the public pre-announcement to the [jenkinsci-advisories mailing list](https://groups.google.com/g/jenkinsci-advisories)
 
