@@ -36,11 +36,6 @@ spec:
     securityContext:
       privileged: false
     tty: false
-    volumeMounts:
-      - name: binary-core-packages
-        mountPath: 'C:\Packages\binary'
-      - name: website-core-packages
-        mountPath: 'C:\Packages\web'
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -55,10 +50,3 @@ spec:
       operator: "Equal"
       value: "windows"
       effect: "NoSchedule"
-  volumes:
-    - name: binary-core-packages
-      persistentVolumeClaim:
-        claimName: binary-core-packages
-    - name: website-core-packages
-      persistentVolumeClaim:
-        claimName: website-core-packages
