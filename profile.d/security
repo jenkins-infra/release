@@ -16,7 +16,7 @@ MAVEN_PUBLIC_JENKINS_REPOSITORY_MIRROR_URL='http://nexus/repository/jenkins-publ
 SIGN_ALIAS=jenkins
 
 ### Git Staging Promotion Settings
-#
+# Unused:
 RELEASE_GIT_PRODUCTION_REPOSITORY=git@github.com:jenkinsci/jenkins.git
 RELEASE_GIT_PRODUCTION_BRANCH=master
 
@@ -24,5 +24,11 @@ RELEASE_GIT_PRODUCTION_BRANCH=master
 #
 # Remark: Version to be promoted will be the latest version pushed to the maven repository
 #         as retrieved from ./utils/getJenkinsVersion.py
-
+# Unused:
 MAVEN_REPOSITORY_PRODUCTION_NAME=releases
+
+# Real parameters:
+MAVEN_REPOSITORY_NAME=camilla
+RELEASE_GIT_BRANCH=security-stable-2.289
+JENKINS_VERSION=2.289.2
+RELEASELINE=-stable
