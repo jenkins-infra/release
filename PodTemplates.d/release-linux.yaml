@@ -11,7 +11,7 @@ spec:
     env:
     - name: "HOME"
       value: "/home/jenkins/agent/workspace"
-    image: "microsoft/azure-cli:2.0.59"
+    image: "mcr.microsoft.com/azure-cli:2.0.59"
     imagePullPolicy: "IfNotPresent"
     name: "azure-cli"
     resources:
