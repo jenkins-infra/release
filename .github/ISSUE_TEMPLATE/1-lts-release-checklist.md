@@ -67,7 +67,7 @@ This role should rotate between LTS releases
 
 - [ ] Publish changelog (one day prior to the release in case of a security update)
 
-- [ ] Assure that contents of master branch have been merged to the stable-2.277 branch in the [release repository](https://github.com/jenkins-infra/release)
+- [ ] Assure that contents of master branch have been merged to the stable branch in the [release repository](https://github.com/jenkins-infra/release), e.g. `stable-2.277`
 
 - [ ] Assure that contents of master branch have been merged to the stable-2.277 branch in the [packaging repository](https://github.com/jenkinsci/packaging)
 
