@@ -51,13 +51,9 @@ This role should rotate between LTS releases
 
 - [ ] Merge backporting PR in jenkinci/jenkins using a merge commit (do not squash)
 
-- [ ] Create or update release branch in [jenkins-infra/release](https://github.com/jenkins-infra/release), e.g. `stable-2.277`.
+- [ ] Retrieve the url for the RC from the commit status (continuous-integration/jenkins/incrementals) of the last build on the stable branch (requires a passing build). You will get something like https://repo.jenkins-ci.org/incrementals/org/jenkins-ci/main/cli/2.303.2-rc31385.6eec6c02fc3d/, replace `cli` with `jenkins-war`, visit the page and copy the URL to the war file, for the earlier example it would be https://repo.jenkins-ci.org/incrementals/org/jenkins-ci/main/jenkins-war/2.303.2-rc31385.6eec6c02fc3d/jenkins-war-2.303.2-rc31385.6eec6c02fc3d.war. If incrementals are broken you can deploy a build from your own machine with `mvn -e clean deploy -DskipTests=true`.
 
-- [ ] Create or update packaging branch in [jenkinsci/packaging](https://github.com/jenkinsci/packaging), e.g. `stable-2.277`
-
-- [ ] Deploy a release candidate built from your local machine, `mvn -e clean deploy -DskipTests=true`
-
-- [ ] Publish a pre-release [Github release](https://github.com/jenkinsci/jenkins/releases), currently we don't have a changelog for RCs
+- [ ] Publish a pre-release [Github release](https://github.com/jenkinsci/jenkins/releases), e.g. [sample](https://github.com/jenkinsci/jenkins/releases/tag/jenkins-2.289.2-rc) currently we don't have a changelog for RCs
 
 - [ ] Send announcement email, [example](https://groups.google.com/g/jenkinsci-dev/c/ox6SCyOQLuE/m/C-dsLZ4vBwAJ)
 
