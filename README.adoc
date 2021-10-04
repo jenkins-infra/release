@@ -374,7 +374,7 @@ All steps need to be done twice: Once for weekly, once for LTS.
 
 ==== Staging (before release day)
 
-To stage the Maven artifacts, trigger the generic Release link:https://release.ci.jenkins.io/job/core/job/release/[job] from the appropriated branch like `security-stable-2.303.2`.
+To stage the Maven artifacts, trigger the generic Release link:https://release.ci.jenkins.io/job/core/job/release/[job] from the appropriate branch like `security-stable-2.303.2`.
 
 To do that, follow these steps:
 
