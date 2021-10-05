@@ -16,7 +16,7 @@ MAVEN_PUBLIC_JENKINS_REPOSITORY_MIRROR_URL='https://repo.jenkins-ci.org/public/'
 SIGN_ALIAS=jenkins
 
 ### Git Staging Promotion Settings
-#
+# Unused:
 RELEASE_GIT_PRODUCTION_REPOSITORY=git@github.com:jenkinsci/jenkins.git
 RELEASE_GIT_PRODUCTION_BRANCH=master
 
@@ -24,5 +24,9 @@ RELEASE_GIT_PRODUCTION_BRANCH=master
 #
 # Remark: Version to be promoted will be the latest version pushed to the maven repository
 #         as retrieved from ./utils/getJenkinsVersion.py
-
+# Unused:
 MAVEN_REPOSITORY_PRODUCTION_NAME=releases
+
+MAVEN_REPOSITORY_NAME=caravelli
+RELEASE_GIT_BRANCH=security-master
+JENKINS_VERSION=2.315
