@@ -1,4 +1,4 @@
-RELEASE_GIT_BRANCH=master
+RELEASE_GIT_BRANCH=v4.11.x
 RELEASE_GIT_REPOSITORY=git@github.com:jenkinsci/remoting.git
 GIT_EMAIL=66998184+jenkins-release-bot@users.noreply.github.com
 GIT_NAME="Jenkins Release Bot"
