@@ -23,7 +23,10 @@ This role should rotate between LTS releases
 
 - [ ] Create or update release branch in [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins), e.g. `stable-2.277`, use the [init-lts-line](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/init-lts-line) script
 
-- [ ] Create or update release branch in [jenkins-infra/release](https://github.com/jenkins-infra/release), e.g. `stable-2.277`
+- [ ] Create or update release branch in [jenkins-infra/release](https://github.com/jenkins-infra/release), e.g. `stable-2.277`.
+  - [ ] Modify the `RELEASE_GIT_BRANCH` and `JENKINS_VERSION` values in the environment file (`profile.d/stable`) to match the release.
+  - [ ] Modify the `PACKAGING_GIT_BRANCH` value in the packaging script (`Jenkinsfile.d/core/package`) to match the release.
+  - For more info, refer to [stable](https://github.com/jenkins-infra/release#stable).
 
 - [ ] Create or update release branch in [jenkinsci/packaging](https://github.com/jenkinsci/packaging), e.g. `stable-2.277`
 
@@ -35,7 +38,7 @@ This role should rotate between LTS releases
 
 - [ ] Backporting announcement email - [generate-backporting-announcement script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/generate-backporting-announcement)
 
-- [ ] Update jira labels with the selected issues, e.g. `2.277.2-fixed`, `2.277.2-rejected`
+- [ ] Update jira labels with the selected issues, e.g. `2.277.2-fixed`, `2.277.2-rejected`, and remove `lts-candidate`
 
 - [ ] Backport changes, create a local branch in jenkinsci/jenkins, run the [list-issue-commits script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/list-issue-commits) to locate commits via jira ID, some manual work is required to locate them if the issue ID wasn't present at merge time, backport with `git cherry-pick -x $commit`
 
@@ -75,16 +78,20 @@ This role should rotate between LTS releases
 
 - [ ] Confirm [Datadog checks](https://p.datadoghq.com/sb/0Igb9a-e6849e5e019250ef5aaea3589297fe8b) are passing
 
-- [ ] Confirm the [Debian installer acceptance test](https://ci.jenkins.io/job/Infra/job/acceptance-tests/job/install-lts-debian-package/) is passing
+- [ ] Confirm the [Debian installer acceptance test](https://ci.jenkins.io/job/Infra/job/acceptance-tests/job/install-lts-debian-package/) is passing.
+  For good measures, check the console log to confirm that the correct release package was used (e.g. search for `2.277`).
 
-- [ ] Confirm the [Red Hat installer acceptance test](https://ci.jenkins.io/job/Infra/job/acceptance-tests/job/install-lts-redhat-rpm/) is passing
-
-- [ ] Adjust state of [Jira issues](https://issues.jenkins.io/) fixed in the release (see the [changelog](https://www.jenkins.io/changelog-stable) for issue links) and remove the `lts-candidate` label from [Jira issues resolved in the release](https://issues.jenkins.io/issues/?jql=labels%20%3D%20lts-candidate%20and%20status%20in%20(closed%2C%20resolved)%20ORDER%20BY%20status%20DESC%2C%20key%20ASC)
+- [ ] Confirm the [Red Hat installer acceptance test](https://ci.jenkins.io/job/Infra/job/acceptance-tests/job/install-lts-redhat-rpm/) is passing.
+  For good measures, check the console log to confirm that the correct release package was used (e.g. search for `2.277`).
+  
+- [ ] Adjust state and `Released As` of [Jira issues](https://issues.jenkins.io/) fixed in the release (see the [changelog](https://www.jenkins.io/changelog-stable) for issue links)
 
 - [ ] Create pull request to update [bom](https://github.com/jenkinsci/bom) to the newly released version
 
 - [ ] Create pull request to update [configuration-as-code integration tests](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/integrations/pom.xml) to the newly released version
 
-- [ ] Run trusted.ci.jenkins.io [Docker image creation job](https://trusted.ci.jenkins.io:1443/job/Containers/job/Core%20Release%20Containers/job/master/)
+- [ ] Run trusted.ci.jenkins.io [Docker image creation job](https://trusted.ci.jenkins.io:1443/job/Containers/job/Core%20Release%20Containers/job/master/).
+
+- [ ] Confirm that the images are available at [Docker hub](https://hub.docker.com/r/jenkins/jenkins/tags)
 
 - [ ] [Update ci.jenkins.io](https://github.com/jenkins-infra/runbooks/tree/master/ci#upgrading-jenkins) to the new LTS release (note: repo is private, requires infra team membership)
