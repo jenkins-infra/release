@@ -11,7 +11,6 @@ pipeline {
       kubernetes {
         label 'release-component-remoting'
         yamlFile 'PodTemplates.d/release-linux.yaml'
-        inheritFrom 'jnlp-linux'
       }
     }
 
@@ -36,25 +35,19 @@ pipeline {
     stages {
       stage('Clone Remoting Git Repository') {
         steps {
-          container('jnlp') {
-            sshagent(['release-key']) {
-              sh 'utils/release.bash --cloneReleaseGitRepository'
-            }
+          sshagent(['release-key']) {
+            sh 'utils/release.bash --cloneReleaseGitRepository'
           }
         }
       }
       stage('Clean Release') {
         steps {
-          container('maven') {
-            sh 'utils/release.bash --cleanRelease'
-          }
+          sh 'utils/release.bash --cleanRelease'
         }
       }
       stage('Plan') {
         steps {
-          container('maven') {
-            sh 'utils/release.bash --showReleasePlan'
-          }
+          sh 'utils/release.bash --showReleasePlan'
         }
       }
       stage('Validate') {
@@ -64,65 +57,52 @@ pipeline {
         }
 
         steps {
-          container('jnlp'){
-            sh 'echo Validated'
-          }
+          sh 'echo Validated'
         }
       }
 
       stage('Get Code Signing Certificate') {
         steps {
-          container('azure-cli') {
-            sh '''
-              utils/release.bash --downloadAzureKeyvaultSecret
-              utils/release.bash --configureKeystore
-            '''
-          }
+          sh '''
+            utils/release.bash --downloadAzureKeyvaultSecret
+            utils/release.bash --configureKeystore
+          '''
         }
       }
       stage('Get GPG key') {
         steps {
-          container('azure-cli') {
-            sh '''
-              utils/release.bash --getGPGKeyFromAzure
-            '''
-          }
+          sh '''
+            utils/release.bash --getGPGKeyFromAzure
+          '''
         }
       }
       stage('Prepare Release') {
         steps {
-          container('maven') {
-            // Maven Release requires gpg key with password password and a certificate key with password
-            sh '''
-              utils/release.bash --configureGPG
-              utils/release.bash --configureGit
-              utils/release.bash --prepareRelease
-            '''
+          // Maven Release requires gpg key with password password and a certificate key with password
+          sh '''
+            utils/release.bash --configureGPG
+            utils/release.bash --configureGit
+            utils/release.bash --prepareRelease
+          '''
 
-            script {
-              def properties = readProperties file: 'release/release.properties'
-              env.RELEASE_SCM_TAG = properties['scm.tag']
-            }
+          script {
+            def properties = readProperties file: 'release/release.properties'
+            env.RELEASE_SCM_TAG = properties['scm.tag']
           }
         }
       }
       stage('Push Commits') {
         steps {
-          container('jnlp') {
-            sshagent(['release-key']) {
-              sh 'utils/release.bash --pushCommits'
-            }
-
+          sshagent(['release-key']) {
+            sh 'utils/release.bash --pushCommits'
           }
         }
       }
       stage('Stage Release') {
         steps {
-          container('maven') {
-            sh '''
-              utils/release.bash --performRelease
-            '''
-          }
+          sh '''
+            utils/release.bash --performRelease
+          '''
         }
       }
     }
