@@ -7,9 +7,8 @@ metadata:
 spec:
   containers:
   - name: jnlp
-    ## Todo: stop using latest tag
-    image: dduportal/jenkinsciinfra-package:2.0.0
-    imagePullPolicy: "Always"
+    image: jenkinsciinfra/packaging:2.0.0
+    imagePullPolicy: "IfNotPresent"
     env:
     - name: "HOME"
       value: "/home/jenkins/agent/workspace"
