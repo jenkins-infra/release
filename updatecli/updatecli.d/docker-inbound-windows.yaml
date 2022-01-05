@@ -1,0 +1,66 @@
+---
+title: "Bump jenkins/inbound-agent (windowsservercore-1809) Docker image version"
+
+scms:
+  default:
+    kind: github
+    spec:
+      user: "{{ .github.user }}"
+      email: "{{ .github.email }}"
+      owner: "{{ .github.owner }}"
+      repository: "{{ .github.repository }}"
+      token: "{{ requiredEnv .github.token }}"
+      username: "{{ .github.username }}"
+      branch: "{{ .github.branch }}"
+
+sources:
+  lastVersion:
+    kind: githubRelease
+    name: Get the last jenkinsciinfra/packaging Docker image version
+    spec:
+      owner: "jenkinsci"
+      repository: "docker-inbound-agent"
+      token: "{{ requiredEnv .github.token }}"
+      username: "{{ .github.username }}"
+      versionFilter:
+        kind: latest
+
+conditions:
+  testDockerImagePublished:
+    name: "Does the Docker image jenkinsciinfra/packaging with the last discovered tag is published?"
+    kind: dockerImage
+    disablesourceinput: true
+    spec:
+      image: jenkins/inbound-agent
+      tag: '{{ source `lastVersion`}}-windowsservercore-ltsc2019'
+  testJNLPContainerForPackagingPod:
+    name: "Does the pod template manifest for package job has a container named 'jnlp'?"
+    kind: yaml
+    disablesourceinput: true
+    spec:
+      file: "PodTemplates.d/package-windows.yaml"
+      key: spec.containers[0].name
+      value: "jnlp"
+
+targets:
+  updateJNLPContainerForPackagingPod:
+    name: "Update the image of the jnlp container of the pod template manifest for windows package job"
+    sourceID: lastVersion
+    transformers:
+      - addPrefix: "jenkins/inbound-agent:"
+      - addSuffix: "-windowsservercore-ltsc2019"
+    kind: yaml
+    spec:
+      file: PodTemplates.d/package-windows.yaml
+      key: spec.containers[0].image
+    scmID: default
+
+pullrequests:
+  default:
+    kind: github
+    scmID: default
+    targets:
+      - updateJNLPContainerForPackagingPod
+    spec:
+      labels:
+        - dependencies
