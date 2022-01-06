@@ -379,7 +379,7 @@ To stage the Maven artifacts, trigger the generic Release link:https://release.c
 To do that, follow these steps:
 
 .. Force repository scan
-.. Trigger the first build to have access to job parameter and immediately abort it
+.. Trigger the first build to scan the script and wait until it finishes; it will skip all actual work.
 .. Trigger a job with the correct parameters
 ... `RELEASE_PROFILE` set to `security`
 ... `RELEASE_GIT_BRANCH` set to `unused` as we already define it in the release profile file, which overrides the job parameter
