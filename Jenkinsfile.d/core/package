@@ -2,7 +2,7 @@ pipeline {
   agent {
     kubernetes {
       label 'package-linux'
-      yamlFile 'PodTemplates.d/package-linux'
+      yamlFile 'PodTemplates.d/package-linux.yaml'
       workingDir '/home/jenkins/agent'
     }
   }
@@ -257,7 +257,7 @@ pipeline {
               agent {
                 kubernetes {
                   label 'packaging-windows'
-                  yamlFile 'PodTemplates.d/package-windows'
+                  yamlFile 'PodTemplates.d/package-windows.yaml'
                 }
               }
               steps {
