@@ -2,7 +2,7 @@
 # WARNING: Any variables defined here, override those defined from the Jenkinsfile
 #
 #
-RELEASE_GIT_BRANCH=master
+RELEASE_GIT_BRANCH=stable-2.319
 RELEASE_GIT_REPOSITORY=git@github.com:jenkinsci/jenkins.git
 GIT_EMAIL=66998184+jenkins-release-bot@users.noreply.github.com
 GIT_NAME="Jenkins Release Bot"
@@ -12,6 +12,7 @@ MAVEN_REPOSITORY_URL='https://repo.jenkins-ci.org'
 MAVEN_REPOSITORY_NAME=releases
 MAVEN_PUBLIC_JENKINS_REPOSITORY_MIRROR_URL='https://repo.jenkins-ci.org/public/'
 SIGN_ALIAS=jenkins
+JENKINS_VERSION=2.319.3
 
 # Used by jenkinsci/packaging
 RELEASELINE=-stable
