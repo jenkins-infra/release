@@ -6,37 +6,37 @@ metadata:
     job: "package"
 spec:
   containers:
-  - name: jnlp
-    image: jenkinsciinfra/packaging:2.0.0
-    imagePullPolicy: "IfNotPresent"
-    env:
-    - name: "HOME"
-      value: "/home/jenkins/agent/workspace"
-    resources:
-      limits:
-        memory: "1Gi"
-        cpu: "1"
-      requests:
-        memory: "1Gi"
-        cpu: "1"
-    securityContext:
-      privileged: false
-      runAsUser: 1000
-      runAsGroup: 1000
-    volumeMounts:
-      - name: binary-core-packages
-        mountPath: /srv/releases/jenkins
-      - name: website-core-packages
-        mountPath: /var/www/pkg.jenkins.io.staging/
+    - name: jnlp
+      image: jenkinsciinfra/packaging:2.1.0
+      imagePullPolicy: "IfNotPresent"
+      env:
+        - name: "HOME"
+          value: "/home/jenkins/agent/workspace"
+      resources:
+        limits:
+          memory: "1Gi"
+          cpu: "1"
+        requests:
+          memory: "1Gi"
+          cpu: "1"
+      securityContext:
+        privileged: false
+        runAsUser: 1000
+        runAsGroup: 1000
+      volumeMounts:
+        - name: binary-core-packages
+          mountPath: /srv/releases/jenkins
+        - name: website-core-packages
+          mountPath: /var/www/pkg.jenkins.io.staging/
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
-        - matchExpressions:
-          - key: kubernetes.io/os
-            operator: In
-            values:
-              - linux
+          - matchExpressions:
+              - key: kubernetes.io/os
+                operator: In
+                values:
+                  - linux
   volumes:
     - name: binary-core-packages
       persistentVolumeClaim:
