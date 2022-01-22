@@ -2,8 +2,7 @@ pipeline {
   agent {
     kubernetes {
       label 'package-linux'
-      yamlFile 'PodTemplates.d/package-linux'
-      inheritFrom 'jnlp-linux'
+      yamlFile 'PodTemplates.d/package-linux.yaml'
       workingDir '/home/jenkins/agent'
     }
   }
@@ -101,9 +100,7 @@ pipeline {
   stages {
     stage('Plan') {
       steps {
-        container('packaging') {
-          sh 'utils/release.bash --showPackagingPlan'
-        }
+        sh 'utils/release.bash --showPackagingPlan'
       }
     }
     stage('Validate') {
@@ -117,45 +114,37 @@ pipeline {
       }
 
       steps {
-        container('jnlp'){
-          sh 'echo Validated'
-        }
+        sh 'echo Validated'
       }
 
     }
     stage('Get GPG key') {
 
       steps {
-        container('azure-cli') {
-          checkout scm
-          dir (WORKING_DIRECTORY){
-            git branch: PACKAGING_GIT_BRANCH, credentialsId: 'release-key', url: PACKAGING_GIT_REPOSITORY
-          }
-
-          sh '''
-            ./utils/release.bash --getGPGKeyFromAzure
-          '''
-
-          dir (WORKING_DIRECTORY){
-            stash includes: GPG_FILE , name: 'GPG'
-          }
+        checkout scm
+        dir (WORKING_DIRECTORY){
+          git branch: PACKAGING_GIT_BRANCH, credentialsId: 'release-key', url: PACKAGING_GIT_REPOSITORY
         }
 
-        container('packaging'){
-          sh './utils/release.bash --configureGPG'
+        sh '''
+          ./utils/release.bash --getGPGKeyFromAzure
+        '''
+
+        dir (WORKING_DIRECTORY){
+          stash includes: GPG_FILE , name: 'GPG'
         }
+
+        sh './utils/release.bash --configureGPG'
       }
     }
 
     stage('Get Code Signing Certificate') {
 
       steps {
-        container('azure-cli') {
-          sh '''
-            utils/release.bash --downloadAzureKeyvaultSecret
-            utils/release.bash --configureKeystore
-          '''
-        }
+        sh '''
+          utils/release.bash --downloadAzureKeyvaultSecret
+          utils/release.bash --configureKeystore
+        '''
 
         stash includes: SIGN_KEYSTORE_FILENAME, name: 'KEYSTORE'
       }
@@ -163,14 +152,12 @@ pipeline {
 
     stage('Download WAR archive to package'){
       steps{
-        container('packaging'){
-          sh '''
-            ./utils/release.bash --downloadJenkins
-          '''
-          dir (WORKING_DIRECTORY){
-            stash includes: WAR_FILENAME, name: "WAR"
-            archiveArtifacts artifacts: "*.war"
-          }
+        sh '''
+          ./utils/release.bash --downloadJenkins
+        '''
+        dir (WORKING_DIRECTORY){
+          stash includes: WAR_FILENAME, name: "WAR"
+          archiveArtifacts artifacts: "*.war"
         }
       }
     }
@@ -181,12 +168,10 @@ pipeline {
           stages {
             stage('Publish'){
               steps {
-                container('packaging'){
-                  sshagent(['pkgserver']) {
-                    sh '''
-                      ./utils/release.bash --packaging war.publish
-                    '''
-                  }
+                sshagent(['pkgserver']) {
+                  sh '''
+                    ./utils/release.bash --packaging war.publish
+                  '''
                 }
               }
             }
@@ -196,24 +181,20 @@ pipeline {
           stages {
             stage('Build'){
               steps {
-                container('packaging'){
-                  sh '''
-                    ./utils/release.bash --packaging deb
-                  '''
-                  dir (WORKING_DIRECTORY){
-                    archiveArtifacts artifacts: "target/debian/*.deb"
-                  }
+                sh '''
+                  ./utils/release.bash --packaging deb
+                '''
+                dir (WORKING_DIRECTORY){
+                  archiveArtifacts artifacts: "target/debian/*.deb"
                 }
               }
             }
             stage('Publish'){
               steps {
-                container('packaging'){
-                  sshagent(['pkgserver']) {
-                    sh '''
-                      ./utils/release.bash --packaging deb.publish
-                    '''
-                  }
+                sshagent(['pkgserver']) {
+                  sh '''
+                    ./utils/release.bash --packaging deb.publish
+                  '''
                 }
               }
             }
@@ -223,24 +204,20 @@ pipeline {
           stages {
             stage('Build'){
               steps {
-                container('packaging'){
-                  sh '''
-                    ./utils/release.bash --packaging rpm
-                  '''
-                  dir (WORKING_DIRECTORY){
-                    archiveArtifacts artifacts: "target/rpm/*.rpm"
-                  }
+                sh '''
+                  ./utils/release.bash --packaging rpm
+                '''
+                dir (WORKING_DIRECTORY){
+                  archiveArtifacts artifacts: "target/rpm/*.rpm"
                 }
               }
             }
             stage('Publish'){
               steps {
-                container('packaging'){
-                  sshagent(['pkgserver']) {
-                    sh '''
-                      ./utils/release.bash --packaging rpm.publish
-                    '''
-                  }
+                sshagent(['pkgserver']) {
+                  sh '''
+                    ./utils/release.bash --packaging rpm.publish
+                  '''
                 }
               }
             }
@@ -250,24 +227,20 @@ pipeline {
           stages {
             stage('Build'){
               steps {
-                container('packaging'){
-                  sh '''
-                    ./utils/release.bash --packaging suse
-                  '''
-                  dir (WORKING_DIRECTORY){
-                    archiveArtifacts artifacts: "target/suse/*.rpm"
-                  }
+                sh '''
+                  ./utils/release.bash --packaging suse
+                '''
+                dir (WORKING_DIRECTORY){
+                  archiveArtifacts artifacts: "target/suse/*.rpm"
                 }
               }
             }
             stage('Publish'){
               steps {
-                container('packaging'){
-                  sshagent(['pkgserver']) {
-                    sh '''
-                      ./utils/release.bash --packaging suse.publish
-                    '''
-                  }
+                sshagent(['pkgserver']) {
+                  sh '''
+                    ./utils/release.bash --packaging suse.publish
+                  '''
                 }
               }
             }
@@ -284,7 +257,7 @@ pipeline {
               agent {
                 kubernetes {
                   label 'packaging-windows'
-                  yamlFile 'PodTemplates.d/package-windows'
+                  yamlFile 'PodTemplates.d/package-windows.yaml'
                 }
               }
               steps {
@@ -313,13 +286,11 @@ pipeline {
             }
             stage('Publish'){
               steps {
-                container('packaging') {
-                  unarchive mapping: ['*.msi*': WORKING_DIRECTORY]
-                  sshagent(['pkgserver']) {
-                    sh '''
-                      ./utils/release.bash --packaging msi.publish
-                    '''
-                  }
+                unarchive mapping: ['*.msi*': WORKING_DIRECTORY]
+                sshagent(['pkgserver']) {
+                  sh '''
+                    ./utils/release.bash --packaging msi.publish
+                  '''
                 }
               }
             }
@@ -336,12 +307,10 @@ pipeline {
           }
 
           steps {
-            container('packaging'){
-              sshagent(['pkgserver']) {
-                sh '''
-                  ./utils/release.bash --promoteStagingMavenArtifacts
-                '''
-              }
+            sshagent(['pkgserver']) {
+              sh '''
+                ./utils/release.bash --promoteStagingMavenArtifacts
+              '''
             }
           }
         }
@@ -350,12 +319,10 @@ pipeline {
             environment name: 'GIT_STAGING_REPOSITORY_PROMOTION_ENABLED', value: 'true'
           }
           steps {
-            container('packaging'){
-              sshagent(['pkgserver']) {
-                sh '''
-                  ./utils/release.bash --promoteStagingGitRepository
-                '''
-              }
+            sshagent(['pkgserver']) {
+              sh '''
+                ./utils/release.bash --promoteStagingGitRepository
+              '''
             }
           }
         }
@@ -364,12 +331,10 @@ pipeline {
     // Force mirror synchronization
     stage('Synchronize mirror'){
       steps{
-        container('packaging'){
-          sshagent(['pkgserver']) {
-            sh '''
-              ./utils/release.bash --syncMirror
-            '''
-          }
+        sshagent(['pkgserver']) {
+          sh '''
+            ./utils/release.bash --syncMirror
+          '''
         }
       }
     }
@@ -379,12 +344,10 @@ pipeline {
         FASTLY_SERVICE_ID = credentials('fastly_pkgserver_service_id')
       }
       steps{
-        container('packaging'){
-          sshagent(['pkgserver']) {
-            sh '''
-              ./utils/release.bash --invalidateFastlyCache
-            '''
-          }
+        sshagent(['pkgserver']) {
+          sh '''
+            ./utils/release.bash --invalidateFastlyCache
+          '''
         }
       }
     }
