@@ -54,7 +54,7 @@ This role should rotate between LTS releases
 
 - [ ] Merge backporting PR in jenkinci/jenkins using a merge commit (do not squash)
 
-- [ ] Retrieve the url for the RC from the commit status (continuous-integration/jenkins/incrementals) of the last build on the stable branch (requires a passing build). You will get something like https://repo.jenkins-ci.org/incrementals/org/jenkins-ci/main/cli/2.303.2-rc31385.6eec6c02fc3d/, replace `cli` with `jenkins-war`, visit the page and copy the URL to the war file, for the earlier example it would be https://repo.jenkins-ci.org/incrementals/org/jenkins-ci/main/jenkins-war/2.303.2-rc31385.6eec6c02fc3d/jenkins-war-2.303.2-rc31385.6eec6c02fc3d.war. If incrementals are broken you can deploy a build from your own machine with `mvn -e clean deploy -DskipTests=true`.
+- [ ] Retrieve the url for the RC from the commit status (Jenkins Incrementals Publisher / Incrementals) of the last build on the stable branch (requires a passing build). Visit the `jenkins-war` URL and copy the URL of the war file, which would be something like https://repo.jenkins-ci.org/incrementals/org/jenkins-ci/main/jenkins-war/2.303.2-rc31385.6eec6c02fc3d/jenkins-war-2.303.2-rc31385.6eec6c02fc3d.war. If incrementals are broken you can deploy a build from your own machine with `mvn -e clean deploy -DskipTests=true`.
 
 - [ ] Publish a pre-release [Github release](https://github.com/jenkinsci/jenkins/releases), e.g. [sample](https://github.com/jenkinsci/jenkins/releases/tag/jenkins-2.289.2-rc) currently we don't have a changelog for RCs
 
@@ -94,4 +94,4 @@ This role should rotate between LTS releases
 
 - [ ] Confirm that the images are available at [Docker hub](https://hub.docker.com/r/jenkins/jenkins/tags)
 
-- [ ] [Update ci.jenkins.io](https://github.com/jenkins-infra/runbooks/tree/master/ci#upgrading-jenkins) to the new LTS release (note: repo is private, requires infra team membership)
+- [ ] Create a [helpdesk](https://github.com/jenkins-infra/helpdesk/issues) ticket to update `ci.jenkins.io`, `trusted.ci`, `cert.ci` and `release.ci` to the new LTS release, [example](https://github.com/jenkins-infra/helpdesk/issues/2816)
