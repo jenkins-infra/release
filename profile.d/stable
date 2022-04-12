@@ -15,4 +15,4 @@ SIGN_ALIAS=jenkins
 
 # Used by jenkinsci/packaging
 RELEASELINE=-stable
-JENKINS_VERSION=2.332.2
+JENKINS_VERSION=2.332.3
