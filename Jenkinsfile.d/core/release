@@ -22,7 +22,7 @@ pipeline {
         'stable-rc',
         'weekly'
       ],
-      description: 'Define which release profile we are going to use. https://git.io/Jv7Nr',
+      description: 'Define which release profile we are going to use. https://github.com/jenkins-infra/release/tree/master/profile.d',
       name: 'RELEASE_PROFILE'
     )
     string(
