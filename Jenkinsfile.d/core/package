@@ -15,7 +15,7 @@ pipeline {
         'stable-rc',
         'security'
       ],
-      description: 'Define which Jenkins Release we are packaging for. https://git.io/Jv7Nr',
+      description: 'Define which Jenkins Release we are packaging for. https://github.com/jenkins-infra/release/tree/master/profile.d',
       name: 'RELEASE_PROFILE'
     )
     string(
