@@ -82,6 +82,7 @@ pipeline {
     AZURE_VAULT_TENANT_ID     = credentials('azure-vault-tenant-id')
     GPG_FILE                  = 'jenkins-release.gpg'
     GPG_PASSPHRASE            = credentials('release-gpg-passphrase')
+    JAVA_VERSION              = "${params.RELEASE_PROFILE == 'weekly' ? '11' : '8'}"
     PACKAGING_GIT_REPOSITORY  = 'git@github.com:jenkinsci/packaging.git'
     PACKAGING_GIT_BRANCH      = 'master'
     SIGN_KEYSTORE_FILENAME    = 'jenkins.pfx'
@@ -190,6 +191,10 @@ pipeline {
               }
             }
             stage('Publish'){
+              environment {
+                JAVA_HOME = "/opt/jdk-${env.JAVA_VERSION}"
+                PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
+              }
               steps {
                 sshagent(['pkgserver']) {
                   sh '''
