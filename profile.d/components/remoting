@@ -1,3 +1,4 @@
+# Releases from the master branch now use JEP-229, not this release process
 RELEASE_GIT_BRANCH=stable-4.13.x
 RELEASE_GIT_REPOSITORY=git@github.com:jenkinsci/remoting.git
 GIT_EMAIL=66998184+jenkins-release-bot@users.noreply.github.com
