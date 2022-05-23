@@ -567,7 +567,7 @@ function main(){
             --showPackagingPlan) echo "Show Packaging Plan" && showPackagingPlan ;;
             --promoteStagingMavenArtifacts) echo "Promote Staging Maven Artifacts" && promoteStagingMavenArtifacts ;;
             --promoteStagingGitRepository) echo "Promote Staging Git Repository" && promoteStagingGitRepository ;;
-            --rollback) echo "Rollback release $RELEASE_SCM_TAG" && rollblack ;;
+            --rollback) echo "Rollback release $RELEASE_SCM_TAG" && rollback ;;
             --stageRelease) echo "Stage Release" && stageRelease ;;
             --packaging) echo 'Execute packaging makefile, quote required around Makefile target' && packaging "$2";;
             --syncMirror) echo 'Trigger mirror synchronization' && syncMirror ;;
