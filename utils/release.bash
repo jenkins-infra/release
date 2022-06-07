@@ -77,6 +77,7 @@ function configureKeystore(){
   case "$SIGN_CERTIFICATE" in
     *.pem )
       openssl pkcs12 -export \
+        -provider legacy `# https://github.com/openssl/openssl/issues/11672` \
         -out "$SIGN_KEYSTORE" \
         -in "${SIGN_CERTIFICATE}" \
         -password "pass:$SIGN_STOREPASS" \
@@ -85,8 +86,14 @@ function configureKeystore(){
     *.pfx )
       # pfx file download from azure key vault are not password protected, which is required for maven release plugin
       # so we need to add a new password
-      openssl pkcs12 -in "${SIGN_CERTIFICATE}" -out tmpjenkins.pem -nodes -passin pass:""
+      openssl pkcs12 \
+        -in "${SIGN_CERTIFICATE}" \
+        -provider legacy `# https://github.com/openssl/openssl/issues/11672` \
+        -out tmpjenkins.pem \
+        -nodes \
+        -passin pass:""
       openssl pkcs12 -export \
+        -provider legacy `# https://github.com/openssl/openssl/issues/11672` \
         -out "$SIGN_KEYSTORE" \
         -in tmpjenkins.pem \
         -password "pass:$SIGN_STOREPASS" \
