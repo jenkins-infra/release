@@ -14,8 +14,6 @@ spec:
           value: "/home/jenkins/agent/workspace"
         - name: "MAVEN_OPTS"
           value: "-Xmx8g -Xms8g"
-        - name: "JENKINS_JAVA_BIN"
-          value: "/opt/jdk-11/bin/java"
       resources:
         limits:
           memory: "16Gi"
