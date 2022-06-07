@@ -8,7 +8,7 @@ metadata:
     jenkins/default-release-jenkins-agent: true
 spec:
   containers:
-  - image: "jenkins/inbound-agent:4.3-9-windowsservercore-1809"
+  - image: "jenkins/inbound-agent:4.13-2-jdk11-nanoserver-1809"
     imagePullPolicy: "Always"
     name: "jnlp"
     resources:
