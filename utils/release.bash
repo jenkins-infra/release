@@ -436,7 +436,7 @@ function stageRelease(){
   # 2020-06-24: --no-transfer-progress doesn't seem to be fully suported in maven release plugin
   # This workaround can be reverted once MRELEASE-1048 is fixed
   # https://issues.apache.org/jira/browse/MRELEASE-1048
-  mvn -B \
+  mvn -V -B \
     "-DstagingRepository=${MAVEN_REPOSITORY_NAME}::default::${MAVEN_REPOSITORY_URL}/${MAVEN_REPOSITORY_NAME}" \
     -s settings-release.xml \
     --no-transfer-progress \
