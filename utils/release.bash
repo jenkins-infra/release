@@ -442,7 +442,6 @@ function stageRelease(){
     --no-transfer-progress \
     -DdeployAtEnd=true \
     -Darguments=-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
-    generate-resources \
     release:stage
 }
 
