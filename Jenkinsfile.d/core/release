@@ -9,7 +9,6 @@
 pipeline {
   agent {
     kubernetes {
-      label 'release-linux'
       yamlFile 'PodTemplates.d/release-linux.yaml'
     }
   }
