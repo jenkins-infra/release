@@ -255,7 +255,6 @@ pipeline {
               // as the step 'container' is known to not be working
               agent {
                 kubernetes {
-                  label 'packaging-windows'
                   yamlFile 'PodTemplates.d/package-windows.yaml'
                 }
               }
