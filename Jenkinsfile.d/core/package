@@ -1,7 +1,6 @@
 pipeline {
   agent {
     kubernetes {
-      label 'package-linux'
       yamlFile 'PodTemplates.d/package-linux.yaml'
       workingDir '/home/jenkins/agent'
     }
@@ -15,7 +14,7 @@ pipeline {
         'stable-rc',
         'security'
       ],
-      description: 'Define which Jenkins Release we are packaging for. https://git.io/Jv7Nr',
+      description: 'Define which Jenkins Release we are packaging for. https://github.com/jenkins-infra/release/tree/master/profile.d',
       name: 'RELEASE_PROFILE'
     )
     string(
@@ -256,7 +255,6 @@ pipeline {
               // as the step 'container' is known to not be working
               agent {
                 kubernetes {
-                  label 'packaging-windows'
                   yamlFile 'PodTemplates.d/package-windows.yaml'
                 }
               }
