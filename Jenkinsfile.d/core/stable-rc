@@ -2,7 +2,6 @@ pipeline {
 
   agent {
     kubernetes {
-      label 'release-stable-rc'
     }
   }
 

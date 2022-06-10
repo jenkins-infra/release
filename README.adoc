@@ -223,7 +223,7 @@ At this stage, we are going to retrieve the Java code, release a new version usi
 It's important to notice that we do not use the maven release plugin to checkout git repositories neither to push changes. This allow us to release from a different git repository than the one defined in the pom.xml. We also need to be able to push commits to a different repository than the one defined in the pom.xml.
 
 . link:http://maven.apache.org/maven-release/maven-release-plugin/perform-mojo.html#localCheckout[localCheckout] must be set to true
-. link:http://maven.apache.org/maven-release/maven-release-plugin/prepare-mojo.html#pushChanges[puchChanges] must be set to false
+. link:http://maven.apache.org/maven-release/maven-release-plugin/prepare-mojo.html#pushChanges[pushChanges] must be set to false
 
 
 ==== Steps
