@@ -26,3 +26,9 @@ RELEASE_GIT_PRODUCTION_BRANCH=master
 #         as retrieved from ./utils/getJenkinsVersion.py
 
 MAVEN_REPOSITORY_PRODUCTION_NAME=releases
+
+# Most settings above are unused
+RELEASE_GIT_BRANCH=security-master
+MAVEN_REPOSITORY_NAME=codsworth
+JENKINS_VERSION=2.356
+RELEASELINE=
