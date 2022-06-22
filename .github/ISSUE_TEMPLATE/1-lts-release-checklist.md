@@ -1,6 +1,6 @@
 ---
 name: "🚤 New LTS release checklist"
-labels: lts
+labels: lts-checklist
 about: Track work required for a new LTS release
 ---
 
@@ -56,7 +56,7 @@ This role should rotate between LTS releases
 
 - [ ] Retrieve the url for the RC from the commit status (Jenkins Incrementals Publisher / Incrementals) of the last build on the stable branch (requires a passing build). Visit the `jenkins-war` URL and copy the URL of the war file, which would be something like https://repo.jenkins-ci.org/incrementals/org/jenkins-ci/main/jenkins-war/2.303.2-rc31385.6eec6c02fc3d/jenkins-war-2.303.2-rc31385.6eec6c02fc3d.war. If incrementals are broken you can deploy a build from your own machine with `mvn -e clean deploy -DskipTests=true`.
 
-- [ ] Publish a pre-release [Github release](https://github.com/jenkinsci/jenkins/releases), e.g. [sample](https://github.com/jenkinsci/jenkins/releases/tag/jenkins-2.289.2-rc) currently we don't have a changelog for RCs
+- [ ] Publish a pre-release [Github release](https://github.com/jenkinsci/jenkins/releases), e.g. [sample](https://github.com/jenkinsci/jenkins/releases/tag/jenkins-2.346.1-rc) currently we don't have a changelog for RCs
 
 - [ ] Send announcement email, [example](https://groups.google.com/g/jenkinsci-dev/c/ox6SCyOQLuE/m/C-dsLZ4vBwAJ)
 
@@ -70,11 +70,11 @@ This role should rotate between LTS releases
 
 - [ ] Assure that contents of master branch have been merged to the stable branch in the [packaging repository](https://github.com/jenkinsci/packaging), e.g. `stable-2.277`
 
-- [ ] Run job on [release.ci.jenkins.io](https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Fstable%2Frelease/branches/)
+- [ ] Run job on [release.ci.jenkins.io](https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Fstable%2Frelease/branches/) if no security release for Jenkins is planned.
 
 - [ ] Check [LTS changelog](https://www.jenkins.io/changelog-stable/) is visible on the downloads site
 
-- [ ] Publish [GitHub release](https://github.com/jenkinsci/jenkins/releases) pointing to LTS changelog
+- [ ] Publish [GitHub release](https://github.com/jenkinsci/jenkins/releases) pointing to LTS changelog, [sample](https://github.com/jenkinsci/jenkins/releases/tag/jenkins-2.346.1)
 
 - [ ] Confirm [Datadog checks](https://p.datadoghq.com/sb/0Igb9a-e6849e5e019250ef5aaea3589297fe8b) are passing
 
