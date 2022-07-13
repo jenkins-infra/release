@@ -72,6 +72,8 @@ This role should rotate between LTS releases
 
 - [ ] Run job on [release.ci.jenkins.io](https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Fstable%2Frelease/branches/) if no security release for Jenkins is planned.
 
+- [ ] Announce the start of the LTS release process in the #jenkins-release and #jenkins-infra IRC channels
+
 - [ ] Check [LTS changelog](https://www.jenkins.io/changelog-stable/) is visible on the downloads site
 
 - [ ] Publish [GitHub release](https://github.com/jenkinsci/jenkins/releases) pointing to LTS changelog, [sample](https://github.com/jenkinsci/jenkins/releases/tag/jenkins-2.346.1)
