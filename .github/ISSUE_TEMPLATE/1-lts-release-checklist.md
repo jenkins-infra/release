@@ -92,6 +92,7 @@ This role should rotate between LTS releases
   (strike this out for new point release)
 
 - [ ] Create pull request to update [configuration-as-code integration tests](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/integrations/pom.xml) to the newly released version
+- (strike this out for new point release)
 
 - [ ] Run trusted.ci.jenkins.io [Docker image creation job](https://trusted.ci.jenkins.io:1443/job/Containers/job/Core%20Release%20Containers/job/master/).
 
