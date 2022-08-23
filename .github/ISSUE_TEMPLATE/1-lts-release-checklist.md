@@ -23,6 +23,8 @@ This role should rotate between LTS releases
 
 - [ ] Create or update release branch in [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins), e.g. `stable-2.277`, use the [init-lts-line](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/init-lts-line) script
 
+- [ ] Update [dependabot.yml](https://github.com/jenkinsci/jenkins/blob/master/.github/dependabot.yml) and [renovate.json](https://github.com/jenkinsci/jenkins/blob/master/renovate.json)'s security branches to the new stable branch, e.g. `stable-2.277`.
+
 - [ ] Create or update release branch in [jenkins-infra/release](https://github.com/jenkins-infra/release), e.g. `stable-2.277`.
   - [ ] Modify the `RELEASE_GIT_BRANCH` and `JENKINS_VERSION` values in the environment file (`profile.d/stable`) to match the release.
   - [ ] Modify the `PACKAGING_GIT_BRANCH` value in the packaging script (`Jenkinsfile.d/core/package`) to match the release.
@@ -39,6 +41,9 @@ This role should rotate between LTS releases
 - [ ] Backporting announcement email - [generate-backporting-announcement script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/generate-backporting-announcement)
 
 - [ ] Update jira labels for [lts-candidate issues](https://issues.jenkins.io/issues/?filter=12146), either add `2.277.2-fixed` and remove `lts-candidate` or add `2.277.2-rejected`, and retain `lts-candidate`
+
+- [ ] Read over [open security PRs](https://github.com/jenkinsci/jenkins/pulls?q=is%3Apr+is%3Aopen+label%3Ainto-lts), created by dependabot and renovate, if there are any.
+In case of an open PR, consider it for backporting, if the dependency update has been verified working in a prior weekly release.
 
 - [ ] Backport changes, create a local branch in jenkinsci/jenkins, run the [list-issue-commits script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/list-issue-commits) to locate commits via jira ID, some manual work is required to locate them if the issue ID wasn't present at merge time, backport with `git cherry-pick -x $commit`
 
