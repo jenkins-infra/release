@@ -440,7 +440,6 @@ function stageRelease(){
     "-DstagingRepository=${MAVEN_REPOSITORY_NAME}::default::${MAVEN_REPOSITORY_URL}/${MAVEN_REPOSITORY_NAME}" \
     -s settings-release.xml \
     --no-transfer-progress \
-    -DdeployAtEnd=true \
     -Darguments=-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
     release:stage
 }
@@ -464,7 +463,6 @@ function performRelease(){
   mvn -B \
     -s settings-release.xml \
     --no-transfer-progress \
-    -DdeployAtEnd=true \
     -Darguments=-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
     release:perform
 }
