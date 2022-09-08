@@ -88,12 +88,6 @@ This role should rotate between LTS releases
   
 - [ ] Adjust state and `Released As` of [Jira issues](https://issues.jenkins.io/) fixed in the release (see the [changelog](https://www.jenkins.io/changelog-stable) for issue links)
 
-- [ ] Create pull request to update [bom](https://github.com/jenkinsci/bom) to the newly released version
-  (strike this out for new point release)
-
-- [ ] Create pull request to update [configuration-as-code integration tests](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/integrations/pom.xml) to the newly released version
-  (strike this out for new point release)
-
 - [ ] Run trusted.ci.jenkins.io [Docker image creation job](https://trusted.ci.jenkins.io:1443/job/Containers/job/Core%20Release%20Containers/job/master/).
 
 - [ ] Confirm that the images are available at [Docker hub](https://hub.docker.com/r/jenkins/jenkins/tags)
