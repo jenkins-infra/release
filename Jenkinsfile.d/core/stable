@@ -1,9 +1,5 @@
 pipeline {
-
-  agent {
-    kubernetes {
-    }
-  }
+  agent none
 
   options {
     disableConcurrentBuilds()

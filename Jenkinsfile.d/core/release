@@ -45,6 +45,7 @@ pipeline {
 
   options {
     disableConcurrentBuilds()
+    retry(conditions: [agent(), kubernetesAgent(handleNonKubernetes: true), nonresumable()], count: 2)
   }
 
   environment {
