@@ -3,6 +3,7 @@ pipeline {
     kubernetes {
       yamlFile 'PodTemplates.d/package-linux.yaml'
       workingDir '/home/jenkins/agent'
+      retries 2 // Retry in case of agent error caused by controller restart or pod deletion for instance
     }
   }
 

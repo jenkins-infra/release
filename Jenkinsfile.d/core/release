@@ -4,6 +4,7 @@
   Jenkins Plugins:
     * Azure-Credentials
     * SSH-agent
+    * Kubernetes
 */
 
 pipeline {
