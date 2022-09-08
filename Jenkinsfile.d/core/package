@@ -3,6 +3,7 @@ pipeline {
     kubernetes {
       yamlFile 'PodTemplates.d/package-linux.yaml'
       workingDir '/home/jenkins/agent'
+      retries 2 // Retry in case of agent error caused by controller restart or pod deletion for instance
     }
   }
 
@@ -66,7 +67,6 @@ pipeline {
   options {
     disableConcurrentBuilds()
     buildDiscarder logRotator(numToKeepStr: '15') // Retain only last 15 builds to reduce space requirements
-    retry(conditions: [agent(), kubernetesAgent(handleNonKubernetes: true), nonresumable()], count: 2)
   }
 
 //  ENV JENKINS_VERSION
