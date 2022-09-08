@@ -21,14 +21,14 @@ This role should rotate between LTS releases
 
 - [ ] LTS baseline discussed and selected in the [Jenkins developers mailing list](https://groups.google.com/g/jenkinsci-dev)
 
-- [ ] Create or update release branch in [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins), e.g. `stable-2.277`, use the [init-lts-line](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/init-lts-line) script
+- [ ] Create or update release branch in [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins), e.g. `stable-2.361`, use the [init-lts-line](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/init-lts-line) script
 
-- [ ] Create or update release branch in [jenkins-infra/release](https://github.com/jenkins-infra/release), e.g. `stable-2.277`.
+- [ ] Create or update release branch in [jenkins-infra/release](https://github.com/jenkins-infra/release), e.g. `stable-2.361`.
   - [ ] Modify the `RELEASE_GIT_BRANCH` and `JENKINS_VERSION` values in the environment file (`profile.d/stable`) to match the release.
   - [ ] Modify the `PACKAGING_GIT_BRANCH` value in the packaging script (`Jenkinsfile.d/core/package`) to match the release.
   - For more info, refer to [stable](https://github.com/jenkins-infra/release#stable).
 
-- [ ] Create or update release branch in [jenkinsci/packaging](https://github.com/jenkinsci/packaging), e.g. `stable-2.277`
+- [ ] Create or update release branch in [jenkinsci/packaging](https://github.com/jenkinsci/packaging), e.g. `stable-2.361`
 
 - [ ] Create pull request to update [bom](https://github.com/jenkinsci/bom) to the weekly version that will be the base of the release line (strike this out for new point release)
 
@@ -38,7 +38,7 @@ This role should rotate between LTS releases
 
 - [ ] Backporting announcement email - [generate-backporting-announcement script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/generate-backporting-announcement)
 
-- [ ] Update jira labels for [lts-candidate issues](https://issues.jenkins.io/issues/?filter=12146), either add `2.277.2-fixed` and remove `lts-candidate` or add `2.277.2-rejected`, and retain `lts-candidate`
+- [ ] Update jira labels for [lts-candidate issues](https://issues.jenkins.io/issues/?filter=12146), either add `2.361.2-fixed` and remove `lts-candidate` or add `2.361.2-rejected`, and retain `lts-candidate`
 
 - [ ] Backport changes, create a local branch in jenkinsci/jenkins, run the [list-issue-commits script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/list-issue-commits) to locate commits via jira ID, some manual work is required to locate them if the issue ID wasn't present at merge time, backport with `git cherry-pick -x $commit`
 
@@ -54,9 +54,9 @@ This role should rotate between LTS releases
 
 - [ ] Merge backporting PR in jenkinci/jenkins using a merge commit (do not squash)
 
-- [ ] Retrieve the url for the RC from the commit status (Jenkins Incrementals Publisher / Incrementals) of the last build on the stable branch (requires a passing build). Visit the `jenkins-war` URL and copy the URL of the war file, which would be something like https://repo.jenkins-ci.org/incrementals/org/jenkins-ci/main/jenkins-war/2.303.2-rc31385.6eec6c02fc3d/jenkins-war-2.303.2-rc31385.6eec6c02fc3d.war. If incrementals are broken you can deploy a build from your own machine with `mvn -e clean deploy -DskipTests=true`.
+- [ ] Retrieve the url for the RC from the commit status (Jenkins Incrementals Publisher / Incrementals) of the last build on the stable branch (requires a passing build). Visit the `jenkins-war` URL and copy the URL of the war file, which would be something like https://repo.jenkins-ci.org/incrementals/org/jenkins-ci/main/jenkins-war/2.361.1-rc32701.b_06d9cef554c/jenkins-war-2.361.1-rc32701.b_06d9cef554c.war. If incrementals are broken you can deploy a build from your own machine with `mvn -e clean deploy -DskipTests=true`.
 
-- [ ] Publish a pre-release [Github release](https://github.com/jenkinsci/jenkins/releases), e.g. [sample](https://github.com/jenkinsci/jenkins/releases/tag/jenkins-2.346.1-rc) currently we don't have a changelog for RCs
+- [ ] Publish a pre-release [Github release](https://github.com/jenkinsci/jenkins/releases), e.g. [sample](https://github.com/jenkinsci/jenkins/releases/tag/jenkins-2.361.1-rc) currently we don't have a changelog for RCs
 
 - [ ] Send announcement email, [example](https://groups.google.com/g/jenkinsci-dev/c/ox6SCyOQLuE/m/C-dsLZ4vBwAJ)
 
@@ -66,9 +66,9 @@ This role should rotate between LTS releases
 
 - [ ] Publish changelog (one day prior to the release in case of a security update)
 
-- [ ] Assure that contents of master branch have been merged to the stable branch in the [release repository](https://github.com/jenkins-infra/release), e.g. `stable-2.277`
+- [ ] Assure that contents of master branch have been merged to the stable branch in the [release repository](https://github.com/jenkins-infra/release), e.g. `stable-2.361`
 
-- [ ] Assure that contents of master branch have been merged to the stable branch in the [packaging repository](https://github.com/jenkinsci/packaging), e.g. `stable-2.277`
+- [ ] Assure that contents of master branch have been merged to the stable branch in the [packaging repository](https://github.com/jenkinsci/packaging), e.g. `stable-2.361`
 
 - [ ] Announce the start of the LTS release process in the #jenkins-release and #jenkins-infra IRC channels
 
@@ -76,15 +76,15 @@ This role should rotate between LTS releases
 
 - [ ] Check [LTS changelog](https://www.jenkins.io/changelog-stable/) is visible on the downloads site
 
-- [ ] Publish [GitHub release](https://github.com/jenkinsci/jenkins/releases) pointing to LTS changelog, [sample](https://github.com/jenkinsci/jenkins/releases/tag/jenkins-2.346.1)
+- [ ] Publish [GitHub release](https://github.com/jenkinsci/jenkins/releases) pointing to LTS changelog, [sample](https://github.com/jenkinsci/jenkins/releases/tag/jenkins-2.361.1)
 
 - [ ] Confirm [Datadog checks](https://p.datadoghq.com/sb/0Igb9a-e6849e5e019250ef5aaea3589297fe8b) are passing
 
 - [ ] Confirm the [Debian installer acceptance test](https://ci.jenkins.io/job/Infra/job/acceptance-tests/job/install-lts-debian-package/) is passing.
-  For good measures, check the console log to confirm that the correct release package was used (e.g. search for `2.277`).
+  For good measures, check the console log to confirm that the correct release package was used (e.g. search for `2.361`).
 
 - [ ] Confirm the [Red Hat installer acceptance test](https://ci.jenkins.io/job/Infra/job/acceptance-tests/job/install-lts-redhat-rpm/) is passing.
-  For good measures, check the console log to confirm that the correct release package was used (e.g. search for `2.277`).
+  For good measures, check the console log to confirm that the correct release package was used (e.g. search for `2.361`).
   
 - [ ] Adjust state and `Released As` of [Jira issues](https://issues.jenkins.io/) fixed in the release (see the [changelog](https://www.jenkins.io/changelog-stable) for issue links)
 
