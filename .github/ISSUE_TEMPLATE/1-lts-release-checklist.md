@@ -66,9 +66,9 @@ This role should rotate between LTS releases
 
 - [ ] Publish changelog (one day prior to the release in case of a security update)
 
-- [ ] Compare the contents of the [release repository](https://github.com/jenkins-infra/release) master branch with the stable branch (e.g. `stable-2.277`).  Discuss differences in the Jenkins developers mailing list in case one or more of those differences should be backported
+- [ ] Compare the contents of the [release repository](https://github.com/jenkins-infra/release) master branch with the stable branch (e.g. `stable-2.361`).  Discuss differences in the Jenkins developers mailing list in case one or more of those differences should be backported
 
-- [ ] Compare the contents of the [packaging repository](https://github.com/jenkinsci/packaging) master branch with the stable branch (e.g. `stable-2.277`).  Discuss differences in the Jenkins developers mailing list in case one or more of those differences should be backported
+- [ ] Compare the contents of the [packaging repository](https://github.com/jenkinsci/packaging) master branch with the stable branch (e.g. `stable-2.361`).  Discuss differences in the Jenkins developers mailing list in case one or more of those differences should be backported
 
 - [ ] Announce the start of the LTS release process in the #jenkins-release and #jenkins-infra IRC channels
 
