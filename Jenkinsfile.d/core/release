@@ -11,7 +11,6 @@ pipeline {
   agent {
     kubernetes {
       yamlFile 'PodTemplates.d/release-linux.yaml'
-      retries 2 // Retry in case of agent error caused by controller restart or pod deletion for instance
     }
   }
 
