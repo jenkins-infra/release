@@ -70,8 +70,8 @@ This role should rotate between LTS releases
 
 - [ ] Assure that contents of master branch have been merged to the stable branch in the [packaging repository](https://github.com/jenkinsci/packaging), e.g. `stable-2.361`
 
-- [ ] Announce the start of the LTS release process in the [#jenkins-infra IRC channels](https://gitter.im/jenkinsci/jenkins-infra).
-
+- [ ] Announce the start of the LTS release process in the [#jenkins-release](https://matrix.to/#/#jenkins-release:libera.chat) and [#jenkins-infra](https://matrix.to/#/#jenkins-infra:libera.chat) IRC channels
+- 
 - [ ] Run job on [release.ci.jenkins.io](https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Fstable%2Frelease/branches/) if no security release for Jenkins is planned.
 
 - [ ] Check [LTS changelog](https://www.jenkins.io/changelog-stable/) is visible on the downloads site
