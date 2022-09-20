@@ -2,7 +2,7 @@ blank_issues_enabled: false
 contact_links:
   - name: "💬 Chat"
     url: https://matrix.to/#/#jenkins-release:libera.chat
-    about: Please ask and answer questions here.
+    about: Please ask and answer questions on Matrix (#jenkins-release).
   - name: "❓ IRC"
     url: https://web.libera.chat/
     about: Click here to access IRC from a browser (#jenkins-release on libera.chat).
