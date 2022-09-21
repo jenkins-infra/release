@@ -230,6 +230,7 @@ cat <<EOT> settings-release.xml
   </servers>
   <activeProfiles>
     <activeProfile>release</activeProfile>
+    <activeProfile>sign</activeProfile>
     <activeProfile>automated-release</activeProfile>
   </activeProfiles>
 </settings>
