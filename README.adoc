@@ -465,7 +465,7 @@ So if the process fails on running  `mvn release:stage`, then we can re-trigger 
 kubectl get pods -n release # Looking for the correct jenkins agent name
 kubectl exec -i -t -n release -c maven <pod_name alias jenkins agent> bash
 cd /home/jenkins/agent/workspace/core_release_master/release
-mvn -B -DstagingRepository=releases::default::https://repo.jenkins-ci.org/releases -s settings-release.xml --no-transfer-progress release:stage
+mvn -B -DstagingRepository=releases::https://repo.jenkins-ci.org/releases -s settings-release.xml --no-transfer-progress release:stage
 ```
 
 == Miscellaneous
