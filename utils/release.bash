@@ -411,7 +411,7 @@ function stageRelease(){
 
   printf "\\n Stage Jenkins Release\\n\\n"
   mvn -V -B \
-    "-DstagingRepository=${MAVEN_REPOSITORY_NAME}::default::${MAVEN_REPOSITORY_URL}/${MAVEN_REPOSITORY_NAME}" \
+    "-DstagingRepository=${MAVEN_REPOSITORY_NAME}::${MAVEN_REPOSITORY_URL}/${MAVEN_REPOSITORY_NAME}" \
     -s settings-release.xml \
     --no-transfer-progress \
     release:stage
