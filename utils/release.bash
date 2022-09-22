@@ -39,18 +39,20 @@ function configureGit() {
 function configureGPG() {
 	requireGPGPassphrase
 	if ! gpg --fingerprint "${GPG_KEYNAME}"; then
-		if [ ! -f "${GPG_FILE}" ]; then
+		if [[ ! -f $GPG_FILE ]]; then
 			echo "${GPG_KEYNAME} or ${GPG_FILE} cannot be found"
 			exit 1
 		else
 			gpg --list-keys
-			if [ ! -f "$HOME/.gnupg/gpg.conf" ]; then touch "$HOME/.gnupg/gpg.conf"; fi
-			if ! grep -E '^pinentry-mode loopback' "$HOME/.gnupg/gpg.conf"; then
-				if grep -E '^pinentry-mode' "$HOME/.gnupg/gpg.conf"; then
-					sed -i '/^pinentry-mode/d' "$HOME/.gnupg/gpg.conf"
+			if [[ ! -f "${HOME}/.gnupg/gpg.conf" ]]; then
+				touch "${HOME}/.gnupg/gpg.conf"
+			fi
+			if ! grep -E '^pinentry-mode loopback' "${HOME}/.gnupg/gpg.conf"; then
+				if grep -E '^pinentry-mode' "${HOME}/.gnupg/gpg.conf"; then
+					sed -i '/^pinentry-mode/d' "${HOME}/.gnupg/gpg.conf"
 				fi
 				## --pinenty-mode is needed to avoid gpg prompt during maven release
-				echo 'pinentry-mode loopback' >>"$HOME/.gnupg/gpg.conf"
+				echo 'pinentry-mode loopback' >>"${HOME}/.gnupg/gpg.conf"
 			fi
 			gpg --import --batch "${GPG_FILE}"
 		fi
@@ -60,19 +62,19 @@ function configureGPG() {
 function configureKeystore() {
 	requireKeystorePass
 
-	if [ ! -f "${SIGN_CERTIFICATE}" ]; then
+	if [[ ! -f $SIGN_CERTIFICATE ]]; then
 		echo "${SIGN_CERTIFICATE} not found"
 		exit 1
 	fi
 
-	case "$SIGN_CERTIFICATE" in
+	case "${SIGN_CERTIFICATE}" in
 	*.pem)
 		openssl pkcs12 -export \
 			-legacy `# https://github.com/openssl/openssl/issues/11672` \
-			-out "$SIGN_KEYSTORE" \
+			-out "${SIGN_KEYSTORE}" \
 			-in "${SIGN_CERTIFICATE}" \
-			-password "pass:$SIGN_STOREPASS" \
-			-name "$SIGN_ALIAS"
+			-password "pass:${SIGN_STOREPASS}" \
+			-name "${SIGN_ALIAS}"
 		;;
 	*.pfx)
 		# pfx file download from azure key vault are not password protected, which is required for maven release plugin
@@ -85,10 +87,10 @@ function configureKeystore() {
 			-passin pass:""
 		openssl pkcs12 -export \
 			-legacy `# https://github.com/openssl/openssl/issues/11672` \
-			-out "$SIGN_KEYSTORE" \
+			-out "${SIGN_KEYSTORE}" \
 			-in tmpjenkins.pem \
-			-password "pass:$SIGN_STOREPASS" \
-			-name "$SIGN_ALIAS"
+			-password "pass:${SIGN_STOREPASS}" \
+			-name "${SIGN_ALIAS}"
 		rm tmpjenkins.pem
 		;;
 	*)
@@ -99,9 +101,9 @@ function configureKeystore() {
 
 function azureAccountAuth() {
 	az login --service-principal \
-		-u "$AZURE_VAULT_CLIENT_ID" \
-		-p "$AZURE_VAULT_CLIENT_SECRET" \
-		-t "$AZURE_VAULT_TENANT_ID"
+		-u "${AZURE_VAULT_CLIENT_ID}" \
+		-p "${AZURE_VAULT_CLIENT_SECRET}" \
+		-t "${AZURE_VAULT_TENANT_ID}"
 }
 
 # Download Certificate from Azure KeyVault
@@ -110,10 +112,10 @@ function downloadAzureKeyvaultSecret() {
 	azureAccountAuth
 
 	az keyvault secret download \
-		--vault-name "$AZURE_VAULT_NAME" \
-		--name "$AZURE_VAULT_CERT" \
+		--vault-name "${AZURE_VAULT_NAME}" \
+		--name "${AZURE_VAULT_CERT}" \
 		--encoding base64 \
-		--file "$SIGN_CERTIFICATE"
+		--file "${SIGN_CERTIFICATE}"
 }
 
 # JENKINS_VERSION: Define which version will be package where:
@@ -129,9 +131,9 @@ function getGPGKeyFromAzure() {
 	azureAccountAuth
 
 	az keyvault secret download \
-		--vault-name "$AZURE_VAULT_NAME" \
-		--name "$GPG_VAULT_NAME" \
-		--file "$GPG_FILE" \
+		--vault-name "${AZURE_VAULT_NAME}" \
+		--name "${GPG_VAULT_NAME}" \
+		--file "${GPG_FILE}" \
 		--encoding base64
 }
 
@@ -165,8 +167,8 @@ function generateSettingsXml() {
       </properties>
       <repositories>
         <repository>
-          <id>$MAVEN_REPOSITORY_NAME</id>
-          <name>$MAVEN_REPOSITORY_NAME</name>
+          <id>${MAVEN_REPOSITORY_NAME}</id>
+          <name>${MAVEN_REPOSITORY_NAME}</name>
           <releases>
             <enabled>true</enabled>
             <updatePolicy>always</updatePolicy>
@@ -183,8 +185,8 @@ function generateSettingsXml() {
       </repositories>
       <pluginRepositories>
         <pluginRepository>
-          <id>$MAVEN_REPOSITORY_NAME</id>
-          <name>$MAVEN_REPOSITORY_NAME</name>
+          <id>${MAVEN_REPOSITORY_NAME}</id>
+          <name>${MAVEN_REPOSITORY_NAME}</name>
           <releases>
             <enabled>true</enabled>
             <updatePolicy>always</updatePolicy>
@@ -203,20 +205,20 @@ function generateSettingsXml() {
   </profiles>
   <servers>
     <server>
-      <id>$MAVEN_REPOSITORY_NAME</id>
-      <username>$MAVEN_REPOSITORY_USERNAME</username>
-      <password>$MAVEN_REPOSITORY_PASSWORD</password>
+      <id>${MAVEN_REPOSITORY_NAME}</id>
+      <username>${MAVEN_REPOSITORY_USERNAME}</username>
+      <password>${MAVEN_REPOSITORY_PASSWORD}</password>
     </server>
     <server>
       <id>mirror-jenkins-public</id>
-      <username>$MAVEN_REPOSITORY_USERNAME</username>
-      <password>$MAVEN_REPOSITORY_PASSWORD</password>
+      <username>${MAVEN_REPOSITORY_USERNAME}</username>
+      <password>${MAVEN_REPOSITORY_PASSWORD}</password>
     </server>
     <!--This server id is used by jenkinsci/remoting -->
     <server>
       <id>maven.jenkins-ci.org</id>
-      <username>$MAVEN_REPOSITORY_USERNAME</username>
-      <password>$MAVEN_REPOSITORY_PASSWORD</password>
+      <username>${MAVEN_REPOSITORY_USERNAME}</username>
+      <password>${MAVEN_REPOSITORY_PASSWORD}</password>
     </server>
   </servers>
   <activeProfiles>
@@ -243,10 +245,10 @@ function guessGitBranchInformation() {
 	: "${BRANCH_NAME:=$DEFAULT_BRANCH_NAME}"
 
 	BRANCH_NAME="${BRANCH_NAME//-/ }"
-	IFS=" " read -r -a array <<<"$BRANCH_NAME"
+	IFS=" " read -r -a array <<<"${BRANCH_NAME}"
 
 	if [[ ${#array[@]} == 3 ]]; then
-		echo "Based on branch $BRANCH_NAME, expect a security release"
+		echo "Based on branch ${BRANCH_NAME}, expect a security release"
 		if [[ ${array[0]} != "security" ]]; then
 			echo "Wrong branch name '${array[0]}', you probably want 'security-{stable|weekly}-<JENKINS_VERSION>"
 			exit 1
@@ -262,7 +264,7 @@ function guessGitBranchInformation() {
 	fi
 
 	if [[ ${#array[@]} == 2 ]]; then
-		echo "Based on branch $BRANCH_NAME, expect a stable release"
+		echo "Based on branch ${BRANCH_NAME}, expect a stable release"
 		if [[ ${array[0]} != "stable" ]]; then
 			echo "Wrong branch name '${array[0]}', you probably want 'stable-<JENKINS_VERSION>"
 			exit 1
@@ -274,7 +276,7 @@ function guessGitBranchInformation() {
 	fi
 
 	if [[ ${#array[@]} == 1 ]]; then
-		echo "Based on branch $BRANCH_NAME, expect a weekly release"
+		echo "Based on branch ${BRANCH_NAME}, expect a weekly release"
 		if [[ ${array[0]} != "master" ]]; then
 			echo "Wrong branch name '${array[0]}', you probably want to use 'master'"
 			exit 1
@@ -291,15 +293,13 @@ function invalidateFastlyCache() {
 
 	curl \
 		-X POST \
-		-H "Fastly-Key: $FASTLY_API_TOKEN" \
+		-H "Fastly-Key: ${FASTLY_API_TOKEN}" \
 		-H "Accept: application/json" \
 		-H "Fastly-Soft-Purge:1" \
-		"https://api.fastly.com/service/$FASTLY_SERVICE_ID/purge_all"
-
+		"https://api.fastly.com/service/${FASTLY_SERVICE_ID}/purge_all"
 }
 
 function configurePackagingEnv() {
-
 	requireGPGPassphrase
 
 	: "${BRAND:=$WORKSPACE/$WORKING_DIRECTORY/branding/common}"
@@ -309,19 +309,18 @@ function configurePackagingEnv() {
 	: "${CREDENTIAL:=$BRAND}" # For now, we just want this variable to be set to not empty
 	: "${GPG_PASSPHRASE_FILE:=$WORKSPACE/$WORKING_DIRECTORY/$GPG_KEYNAME.pass}"
 
-	cat <<EOT >"$GPG_PASSPHRASE_FILE"
-$GPG_PASSPHRASE
+	cat <<EOT >"${GPG_PASSPHRASE_FILE}"
+${GPG_PASSPHRASE}
 EOT
 
-	if [ ! -f "$GPG_PASSPHRASE_FILE" ]; then
-		echo "$GPG_PASSPHRASE_FILE wasn't correctly created"
+	if [[ ! -f $GPG_PASSPHRASE_FILE ]]; then
+		echo "${GPG_PASSPHRASE_FILE} wasn't correctly created"
 		exit 1
 	fi
-
 }
 
 function cleanPackagingEnv() {
-	rm "$GPG_PASSPHRASE_FILE"
+	rm "${GPG_PASSPHRASE_FILE}"
 }
 
 function packaging() {
@@ -350,32 +349,30 @@ function promoteStagingMavenArtifacts() {
 	# keeps in mind that it won't delete from source and override on destination if already exist!.
 	# It's wise to disable delete permission on destination repository
 	# as explained here https://www.jfrog.com/confluence/display/JFROG/Permissions#Permissions-RepositoryPermissions
-	DEFAULT_PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS="item --mode copy --source $MAVEN_REPOSITORY_NAME --destination $MAVEN_REPOSITORY_PRODUCTION_NAME --url $MAVEN_REPOSITORY_URL --username $MAVEN_REPOSITORY_USERNAME --password $MAVEN_REPOSITORY_PASSWORD --search '/org/jenkins-ci/main' $(jv get)}"
+	DEFAULT_PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS="item --mode copy --source ${MAVEN_REPOSITORY_NAME} --destination ${MAVEN_REPOSITORY_PRODUCTION_NAME} --url ${MAVEN_REPOSITORY_URL} --username ${MAVEN_REPOSITORY_USERNAME} --password ${MAVEN_REPOSITORY_PASSWORD} --search '/org/jenkins-ci/main' $(jv get)}"
 
 	: "${PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS:=$DEFAULT_PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS}"
 
 	# Convert to array
-	IFS=" " read -r -a PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS <<<"$PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS"
+	IFS=" " read -r -a PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS <<<"${PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS}"
 
 	../utils/promoteMavenArtifacts.py "${PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS[@]}"
-
 }
 
 function promoteStagingGitRepository() {
-
 	# Ensure we always work from a clean environment
-	if [ -d "$RELEASE_GIT_STAGING_REPOSITORY_PATH" ]; then
-		rm -Rf "$RELEASE_GIT_STAGING_REPOSITORY_PATH"
+	if [[ -d $RELEASE_GIT_STAGING_REPOSITORY_PATH ]]; then
+		rm -Rf "${RELEASE_GIT_STAGING_REPOSITORY_PATH}"
 	fi
 
-	mkdir -p "$RELEASE_GIT_STAGING_REPOSITORY_PATH"
-	pushd "$RELEASE_GIT_STAGING_REPOSITORY_PATH"
+	mkdir -p "${RELEASE_GIT_STAGING_REPOSITORY_PATH}"
+	pushd "${RELEASE_GIT_STAGING_REPOSITORY_PATH}"
 
 	# Clone production repository on a specific branch
-	git clone --branch "$RELEASE_GIT_PRODUCTION_BRANCH" "$RELEASE_GIT_PRODUCTION_REPOSITORY" .
+	git clone --branch "${RELEASE_GIT_PRODUCTION_BRANCH}" "${RELEASE_GIT_PRODUCTION_REPOSITORY}" .
 
 	# Fetch commits from staging repository
-	git fetch "$RELEASE_GIT_STAGING_REPOSITORY" "$RELEASE_GIT_STAGING_BRANCH"
+	git fetch "${RELEASE_GIT_STAGING_REPOSITORY}" "${RELEASE_GIT_STAGING_BRANCH}"
 
 	# Merge commits from staging repository
 	git merge --no-edit --log=20 FETCH_HEAD
@@ -383,7 +380,6 @@ function promoteStagingGitRepository() {
 	git push
 
 	popd
-
 }
 
 function pushCommits() {
@@ -393,12 +389,12 @@ function pushCommits() {
 	git config --get remote.origin.url
 	sed -i 's#url = https://github.com/#url = git@github.com:#' .git/config
 	git pull
-	git push origin "HEAD:$RELEASE_GIT_BRANCH" "$RELEASE_SCM_TAG"
+	git push origin "HEAD:${RELEASE_GIT_BRANCH}" "${RELEASE_SCM_TAG}"
 }
 
 function rollback() {
 	mvn release:rollback
-	git push --delete origin "$RELEASE_SCM_TAG"
+	git push --delete origin "${RELEASE_SCM_TAG}"
 }
 
 function stageRelease() {
@@ -430,45 +426,42 @@ function validateKeystore() {
 }
 
 function verifyGPGSignature() {
-	gpg --verify "$JENKINS_ASC" "$JENKINS_WAR"
-	unzip -qc "$JENKINS_WAR" META-INF/MANIFEST.MF | grep 'Jenkins-Version' | awk '{print $2}'
+	gpg --verify "${JENKINS_ASC}" "${JENKINS_WAR}"
+	unzip -qc "${JENKINS_WAR}" META-INF/MANIFEST.MF | grep 'Jenkins-Version' | awk '{print $2}'
 }
 
 function verifyCertificateSignature() {
-	jarsigner -verbose -verify -certs -strict "$JENKINS_WAR"
+	jarsigner -verbose -verify -certs -strict "${JENKINS_WAR}"
 }
 
 function showReleasePlan() {
-
 	cat <<-EOF
-		    A new $RELEASE_PROFILE release will be generated for the "${RELEASELINE:-weekly}" release).
+		A new ${RELEASE_PROFILE} release will be generated for the "${RELEASELINE:-weekly}" release).
 
-		    This new release will use the git repository: $RELEASE_GIT_REPOSITORY,
-		    using branch $RELEASE_GIT_BRANCH then push commits to the same location.
+		This new release will use the git repository: ${RELEASE_GIT_REPOSITORY},
+		using branch ${RELEASE_GIT_BRANCH} then push commits to the same location.
 
-		    Artifacts will be pushed to the maven repository named "$MAVEN_REPOSITORY_NAME"
-		    located on "$MAVEN_REPOSITORY_URL" authenticated as "$MAVEN_REPOSITORY_USERNAME"
+		Artifacts will be pushed to the maven repository named "${MAVEN_REPOSITORY_NAME}"
+		located on "${MAVEN_REPOSITORY_URL}" authenticated as "${MAVEN_REPOSITORY_USERNAME}"
 	EOF
-
 }
 
 function showPackagingPlan() {
-
 	cat <<-EOF
-		    New Jenkins core packages will be generated for version $(jv get) for the "${RELEASELINE:-weekly}" release
+		New Jenkins core packages will be generated for version $(jv get) for the "${RELEASELINE:-weekly}" release
 
-		    Those new packages will be generated based on a war file downloaded
-		    from $JENKINS_DOWNLOAD_URL
+		Those new packages will be generated based on a war file downloaded
+		from ${JENKINS_DOWNLOAD_URL}
 
-		    Once built, packages will be pushed to $PKGSERVER
+		Once built, packages will be pushed to ${PKGSERVER}
 	EOF
 
 	if $GIT_STAGING_REPOSITORY_PROMOTION_ENABLED -eq "true"; then
 		cat <<-EOF
-			    Git repository promotion is enabled
-			    Git commits will be promoted from:
-			        $RELEASE_GIT_STAGING_REPOSITORY:$RELEASE_GIT_STAGING_BRANCH to
-			        $RELEASE_GIT_PRODUCTION_REPOSITORY:$RELEASE_GIT_PRODUCTION_BRANCH
+			Git repository promotion is enabled
+			Git commits will be promoted from:
+			${RELEASE_GIT_STAGING_REPOSITORY}:${RELEASE_GIT_STAGING_BRANCH} to
+			${RELEASE_GIT_PRODUCTION_REPOSITORY}:${RELEASE_GIT_PRODUCTION_BRANCH}
 		EOF
 	else
 		echo Git Repository promotion is disabled
@@ -477,9 +470,9 @@ function showPackagingPlan() {
 	if $MAVEN_STAGING_REPOSITORY_PROMOTION_ENABLED -eq "true"; then
 
 		cat <<-EOF
-			    Maven artifacts promotion is enabled
-			    Artifacts will be promoted from repository $MAVEN_REPOSITORY_NAME to $MAVEN_REPOSITORY_PRODUCTION_NAME
-			    located on artifactory at $MAVEN_REPOSITORY_URL
+			Maven artifacts promotion is enabled
+			Artifacts will be promoted from repository ${MAVEN_REPOSITORY_NAME} to ${MAVEN_REPOSITORY_PRODUCTION_NAME}
+			located on artifactory at ${MAVEN_REPOSITORY_URL}
 		EOF
 
 	else
@@ -488,14 +481,13 @@ function showPackagingPlan() {
 }
 
 function syncMirror() {
-
 	# Convert PKGSERVER_SSH_OPTS to an array
-	IFS=" " read -r -a PKGSERVER_SSH_OPTS <<<"$PKGSERVER_SSH_OPTS"
-	ssh "${PKGSERVER_SSH_OPTS[@]}" "$PKGSERVER" /srv/releases/sync.sh
+	IFS=" " read -r -a PKGSERVER_SSH_OPTS <<<"${PKGSERVER_SSH_OPTS}"
+	ssh "${PKGSERVER_SSH_OPTS[@]}" "${PKGSERVER}" /srv/releases/sync.sh
 }
 
 function main() {
-	if [ $# -eq 0 ]; then
+	if [[ $# -eq 0 ]]; then
 		configureGPG
 		configureKeystore
 		configureGit
@@ -506,7 +498,7 @@ function main() {
 		prepareRelease
 		stageRelease
 	else
-		while [ $# -gt 0 ]; do
+		while [[ $# -gt 0 ]]; do
 			case "$1" in
 			--cleanRelease) echo "Clean Release" && generateSettingsXml && clean ;;
 			--cloneReleaseGitRepository) echo "Cloning Jenkins Repository" && cloneReleaseGitRepository ;;
@@ -523,12 +515,12 @@ function main() {
 			--verifyCertificateSignature) echo "Verify certificate signature" && verifyCertificateSignature ;;
 			--performRelease) echo "Perform Release" && performRelease ;;
 			--prepareRelease) echo "Prepare Release" && generateSettingsXml && prepareRelease ;;
-			--pushCommits) echo "Push commits on $RELEASE_GIT_BRANCH" && pushCommits ;;
+			--pushCommits) echo "Push commits on ${RELEASE_GIT_BRANCH}" && pushCommits ;;
 			--showReleasePlan) echo "Show Release Plan" && showReleasePlan ;;
 			--showPackagingPlan) echo "Show Packaging Plan" && showPackagingPlan ;;
 			--promoteStagingMavenArtifacts) echo "Promote Staging Maven Artifacts" && promoteStagingMavenArtifacts ;;
 			--promoteStagingGitRepository) echo "Promote Staging Git Repository" && promoteStagingGitRepository ;;
-			--rollback) echo "Rollback release $RELEASE_SCM_TAG" && rollback ;;
+			--rollback) echo "Rollback release ${RELEASE_SCM_TAG}" && rollback ;;
 			--stageRelease) echo "Stage Release" && stageRelease ;;
 			--packaging) echo 'Execute packaging makefile, quote required around Makefile target' && packaging "$2" ;;
 			--syncMirror) echo 'Trigger mirror synchronization' && syncMirror ;;
@@ -550,7 +542,7 @@ function main() {
 
 # disable shellcheck warning
 # shellcheck source=/dev/null
-source "${ROOT_DIR}/profile.d/$RELEASE_PROFILE"
+source "${ROOT_DIR}/profile.d/${RELEASE_PROFILE}"
 
 # https://maven.apache.org/maven-release/maven-release-plugin/perform-mojo.html
 # mvn -Prelease help:active-profiles
@@ -607,10 +599,10 @@ export RELEASE_PROFILE
 export RELEASELINE
 export JENKINS_VERSION
 
-if [ ! -d "$WORKING_DIRECTORY" ]; then
-	mkdir -p "$WORKING_DIRECTORY"
+if [[ ! -d $WORKING_DIRECTORY ]]; then
+	mkdir -p "${WORKING_DIRECTORY}"
 fi
 
-pushd $WORKING_DIRECTORY
+pushd "${WORKING_DIRECTORY}"
 
 main "$@"
