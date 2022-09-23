@@ -20,7 +20,7 @@ function requireAzureKeyvaultCredentials() {
 }
 
 function clean() {
-	mvn -s settings-release.xml -B --no-transfer-progress release:clean
+	mvn -B -V -s settings-release.xml -ntp release:clean
 }
 
 function cloneReleaseGitRepository() {
@@ -339,7 +339,7 @@ function prepareRelease() {
 	generateSettingsXml
 
 	printf '\n Prepare Jenkins Release\n\n'
-	mvn -B -s settings-release.xml --no-transfer-progress release:prepare
+	mvn -B -V -s settings-release.xml -ntp release:prepare
 }
 
 function promoteStagingMavenArtifacts() {
@@ -393,7 +393,7 @@ function pushCommits() {
 }
 
 function rollback() {
-	mvn release:rollback
+	mvn -B -V -ntp release:rollback
 	git push --delete origin "${RELEASE_SCM_TAG}"
 }
 
@@ -402,10 +402,10 @@ function stageRelease() {
 	requireKeystorePass
 
 	printf '\n Stage Jenkins Release\n\n'
-	mvn -V -B \
+	mvn -B -V \
 		"-DstagingRepository=${MAVEN_REPOSITORY_NAME}::${MAVEN_REPOSITORY_URL}/${MAVEN_REPOSITORY_NAME}" \
 		-s settings-release.xml \
-		--no-transfer-progress \
+		-ntp \
 		release:stage
 }
 
@@ -414,10 +414,7 @@ function performRelease() {
 	requireKeystorePass
 
 	printf '\n Perform Jenkins Release\n\n'
-	mvn -B \
-		-s settings-release.xml \
-		--no-transfer-progress \
-		release:perform
+	mvn -B -V -s settings-release.xml -ntp release:perform
 }
 
 function validateKeystore() {
