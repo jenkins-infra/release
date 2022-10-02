@@ -42,8 +42,10 @@ This role should rotate between LTS releases
 
 - [ ] Backport changes, create a local branch in jenkinsci/jenkins, run the [list-issue-commits script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/list-issue-commits) to locate commits via jira ID, some manual work is required to locate them if the issue ID wasn't present at merge time, backport with `git cherry-pick -x $commit`
 
-- [ ] Open backporting PR with into-lts label and summary of changes in description from [lts-candidate-stats script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/lts-candidate-stats) and the selected [Jira lts-candidates](https://issues.jenkins-ci.org/issues/?filter=12146)  
-Also check the [release repository](https://github.com/jenkins-infra/release/issues?q=is%3Aclosed+label%3Alts-candidate+) for additional candidates.
+- [ ] Open backporting PR with `into-lts` label and summary of changes in description from [lts-candidate-stats script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/lts-candidate-stats) and
+  - [ ] the selected [Jira lts-candidates](https://issues.jenkins-ci.org/issues/?filter=12146)  
+  - [ ] possible LTS candidates in the [release](https://github.com/jenkins-infra/release/issues?q=is%3Aclosed+label%3Alts-candidate+) repository
+  - [ ] possible LTS candidates in the [packaging](https://github.com/jenkinsci/packaging/issues?q=is%3Aclosed+label%3Alts-candidate) repository
 
 - [ ] Review ATH, bom and configuration-as-code integration tests results
 
