@@ -109,11 +109,11 @@ You'll need to update several files, see to the LTS checklist.
 
 ### Update the bill of materials (BOM)
 
-Create a PR, which updates the BOM to the weekly release, the LTS release is based upon.
+Create a PR, which updates the [BOM](https://github.com/jenkinsci/bom) to the weekly release, the LTS release is based upon.
 
-1. Modify the newest `bom-2.VVV.x/pom.xml` to declare the LTS line you are initiating.
+1. Modify the newest `bom-2.VVV.x/pom.xml` to declare the LTS line you are initiating.  
 This is done by replacing `<artifactId>bom-weekly</artifactId>` in the `<dependencyManagement>` block to `<artifactId>bom-2.VVV.x</artifactId>`, where `VVV` is the version of the weekly release you are basing the LTS line on.
-2. Create a new file in a new directory with the path `bom-2.VVV.x/pom.xml`. This file should contain the following content:
+2. Create a new file for the LTS release in `bom-2.VVV.x/pom.xml`. This file should contain the following content:
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -163,7 +163,8 @@ Bear in mind to replace VVV with the LTS baseline again.
 
 ### Update configurations-as-code (JCasC) integration tests
 
-Create a PR to update the [JCasC](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/integrations/pom.xml) integration tests to the weekly release, the LTS release is based upon.
+Create a PR to update the [JCasC](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/integrations/pom.xml) integration tests to the weekly release, the LTS release is based upon.  
+This is done by replacing the `jenkins.version` property in the `<properties>` block to the version of the weekly release you are basing the LTS line on.
 
 ### Review Jira issues and GitHub PRs
 
