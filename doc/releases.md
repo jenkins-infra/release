@@ -61,13 +61,13 @@ This document uses the following generic terms, which may need a clarification:
 ## Knowledge Prerequisites:
 - Novice knowledge about GitHub, how to create branches, pull requests and releases.
 - Novice knowlege how to use a terminal to run a script and specify an input.
-- Competence knowlege how to cherry-pick commits and resolve merge conflicts with a situational merge strategy.
+- Competence knowledge how to cherry-pick commits and resolve merge conflicts with a situational merge strategy.
 - Beginner knowledge about Jenkins, multibranch pipelines and folders.
 
 ## Access Prerequisites:
 **The following is only available to release team members.**  
 You can safely ignore it, these are not needed for the majority of steps. If they are needed, the steps below will tell you with a warning symbol (⚠️).  
-It's recommended to ask someone from the release team to take care of these steps, if you are not a release team member yourself.
+It's recommended to ask someone from the release team to take care of these steps, if you are not a release team member yourself yet.
 <details>
 <summary>Access to the Jenkins release infrastructure</summary>
 
@@ -75,18 +75,18 @@ It's recommended to ask someone from the release team to take care of these step
     - The account is part of the `release-core` LDAP group.
 - A VPN client to access the Jenkins VPN to access non-public resources.
 - Access to [release.ci.jenkins.io](https://release.ci.jenkins.io/) and [trusted.ci.jenkins.io](https://trusted.ci.jenkins.io:1443).
-- Write access on [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins), [jenkinsci/packaging](https://github.com/jenkinsci/packaging) and [jenkins-infra/release](https://github.com/jenkins-infra/releases).
+- Be part of the `release` team in the jenkinsci and jenkins-infra organization.
 
 </details>
 
 ## Preparation
 
-Timing for the preperation phase is usually 14 days before the RC release date or after the baseline selection and open call for the release lead took place.  
+Timing for the preperation phase is usually 14 days before the RC release date or after the baseline selection an open call for the release lead takes place.  
 It's recommended to start the preperation phase as soon as the release lead is selected.
 
 ### Baseline selection
 
-Long-Term-Support (LTS) releases are picked every 12 weeks from a weekly baseline. You can find more information about the LTS release line process [on the dedicated page](https://www.jenkins.io/download/lts/).
+Long-Term-Support (LTS) releases are picked every 12 weeks from a weekly baseline. You can find more information about the LTS release line process [LTS Release Line](https://www.jenkins.io/download/lts/).
 
 The [release officer](https://www.jenkins.io/project/board/#release) ends the selection and announces the weekly baseline with an open call for the release lead on the [jenkins-dev mailing list](https://groups.google.com/g/jenkinsci-dev).  
 To be the release lead, you need to respond to the call and declare your intest to lead the release.
@@ -176,7 +176,7 @@ Run the [backporting announcement](https://github.com/jenkins-infra/backend-comm
 
 ### Update Jira issues for backporting
 
-Use [this](https://issues.jenkins.io/issues/?filter=12146) query to list issues eligible for a backport.  
+Use the [LTS candidates](https://issues.jenkins.io/issues/?filter=12146) query to list issues eligible for a backport.  
 Add `2.VVV.p-fixed` and remove `lts-candidate` or add `2.VVV.p-rejected` and retain the `lts-candidate` label.  
 .p stands for patch release, like .1, .2, or .3.
 
@@ -194,7 +194,7 @@ Additionally, take a look at the [release](https://github.com/jenkins-infra/rele
 
 ### Review tests
 1. Review acceptance tests. Take a look at the checks of your backporting PR from step 10, and make sure, that `Tests / ath / Running ATH / ATH` are green:  
-![](images/jenkins-ath.png)  
+![acceptance test screenshot](images/jenkins-ath.png)  
 The amount of tests may vary.
 2. Review BOM tests. Make sure, that all tests from your BOM PR are green.
 3. Review JCasC tests. Make sure, that all tests from your JCasC PR are green.
@@ -213,7 +213,7 @@ Merge the backporting PR from the prior step into the `stable-2.VVV` branch. Do 
 ### Obtain the RC URL
 
 If the build passes, obtain the "Incrementals" URL from the "Checks" tab of the stable branch:  
-![](images/incrementals.png)  
+![incrementals screenshot](images/incrementals.png)  
 Select `Details` -> `jenkins-war` and obtain the `jenkins-war-2.VVV-rcXXXXX.CCCCCCCCCCCCC.war`
 URL. `C` is the commit hash of the merge commit and acts as placeholder.
 
@@ -230,9 +230,9 @@ Send an announcement email to the jenkinsci-devforum mailing list. Use [this](ht
 
 ### Check for security updates
 
-Check with the security team, weather a security update is planned for this release, which impacts the LTS release and core itself. Security pre-announcements are sent to the [jenkinsci-advisories](https://groups.google.com/g/jenkinsci-advisories) mailing list.  
+Check with the security team, whether a security update is planned for this release, which impacts the LTS release and core itself. Security pre-announcements are sent to the [jenkinsci-advisories](https://groups.google.com/g/jenkinsci-advisories) mailing list.  
 Even if no security update is planned, it is a good idea to verify with the security team that no security update is is progress.  
-Incase a security update impacting the LTS release is planned, the release process is paused and the security team takes over the release.
+In case a security update impacting the LTS release is planned, the release process is paused and the security team takes over the release.
 
 ## LTS release
 
@@ -273,7 +273,7 @@ Adjust state and `Released As` of [Jira issues](https://issues.jenkins.io/) fixe
 
 Run trusted.ci.jenkins.io [Docker image creation job](https://trusted.ci.jenkins.io:1443/job/Containers/job/Core%20Release%20Containers/job/master/).
 
-**Note**: If you do not have access to the network trusted.ci.jenkins.io is in, ask a release team member to start the job for you. Access to the VPN is not sufficient.
+**Note**: If you do not have access to the network trusted.ci.jenkins.io is in, ask a release team or infrastructure team member to start the job for you. Access to the VPN is not sufficient.
 
 ### Check docker images
 
