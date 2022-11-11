@@ -45,7 +45,7 @@ Bear in mind, as future release lead, you do not need to work through the releas
 This document uses the following generic terms, which may need a clarification:
 
 - checklist: The [release checklist](https://github.com/jenkins-infra/release/blob/master/.github/ISSUE_TEMPLATE/1-lts-release-checklist.md)
-- 2.VVV: The version number of the weekly release the LTS release is based upon, e.g. 2.375.
+- 2.VVV: The version number of the weekly release the LTS release is based upon, e.g. 2.375.  
   2.VVV.x translates to 2.375.x in this example, .x is no placeholder.
 - RC: Release Candidate
 - ⚠️: Specific permission required. See [Access Prerequisites](#access-prerequisites).
@@ -112,7 +112,7 @@ You'll need to update several files, see to the LTS checklist.
 Create a PR updating the [BOM](https://github.com/jenkinsci/bom) to the weekly release, the LTS release is based upon.
 
 1. Modify the newest `bom-2.VVV.x/pom.xml` to declare the LTS line you are initiating.  
-This is done by replacing `<artifactId>bom-weekly</artifactId>` in the `<dependencyManagement>` block to `<artifactId>bom-2.VVV.x</artifactId>`, where `VVV` is the version of the weekly release you are basing the LTS line on.
+This is done by replacing `<artifactId>bom-weekly</artifactId>` in the `<dependencyManagement>` block to `<artifactId>bom-2.VVV.x</artifactId>`.  
 2. Create a new file for the LTS release in `bom-2.VVV.x/pom.xml`. This file should contain the following content:
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -138,7 +138,7 @@ This is done by replacing `<artifactId>bom-weekly</artifactId>` in the `<depende
     </dependencyManagement>
 </project>
 ```
-Bear in mind to replace VVV with the LTS baseline again.
+Keep in mind to replace VVV with the LTS baseline again.
 
 3. Add the created file to the `pom.xml` in the root directory of the repository in the `<modules>` block:
 ```xml
@@ -213,7 +213,7 @@ Merge the backporting PR from the prior step into the `stable-2.VVV` branch. Do 
 
 If the build passes, obtain the "Incrementals" URL from the "Checks" tab of the stable branch:  
 ![](images/incrementals.png)  
-Select "Details" -> "jenkins-war" and obtain the `jenkins-war-2.VVV-rcXXXXX.CCCCCCCCCCCCC.war`
+Select `Details` -> `jenkins-war` and obtain the `jenkins-war-2.VVV-rcXXXXX.CCCCCCCCCCCCC.war`
 URL. `C` is the commit hash of the merge commit and acts as placeholder.
 
 ### Publish a pre-release
