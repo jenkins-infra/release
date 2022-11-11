@@ -74,7 +74,7 @@ It's recommended to ask someone from the release team to take care of these step
 - An account on [accounts.jenkins.io](https://accounts.jenkins.io/).
     - The account is part of the `release-core` LDAP group.
 - A VPN client to access the Jenkins VPN to access non-public resources.
-- Access to [release.ci.jenkins.io](https://release.ci.jenkins.io/) and [trusted.ci.jenkins.io](https://trusted.ci.jenkins.io/).
+- Access to [release.ci.jenkins.io](https://release.ci.jenkins.io/) and [trusted.ci.jenkins.io](https://trusted.ci.jenkins.io:1443).
 - Write access on [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins), [jenkinsci/packaging](https://github.com/jenkinsci/packaging) and [jenkins-infra/release](https://github.com/jenkins-infra/releases).
 
 </details>
@@ -193,7 +193,7 @@ Visit the checklist for more information.
 
 ### Review tests
 1. Review acceptance tests. Take a look at the checks of your backporting PR from step 10, and make sure, that `Tests / ath / Running ATH / ATH` are green:  
-![](images/jenkins-ath.png)
+![](images/jenkins-ath.png)  
 The amount of tests may vary.
 2. Review BOM tests. Make sure, that all tests from your BOM PR are green.
 3. Review JCasC tests. Make sure, that all tests from your JCasC PR are green.
@@ -211,8 +211,8 @@ Merge the backporting PR from the prior step into the `stable-2.VVV` branch. Do 
 
 ### Obtain the RC URL
 
-If the build passes, obtain the "Incrementals" URL from the "Checks" tab of the stable branch:
-![](images/incrementals.png)
+If the build passes, obtain the "Incrementals" URL from the "Checks" tab of the stable branch:  
+![](images/incrementals.png)  
 Select "Details" -> "jenkins-war" and obtain the `jenkins-war-2.VVV-rcXXXXX.CCCCCCCCCCCCC.war`
 URL. `C` is the commit hash of the merge commit and acts as placeholder.
 
