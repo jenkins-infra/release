@@ -79,7 +79,7 @@ It's recommended to ask someone from the release team to take care of these step
 
 </details>
 
-## Preperation
+## Preparation
 
 Timing for the preperation phase is usually 14 days before the RC release date or after the baseline selection and open call for the release lead took place.  
 It's recommended to start the preperation phase as soon as the release lead is selected.
