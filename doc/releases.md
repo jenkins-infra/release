@@ -44,7 +44,7 @@ Bear in mind, as future release lead, you do not need to work through the releas
 ## Glossary
 This document uses the following generic terms, which may need a clarification:
 
-- checklist: The release checklist, which is available [here](https://github.com/jenkins-infra/release/blob/master/.github/ISSUE_TEMPLATE/1-lts-release-checklist.md).
+- checklist: The [release checklist](https://github.com/jenkins-infra/release/blob/master/.github/ISSUE_TEMPLATE/1-lts-release-checklist.md)
 - 2.VVV: The version number of the weekly release the LTS release is based upon, e.g. 2.375.
   2.VVV.x translates to 2.375.x in this example, .x is no placeholder.
 - RC: Release Candidate
@@ -109,7 +109,7 @@ You'll need to update several files, see to the LTS checklist.
 
 ### Update the bill of materials (BOM)
 
-Create a PR, which updates the [BOM](https://github.com/jenkinsci/bom) to the weekly release, the LTS release is based upon.
+Create a PR updating the [BOM](https://github.com/jenkinsci/bom) to the weekly release, the LTS release is based upon.
 
 1. Modify the newest `bom-2.VVV.x/pom.xml` to declare the LTS line you are initiating.  
 This is done by replacing `<artifactId>bom-weekly</artifactId>` in the `<dependencyManagement>` block to `<artifactId>bom-2.VVV.x</artifactId>`, where `VVV` is the version of the weekly release you are basing the LTS line on.
@@ -177,7 +177,8 @@ Run the [backporting announcement](https://github.com/jenkins-infra/backend-comm
 ### Update Jira issues for backporting
 
 Use [this](https://issues.jenkins.io/issues/?filter=12146) query to list issues eligible for a backport.  
-Add `2.VVV.m-fixed` and remove `lts-candidate` or add `2.VVV.m-rejected` and retain the `lts-candidate` label.
+Add `2.VVV.p-fixed` and remove `lts-candidate` or add `2.VVV.p-rejected` and retain the `lts-candidate` label.  
+.p stands for patch release, like .1, .2, or .3.
 
 ### Backport changes
 
@@ -191,7 +192,7 @@ Use the [list-issue-commits script](https://github.com/jenkins-infra/backend-com
 Visit the checklist for more information.
 
 ### Review tests
-1. Review acceptance tests. Take a look at the checks of your backporting PR from step 10, and make sure, that `Tests / ath / Running ATH / ATH` are green:
+1. Review acceptance tests. Take a look at the checks of your backporting PR from step 10, and make sure, that `Tests / ath / Running ATH / ATH` are green:  
 ![](images/jenkins-ath.png)
 The amount of tests may vary.
 2. Review BOM tests. Make sure, that all tests from your BOM PR are green.
