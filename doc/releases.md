@@ -189,7 +189,8 @@ Incase there are conflicting commits, pick an [appropriate merge strategy](https
 
 Open a PR against the `stable-2.VVV` branch from your separate backporting branch from the prior step.  
 Use the [list-issue-commits script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/list-issue-commits) to generate a list of issues to include in the PR description.  
-Visit the checklist for more information.
+Visit the checklist for more information.  
+Additionally, take a look at the [release](https://github.com/jenkins-infra/release/issues?q=is%3Aclosed+label%3Alts-candidate+) and [packaging](https://github.com/jenkinsci/packaging/issues?q=is%3Aclosed+label%3Alts-candidate) repository, for additional LTS candidates.
 
 ### Review tests
 1. Review acceptance tests. Take a look at the checks of your backporting PR from step 10, and make sure, that `Tests / ath / Running ATH / ATH` are green:  

@@ -42,7 +42,7 @@ This role should rotate between LTS releases
 
 - [ ] Update jira labels for [lts-candidate issues](https://issues.jenkins.io/issues/?filter=12146), either add `2.361.2-fixed` and remove `lts-candidate` or add `2.361.2-rejected`, and retain `lts-candidate`
 
-- [ ] Backport changes, create a local branch in jenkinsci/jenkins, run the [list-issue-commits script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/list-issue-commits) to locate commits via jira ID, some manual work is required to locate them if the issue ID wasn't present at merge time, backport with `git cherry-pick -x $commit`
+- [ ] Backport changes, run the [list-issue-commits script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/list-issue-commits) to locate commits via jira ID, some manual work is required to locate them if the issue ID wasn't present at merge time, backport with `git cherry-pick -x $commit`.
 
 - [ ] Open backporting PR with `into-lts` label and summary of changes in description from [lts-candidate-stats script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/lts-candidate-stats) and
   - [ ] the selected [Jira lts-candidates](https://issues.jenkins-ci.org/issues/?filter=12146)  
