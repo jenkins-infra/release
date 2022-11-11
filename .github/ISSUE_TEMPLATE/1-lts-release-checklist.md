@@ -6,7 +6,7 @@ about: Track work required for a new LTS release
 
 # Next LTS release
 
-More information about the release process is available on the [release guide](../../doc/releases.md).
+More information about the release process is available on the [release guide](../../docs/releases.md).
 
 ## Release Lead
 

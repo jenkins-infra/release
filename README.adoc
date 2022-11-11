@@ -7,7 +7,7 @@ This repository contains everything needed to release https://github.com/jenkins
 
 This includes:
 
-* Documentation how to release Jenkins LTS releases, available at link:doc/releases.md[doc/releases.md].
+* Documentation how to release Jenkins LTS releases, available at link:docs/releases.md[doc/releases.md].
 * Jenkinsfiles for Releasing and Packaging.
 * Kubernetes POD templates definition for releasing and packaging environments on Linux and Windows operating systems.
 * Any configuration or utility scripts
