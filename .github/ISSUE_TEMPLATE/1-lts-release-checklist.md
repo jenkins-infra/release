@@ -32,7 +32,8 @@ This role should rotate between LTS releases
 
 - [ ] Create or update release branch in [jenkinsci/packaging](https://github.com/jenkinsci/packaging), e.g. `stable-2.361`
 
-- [ ] Create pull request to update [bom](https://github.com/jenkinsci/bom) to the weekly version that will be the base of the release line (strike this out for new point release)
+- [ ] Create pull request to update [bom](https://github.com/jenkinsci/bom) to the weekly version that will be the base of the release line (strike this out for new point release).
+      Assure that the [bom-weekly version number](https://github.com/jenkinsci/bom/blob/master/sample-plugin/pom.xml#L17) is already testing the base of the release line or a version newer than the base of the release line.
 
 - [ ] Create pull request to update [configuration-as-code integration tests](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/integrations/pom.xml) to the weekly version that will be the base of the release line (strike this out for new point release)
 
