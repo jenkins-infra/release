@@ -1,5 +1,4 @@
----
-title: "Bump jenkinsciinfra/packaging Docker image version"
+name: Bump `jenkinsciinfra/packaging` Docker image version
 
 scms:
   default:
@@ -15,21 +14,23 @@ scms:
 
 sources:
   lastVersion:
-    kind: githubRelease
+    kind: githubrelease
     name: Get the last jenkinsciinfra/packaging Docker image version
     spec:
       owner: "jenkins-infra"
       repository: "docker-packaging"
       token: "{{ requiredEnv .github.token }}"
       username: "{{ .github.username }}"
-      versionFilter:
+      versionfilter:
         kind: semver
+    transformers:
+      - trimprefix: 'v'
 
 conditions:
   testDockerImagePublished:
     name: "Does the Docker image jenkinsciinfra/packaging with the last discovered tag is published?"
-    kind: dockerImage
-    sourceID: lastVersion
+    kind: dockerimage
+    sourceid: lastVersion
     spec:
       image: "jenkinsciinfra/packaging"
       ## tag come from the input source
@@ -46,32 +47,31 @@ conditions:
 targets:
   updateJNLPContainerForPackagingPod:
     name: "Update the image of the jnlp container of the pod template manifest for package job"
-    sourceID: lastVersion
+    sourceid: lastVersion
     transformers:
-      - addPrefix: "jenkinsciinfra/packaging:"
+      - addprefix: "jenkinsciinfra/packaging:"
     kind: yaml
     spec:
       file: PodTemplates.d/package-linux.yaml
       key: spec.containers[0].image
-    scmID: default
+    scmid: default
   updateJNLPContainerForReleasePod:
     name: "Update the image of the jnlp container of the pod template manifest for release job"
-    sourceID: lastVersion
+    sourceid: lastVersion
     transformers:
-      - addPrefix: "jenkinsciinfra/packaging:"
+      - addprefix: "jenkinsciinfra/packaging:"
     kind: yaml
     spec:
       file: PodTemplates.d/release-linux.yaml
       key: spec.containers[0].image
-    scmID: default
+    scmid: default
 
 pullrequests:
   default:
     kind: github
-    scmID: default
-    targets:
-      - updateJNLPContainerForPackagingPod
-      - updateJNLPContainerForReleasePod
+    scmid: default
+    title: Bump `jenkinsciinfra/packaging` Docker image version to {{ source "lastVersion" }}
     spec:
       labels:
         - dependencies
+        - jenkinsciinfra/packaging
