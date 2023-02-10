@@ -83,7 +83,7 @@ pipeline {
     GPG_FILE                  = 'jenkins-release.gpg'
     GPG_PASSPHRASE            = credentials('release-gpg-passphrase')
     PACKAGING_GIT_REPOSITORY  = 'git@github.com:jenkinsci/packaging.git'
-    PACKAGING_GIT_BRANCH      = 'master'
+    PACKAGING_GIT_BRANCH      = '2.387'
     SIGN_KEYSTORE_FILENAME    = 'jenkins.pfx'
     SIGN_STOREPASS            = credentials('signing-cert-pass')
     WAR_FILENAME              = 'jenkins.war'
