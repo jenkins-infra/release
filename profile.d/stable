@@ -2,7 +2,7 @@
 # WARNING: Any variables defined here, override those defined from the Jenkinsfile
 #
 #
-RELEASE_GIT_BRANCH=master
+RELEASE_GIT_BRANCH=2.387
 RELEASE_GIT_REPOSITORY=git@github.com:jenkinsci/jenkins.git
 GIT_EMAIL=66998184+jenkins-release-bot@users.noreply.github.com
 GIT_NAME="Jenkins Release Bot"
@@ -15,3 +15,4 @@ SIGN_ALIAS=jenkins
 
 # Used by jenkinsci/packaging
 RELEASELINE=-stable
+JENKINS_VERSION=2.387.1
