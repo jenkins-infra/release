@@ -13,17 +13,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
       - name: Diff
-        uses: updatecli/updatecli-action@v2.21.0
+        uses: updatecli/updatecli-action@e616220e571d67e7f98a3bd63f59ab0d8eb4e124 # v2.21.0
         with:
           command: diff
           flags: "--config ./updatecli/updatecli.d --values ./updatecli/values.github-action.yaml"
         env:
           UPDATECLI_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Apply
-        uses: updatecli/updatecli-action@v2.21.0
+        uses: updatecli/updatecli-action@e616220e571d67e7f98a3bd63f59ab0d8eb4e124 # v2.21.0
         if: github.ref == 'refs/heads/master'
         with:
           command: apply
