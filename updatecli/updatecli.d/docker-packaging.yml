@@ -66,9 +66,9 @@ targets:
       key: spec.containers[0].image
     scmid: default
 
-pullrequests:
+actions:
   default:
-    kind: github
+    kind: github/pullrequest
     scmid: default
     title: Bump `jenkinsciinfra/packaging` Docker image version to {{ source "lastVersion" }}
     spec:
