@@ -25,30 +25,16 @@ spec:
         privileged: false
         runAsUser: 1000
         runAsGroup: 1000
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-          - matchExpressions:
-              - key: kubernetes.io/os
-                operator: In
-                values:
-                  - linux
-      preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 1
-          preference:
-            matchExpressions:
-              - key: agentpool
-                operator: In
-                values:
-                  - highmemlinux
+  restartPolicy: "Never"
+  nodeSelector:
+    kubernetes.azure.com/agentpool: releasepool
+    kubernetes.io/os: linux
   tolerations:
     - key: "os"
       operator: "Equal"
       value: "linux"
       effect: "NoSchedule"
-    - key: "profile"
+    - key: "jenkins"
       operator: "Equal"
-      value: "highmem"
+      value: "release.ci.jenkins.io"
       effect: "NoSchedule"
-  restartPolicy: "Never"
