@@ -81,7 +81,7 @@ pipeline {
     AZURE_VAULT_CLIENT_SECRET = credentials('azure-vault-client-secret')
     AZURE_VAULT_TENANT_ID     = credentials('azure-vault-tenant-id')
     GPG_FILE                  = 'jenkins-release.gpg'
-    GPG_PASSPHRASE            = credentials('release-gpg-passphrase')
+    GPG_PASSPHRASE            = credentials('release-gpg-passphrase-2023')
     PACKAGING_GIT_REPOSITORY  = 'git@github.com:jenkinsci/packaging.git'
     PACKAGING_GIT_BRANCH      = 'master'
     SIGN_KEYSTORE_FILENAME    = 'jenkins.pfx'
