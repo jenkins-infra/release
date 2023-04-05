@@ -214,7 +214,7 @@ The second part that we name *packaging* is when we retrieve from a Maven reposi
 ==== Required
 In order to trigger a new release, you must fulfil following requirements:
 
-- [x] https://github.com/jenkins-infra/openvpn[Jenkins VPN Access] access
+- [x] https://github.com/jenkins-infra/docker-openvpn#howto-get-client-access[Jenkins private VPN Access] access
 - [x] Being part of LDAP group 'release-core'
 - [x] https://release.ci.jenkins.io[release.ci.jenkins.io] access
 
@@ -231,7 +231,7 @@ It's important to notice that we do not use the maven release plugin to checkout
 
 Estimated time +- 1h30
 
-. Connect to the Jenkins VPN.
+. Connect to the Jenkins private VPN (private.vpn.jenkins.io).
 . Open your favorite browser to https://release.ci.jenkins.io.
 . Trigger the release job on the master branch. https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Frelease/branches/[Link].
 . Once triggered, it asks you which release line you want to do. It's important to know that the release line matches one of the profiles file defined https://github.com/jenkins-infra/release/tree/master/profile.d[here], so please carefully review the settings and be sure that it does what you are looking for.
@@ -257,7 +257,7 @@ NOTE: Packages are not re-published if they already exist, only package website 
 
 Estimated time +- 30min
 
-. Connect to the Jenkins VPN
+. Connect to the Jenkins private VPN (private.vpn.jenkins.io)
 . Open your favorite browser to https://release.ci.jenkins.io[release.ci.jenkins.io]
 . Trigger the packaging job on the master branch. https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Fpackage/branches/[Link]
 . Once triggered, it asks you which release line you want to package for. The release line matches one of the profile defines in https://github.com/jenkins-infra/release/tree/master/profile.d[profile.d], so please carefully review those settings in order to validate that's what you are looking for.
@@ -298,7 +298,7 @@ It releases using the repository https://github.com/jenkinsci/jenkins[jenkinsci/
 
 If for some reason the release job needs to be re-triggered, you can:
 
-. Connect to the Jenkins VPN
+. Connect to the Jenkins private VPN (private.vpn.jenkins.io)
 . Open your favorite browser to link:https://release.ci.jenkins.io[release.ci.jenkins.io]
 . Review the weekly environment https://github.com/jenkins-infra/release/blob/master/profile.d/weekly[file]:
 . Trigger the weekly link:https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Fweekly%2Frelease/branches/[job]
