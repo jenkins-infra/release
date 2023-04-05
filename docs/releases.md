@@ -277,7 +277,13 @@ Run trusted.ci.jenkins.io [Docker image creation job](https://trusted.ci.jenkins
 
 ### Check docker images
 
-Confirm that the images are available at [Docker hub](https://hub.docker.com/r/jenkins/jenkins/tags)
+Confirm that the images are available at [Docker hub](https://hub.docker.com/r/jenkins/jenkins/tags).
+
+### Update the helm charts
+⚠️ **Requires write access to the repository** ⚠️
+
+Update the helm charts to the new LTS release. The `jenkins-dependency-updater` bot generates the PR automatically in the [jenkinsci/helm-charts](https://github.com/jenkinsci/helm-charts) repository. Once approved and merged, it's released automatically.  
+If the bot didn't create a PR yet, either wait for the next cron schedule or run the [`sync-lts`](https://github.com/jenkinsci/helm-charts/actions/workflows/sync-lts.yaml) workflow manually.
 
 ### Prepare infrastructure for the next release
 
