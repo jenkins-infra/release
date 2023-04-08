@@ -87,6 +87,8 @@ This role should rotate between LTS releases
   
 - [ ] Adjust state and `Released As` of [Jira issues](https://issues.jenkins.io/) fixed in the release (see the [changelog](https://www.jenkins.io/changelog-stable) for issue links).
 
+- [ ] Create pull request to update the `lts` Maven profile in [ATH](https://github.com/jenkinsci/acceptance-test-harness) to the newly released version
+
 - [ ] Run trusted.ci.jenkins.io [Docker image creation job](https://trusted.ci.jenkins.io:1443/job/Containers/job/Core%20Release%20Containers/job/master/).
 
 - [ ] Confirm that the images are available at [Docker hub](https://hub.docker.com/r/jenkins/jenkins/tags).
