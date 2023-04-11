@@ -411,7 +411,7 @@ You can re-trigger individually the two downstream jobs, release, and packaging.
 The Jenkins project uses a Digicert account provided by CDF to request code signing certificate.
 The release environment is designed to download a pkcs12 certificate from Azure key vault.
 
-. Requestt a code signing certificate from Digicert
+. Request a code signing certificate from Digicert
 . Convert the code signing certificate from Digicert from `p7b` format to a `pfx` (with pkcs12) certificate which also includes the private key but not export password
 . Upload the `pfx` certificate to Azure Key Vault
 . Update the release environment credentials with appropriated password
