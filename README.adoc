@@ -233,7 +233,7 @@ Estimated time +- 1h30
 
 . Connect to the Jenkins private VPN (private.vpn.jenkins.io).
 . Open your favorite browser to https://release.ci.jenkins.io.
-. Trigger the release job on the master branch. https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Frelease/branches/[Link].
+. Trigger the release job on the master branch. https://release.ci.jenkins.io/job/core/job/release/[Link].
 . Once triggered, it asks you which release line you want to do. It's important to know that the release line matches one of the profiles file defined https://github.com/jenkins-infra/release/tree/master/profile.d[here], so please carefully review the settings and be sure that it does what you are looking for.
 . At the end of the job, git commits and maven artifacts will be pushed to their respective locations.
 
@@ -259,7 +259,7 @@ Estimated time +- 30min
 
 . Connect to the Jenkins private VPN (private.vpn.jenkins.io)
 . Open your favorite browser to https://release.ci.jenkins.io[release.ci.jenkins.io]
-. Trigger the packaging job on the master branch. https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Fpackage/branches/[Link]
+. Trigger the packaging job on the master branch. https://release.ci.jenkins.io/job/core/job/package/[Link]
 . Once triggered, it asks you which release line you want to package for. The release line matches one of the profile defines in https://github.com/jenkins-infra/release/tree/master/profile.d[profile.d], so please carefully review those settings in order to validate that's what you are looking for.
 
 Once the job is done, every package will be published and then mirror synchronized.
@@ -301,7 +301,7 @@ If for some reason the release job needs to be re-triggered, you can:
 . Connect to the Jenkins private VPN (private.vpn.jenkins.io)
 . Open your favorite browser to link:https://release.ci.jenkins.io[release.ci.jenkins.io]
 . Review the weekly environment https://github.com/jenkins-infra/release/blob/master/profile.d/weekly[file]:
-. Trigger the weekly link:https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Fweekly%2Frelease/branches/[job]
+. Trigger the weekly link:https://release.ci.jenkins.io/job/core/job/weekly/job/release/[job]
 
 [NOTE]
 ====
@@ -322,7 +322,7 @@ Before triggering a new stable release candidatae release, some steps are requir
 . Review and update the stable environment https://github.com/jenkins-infra/release/blob/master/profile.d/stable[file] with:
 .. `RELEASE_GIT_BRANCH` set to the `jenkinsci/jenkins` release branch like `stable-2.235`
 .. `PACKAGING_GIT_BRANCH` set to the appropriate `jenkinsci/packaging` branch, e.g. `stable-2.235`
-. Trigger the stable link:https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Fstable%2Frelease/branches/[job]
+. Trigger the stable link:https://release.ci.jenkins.io/job/core/job/stable/job/release/[job]
 
 [NOTE]
 ====
@@ -346,7 +346,7 @@ Before triggering a new stable release, some steps are required:
 .. `RELEASE_GIT_BRANCH` set to the `jenkinsci/jenkins` release branch like `stable-2.235`
 .. `JENKINS_VERSION` set to the final release version that will be packaged. If set to 'stable' then the packaging job will try to guess the version based on what was pushed to the maven repository. cfr settings.
 .. `PACKAGING_GIT_BRANCH` set to the appropriated `jenkinsci/packaging` branch
-. Trigger the stable link:https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Fstable%2Frelease/branches/[job]
+. Trigger the stable link:https://release.ci.jenkins.io/job/core/job/stable/job/release/[job]
 
 [NOTE]
 ====

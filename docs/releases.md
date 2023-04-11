@@ -245,7 +245,7 @@ Take a look at the checklist, and make sure, that both channels are notified in 
 ### Start the LTS build
 ⚠️ **Requires access to the Jenkins VPN** ⚠️
 
-Run the release job on [release.ci.jenkins.io](https://release.ci.jenkins.io/blue/organizations/jenkins/core%2Fstable%2Frelease/branches/) if no security release for Jenkins is planned.
+Run the release job on [release.ci.jenkins.io](https://release.ci.jenkins.io/job/core/job/stable/job/release/) if no security release for Jenkins is planned.
 
 **Note**: If you do not have access to the Jenkins VPN, ask a release team member to start the job for you.
 
