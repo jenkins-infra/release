@@ -411,9 +411,9 @@ You can re-trigger individually the two downstream jobs, release, and packaging.
 The Jenkins project uses a Digicert account provided by CDF to request code signing certificate.
 The release environment is designed to download a pkcs12 certificate from Azure key vault.
 
-. Get a code signing certificate from Digicert
-. Convert the code signing certificate from Digicert to a pkcs12 certificate which also includes the private key
-. Upload the pkcs12 certificate to Azure Key Vault
+. Request a code signing certificate from Digicert
+. Convert the code signing certificate from Digicert from `p7b` format to a `pfx` (with pkcs12) certificate which also includes the private key but not export password
+. Upload the `pfx` certificate to Azure Key Vault
 . Update the release environment credentials with appropriated password
 
 .Certificate Fields
@@ -442,12 +442,24 @@ Show certificate information
 
   openssl x509 -in jenkins-release.crt -text -noout
 
-Convert p7b  to pkcs12
+Convert p7b to pkcs12
+  
+  # Based from https://knowledge.digicert.com/solution/SO26449.html and https://github.com/jenkins-infra/release/blob/7a03f98eff839d4fed75ea96cf7bebbc963e3a91/README.adoc#certificate
+  # P7B to PFX: 1/2
+  openssl pkcs7 -print_certs -in digicert.p7b -out jenkins-release.crt
+    ## Asks for the Export password, transmitted by Digicert from another channel
+    ## Asks for the `jenkins-release.key` private key passphrase
+  
+  # Check for the intermediate certificate attributes
+  openssl x509 -in jenkins-release.crt -text -noout
+  
+  # P7B to PFX: 2/2
+  openssl pkcs12 -export -in jenkins-release.crt -inkey jenkins-release.key -out jenkins-release.pfx
+    ## Asks for an Export password: do not set any (type enter only)
+  Enter Export Password: # Empty!!
+  Verifying - Enter Export Password: # Empty!!
 
-  openssl pkcs7 -in digicert.p7b -text -print_certs -out intermediateCert.pem
-  openssl pkcs12 -export -in intermediateCert.pem -inkey jenkins-release.key -out jenkins-release.p12
-
-Show pkcs12 information
+Check PFX (pkcs12 format) attributes
 
   openssl pkcs12 -info -in jenkins.pfx
 
