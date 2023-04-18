@@ -50,15 +50,15 @@ pipeline {
 
   environment {
     AZURE_VAULT_NAME              = 'prodreleasecore'
-    AZURE_VAULT_CERT              = 'prodreleasecore'
+    AZURE_VAULT_CERT              = 'prodreleasecore-2023'
     AZURE_VAULT_CLIENT_ID         = credentials('azure-vault-client-id')
     AZURE_VAULT_CLIENT_SECRET     = credentials('azure-vault-client-secret')
     AZURE_VAULT_TENANT_ID         = credentials('azure-vault-tenant-id')
-    GPG_PASSPHRASE                = credentials('release-gpg-passphrase')
+    GPG_PASSPHRASE                = credentials('release-gpg-passphrase-2023')
     GPG_FILE                      = 'jenkins-release.gpg'
     MAVEN_REPOSITORY_USERNAME     = credentials('maven-repository-username')
     MAVEN_REPOSITORY_PASSWORD     = credentials('maven-repository-password')
-    SIGN_STOREPASS                = credentials('signing-cert-pass')
+    SIGN_STOREPASS                = credentials('signing-cert-pass-2023')
   }
 
   stages {
