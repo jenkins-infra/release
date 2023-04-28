@@ -86,8 +86,7 @@ pipeline {
           '''
 
           script {
-            def properties = readProperties file: 'release/release.properties'
-            env.RELEASE_SCM_TAG = properties['scm.tag']
+            env.RELEASE_SCM_TAG = sh(returnStdout: true, script: 'fgrep scm.tag= release/release.properties | cut -c9-').trim()
           }
         }
       }
