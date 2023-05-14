@@ -269,9 +269,12 @@ For good measures, check the console log to confirm that the correct release pac
 Adjust state and `Released As` of [Jira issues](https://issues.jenkins.io/) fixed in the release (see the [changelog](https://www.jenkins.io/changelog-stable) for issue links)
 
 ### Publish Docker image
-⚠️ **Requires access to the network trusted.ci.jenkins.io is in** ⚠️
+⚠️ **Requires write access to the repository jenkinsci/docker** ⚠️
+💡 **Access to the network trusted.ci.jenkins.io is could help in case of error but is not mandatory** 💡 
 
-Run trusted.ci.jenkins.io [Docker image creation job](https://trusted.ci.jenkins.io:1443/job/Containers/job/Core%20Release%20Containers/job/master/).
+Create a new tag in the repository jenkinsci/docker which value is the released core version.
+
+The [Container image job in trusted.ci.jenkins.io](https://trusted.ci.jenkins.io:1443/job/Containers/job/Core%20Release%20Containers) should detect the tag in the next 15 minutes and automatically publish it to the DockerHub.
 
 **Note**: If you do not have access to the network trusted.ci.jenkins.io is in, ask a release team or infrastructure team member to start the job for you. Access to the VPN is not sufficient.
 
