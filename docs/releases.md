@@ -199,6 +199,11 @@ The amount of tests may vary.
 2. Review BOM tests. Make sure, that all tests from your BOM PR are green.
 3. Review JCasC tests. Make sure, that all tests from your JCasC PR are green.
 
+### Update dependabot stable branch in core
+
+Replace `stable-2.xxx` with the new LTS stable branch version.  
+Take a look at the [example PR](https://github.com/jenkinsci/jenkins/pull/8004) how to do that.
+
 ## Release Candidate Creation
 
 Timing for the RC creation is usually the same day the RC is published.
