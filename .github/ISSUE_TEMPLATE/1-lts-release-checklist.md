@@ -50,6 +50,8 @@ This role should rotate between LTS releases
 
 - [ ] Review ATH and bom integration tests results.
 
+- [ ] Update the dependabot branch target in [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins/blob/bacb1c8d2899d161a0995d69ab5c932ca4d3ab30/.github/dependabot.yml#L56) to the new stable branch.
+
 - [ ] Prepare [LTS changelog](https://www.jenkins.io/changelog-stable/) based on the [style guide](https://github.com/jenkins-infra/jenkins.io/blob/master/content/_data/changelogs/_STYLEGUIDE.adoc) using the [changelog generator](https://github.com/jenkinsci/core-changelog-generator/blob/master/README.md) - This is normally done by the docs team, ask in [gitter](https://app.gitter.im/#/room/#jenkins/docs:matrix.org).
 
 - [ ] Prepare [LTS upgrade guide](https://www.jenkins.io/doc/upgrade-guide/) based on [previous upgrade guides](https://github.com/jenkins-infra/jenkins.io/tree/master/content/_data/upgrades)  - This is normally done by the docs team, ask in [gitter](https://app.gitter.im/#/room/#jenkins/docs:matrix.org).
