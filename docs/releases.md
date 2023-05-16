@@ -272,7 +272,7 @@ Adjust state and `Released As` of [Jira issues](https://issues.jenkins.io/) fixe
 ⚠️ **Requires write access to the [jenkinsci/docker repository](https://github.com/jenkinsci/docker) ** ⚠️
 💡 **Access to the network containing trusted.ci.jenkins.io could help in case of error but is not mandatory** 💡 
 
-Create a new tag in the repository jenkinsci/docker which value is the released core version.
+Create a new tag in the [jenkinsci/docker repository](https://github.com/jenkinsci/docker) with the value of the released core version.
 
 The [Container image job in trusted.ci.jenkins.io](https://trusted.ci.jenkins.io:1443/job/Containers/job/Core%20Release%20Containers) should detect the tag in the next 15 minutes and automatically publish it to the DockerHub.
 
