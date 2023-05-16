@@ -270,7 +270,7 @@ Adjust state and `Released As` of [Jira issues](https://issues.jenkins.io/) fixe
 
 ### Publish Docker image
 ⚠️ **Requires write access to the repository jenkinsci/docker** ⚠️
-💡 **Access to the network trusted.ci.jenkins.io is could help in case of error but is not mandatory** 💡 
+💡 **Access to the network containing trusted.ci.jenkins.io could help in case of error but is not mandatory** 💡 
 
 Create a new tag in the repository jenkinsci/docker which value is the released core version.
 
