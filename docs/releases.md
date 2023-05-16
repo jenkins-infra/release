@@ -269,7 +269,7 @@ For good measures, check the console log to confirm that the correct release pac
 Adjust state and `Released As` of [Jira issues](https://issues.jenkins.io/) fixed in the release (see the [changelog](https://www.jenkins.io/changelog-stable) for issue links)
 
 ### Publish Docker image
-⚠️ **Requires write access to the repository jenkinsci/docker** ⚠️
+⚠️ **Requires write access to the [jenkinsci/docker repository](https://github.com/jenkinsci/docker) ** ⚠️
 💡 **Access to the network containing trusted.ci.jenkins.io could help in case of error but is not mandatory** 💡 
 
 Create a new tag in the repository jenkinsci/docker which value is the released core version.
