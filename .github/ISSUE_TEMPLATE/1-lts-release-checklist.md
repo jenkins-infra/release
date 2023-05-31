@@ -99,4 +99,4 @@ This role should rotate between LTS releases
 
 - [ ] Create a [helpdesk](https://github.com/jenkins-infra/helpdesk/issues) ticket to update `ci.jenkins.io`, `trusted.ci`, `cert.ci` and `release.ci` to the new LTS release, [example](https://github.com/jenkins-infra/helpdesk/issues/3561).
   
-- [ ] Send email asking for the next release lead, [example](https://groups.google.com/g/jenkinsci-dev/c/4k6EqCXpcBE/m/68--8pjNDwAJ), dates for the next one can be found on the [Jenkins calendar](https://www.jenkins.io/events/).
+- [ ] Send email asking for the next release lead, [example](https://groups.google.com/g/jenkinsci-dev/c/FrUnLUXdArg/m/BfXf5INlBwAJ), dates for the next one can be found on the [Jenkins calendar](https://www.jenkins.io/events/).
