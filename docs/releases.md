@@ -172,7 +172,8 @@ Make sure that all the Jira issues and GitHub PRs are in the correct state and t
 
 ### Announce the backporting
 
-Run the [backporting announcement](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/generate-backporting-announcement) script. Make sure to fill in the correct release date.
+Send a backporting announcement email to the [jenkinsci-dev](https://groups.google.com/g/jenkinsci-dev) mailing list, using the [default](https://groups.google.com/g/jenkinsci-dev/c/sZY2WXoWLWM) template.
+Remember to exchange the LTS version, release date and Jira URLs.
 
 ### Update Jira issues for backporting
 
