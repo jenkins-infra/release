@@ -37,7 +37,8 @@ This role should rotate between LTS releases
 
 - [ ] Review Jira and GitHub pull requests for additional LTS candidates, adding the `lts-candidate` label, and ensure that all tickets are resolved in Jira.
 
-- [ ] Backporting announcement email - [generate-backporting-announcement script](https://github.com/jenkins-infra/release/blob/master/tools/generate-backporting-announcement).
+- [ ] Send a backporting announcement email to the [jenkinsci-dev](https://groups.google.com/g/jenkinsci-dev) mailing list, using the [default](https://groups.google.com/g/jenkinsci-dev/c/sZY2WXoWLWM) template.
+Remember to exchange the LTS version, release date and Jira URLs.
 
 - [ ] Update Jira labels for [lts-candidate issues](https://issues.jenkins.io/issues/?filter=12146), either add `2.387.2-fixed` and remove `lts-candidate` or add `2.387.2-rejected`, and retain `lts-candidate`.
 
