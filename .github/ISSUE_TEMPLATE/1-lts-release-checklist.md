@@ -23,7 +23,7 @@ This role should rotate between LTS releases
 
 - [ ] LTS baseline discussed and selected in the [Jenkins developers mailing list](https://groups.google.com/g/jenkinsci-dev).
 
-- [ ] Create or update release branch in [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins), e.g. `stable-2.387`, use the [init-lts-line](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/init-lts-line) script or carry out the equivalent steps therein.
+- [ ] Create or update release branch in [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins), e.g. `stable-2.387`, use the [init-lts-line](https://github.com/jenkins-infra/release/blob/master/tools/init-lts-line) script or carry out the equivalent steps therein.
 
 - [ ] Create or update release branch in [jenkins-infra/release](https://github.com/jenkins-infra/release), e.g. `stable-2.387`.
   - [ ] Modify the `RELEASE_GIT_BRANCH` and `JENKINS_VERSION` values in the environment file (`profile.d/stable`) to match the release.
@@ -37,13 +37,13 @@ This role should rotate between LTS releases
 
 - [ ] Review Jira and GitHub pull requests for additional LTS candidates, adding the `lts-candidate` label, and ensure that all tickets are resolved in Jira.
 
-- [ ] Backporting announcement email - [generate-backporting-announcement script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/generate-backporting-announcement).
+- [ ] Backporting announcement email - [generate-backporting-announcement script](https://github.com/jenkins-infra/release/blob/master/tools/generate-backporting-announcement).
 
 - [ ] Update Jira labels for [lts-candidate issues](https://issues.jenkins.io/issues/?filter=12146), either add `2.387.2-fixed` and remove `lts-candidate` or add `2.387.2-rejected`, and retain `lts-candidate`.
 
-- [ ] Backport changes, run the [list-issue-commits script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/list-issue-commits) to locate commits via Jira ID, some manual work is required to locate them if the issue ID wasn't present at merge time, backport with `git cherry-pick -x $commit`.
+- [ ] Backport changes, run the [list-issue-commits script](https://github.com/jenkins-infra/release/blob/master/tools/list-issue-commits) to locate commits via Jira ID, some manual work is required to locate them if the issue ID wasn't present at merge time, backport with `git cherry-pick -x $commit`.
 
-- [ ] Open backporting PR with `into-lts` label and summary of changes in description from [lts-candidate-stats script](https://github.com/jenkins-infra/backend-commit-history-parser/blob/master/bin/lts-candidate-stats) and:
+- [ ] Open backporting PR with `into-lts` label and summary of changes in description from [lts-candidate-stats script](https://github.com/jenkins-infra/release/blob/master/tools/lts-candidate-stats) and:
   - [ ] the selected [Jira lts-candidates](https://issues.jenkins-ci.org/issues/?filter=12146).
   - [ ] possible LTS candidates in the [release](https://github.com/jenkins-infra/release/issues?q=is%3Aclosed+label%3Alts-candidate+) repository.
   - [ ] possible LTS candidates in the [packaging](https://github.com/jenkinsci/packaging/issues?q=is%3Aclosed+label%3Alts-candidate) repository.

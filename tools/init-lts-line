@@ -1,0 +1,45 @@
+#!/bin/bash
+set -euo pipefail
+trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
+
+if [ $# -ne 1 ]; then
+  echo "Usage: $1 <baseline_version>" >&2
+  exit 1
+fi
+
+baseline=$1
+
+# Make tagged commit part of the release branch
+branch_name="stable-${baseline}"
+# Use first child of release commit as branch point (`[maven-release-plugin] prepare for next development iteration`)
+git checkout -b $branch_name $(git log --reverse --ancestry-path --pretty=%H jenkins-${baseline}..master | head -1)
+
+# Update versions
+mvn -q versions:set-property -Dproperty=revision -DnewVersion=${baseline}.1
+
+echo -Plts-release >> .mvn/maven.config
+
+echo "$branch_name" > packaging-ref.txt
+
+git add pom.xml .mvn/maven.config packaging-ref.txt
+git commit -m "Towards ${baseline}.1"
+
+# Create dedicated packaging branch
+packaging="$(mktemp -d /tmp/jenkins-lts-rc-packaging-XXXXXXXX)"
+trap "rm -rf '$packaging'" EXIT
+git clone git@github.com:jenkinsci/packaging.git "$packaging"
+pushd "$packaging"
+git checkout -b "$branch_name" master
+git push -u origin "$branch_name"
+popd
+
+remote_name="$(git remote -v | awk '$2 == "git@github.com:jenkinsci/jenkins.git" && $3 == "(push)" {print $1}')"
+cat <<EOF
+
+Remember to:
+    Push the branch
+        $ git push --set-upstream ${remote_name} ${branch_name}
+    Push the backporting announcement
+        $ generate-backporting-announcement ${baseline}.1
+    Populate community calendar
+EOF
