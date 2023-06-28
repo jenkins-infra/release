@@ -92,7 +92,7 @@ Remember to exchange the LTS version, release date and Jira URLs.
 
 - [ ] Create pull request to update the `lts` Maven profile in [ATH](https://github.com/jenkinsci/acceptance-test-harness) to the newly released version
 
-- [ ] Run trusted.ci.jenkins.io [Docker image creation job](https://trusted.ci.jenkins.io:1443/job/Containers/job/Core%20Release%20Containers/job/master/).
+- [ ] Create a tag matching the LTS release you create in the [docker](https://github.com/jenkinsci/docker/) repository and publish a GitHub release.
 
 - [ ] Confirm that the images are available at [Docker hub](https://hub.docker.com/r/jenkins/jenkins/tags).
 
