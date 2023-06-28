@@ -279,7 +279,7 @@ Adjust state and `Released As` of [Jira issues](https://issues.jenkins.io/) fixe
 💡 **Access to the network containing trusted.ci.jenkins.io could help in case of error but is not mandatory** 💡 
 
 Create a new tag in the [jenkinsci/docker repository](https://github.com/jenkinsci/docker) with the value of the released core version:
-- `git tag -am "2.VVV.V" 2.VVV.V`
+- `git tag --annotate --message="2.VVV.V" 2.VVV.V`
 - `git push upstream 2.VVV.V`
 
 Publish a release on GitHub associated with the tag pushed.
