@@ -230,9 +230,9 @@ Create a pre-release on GitHub for the `stable-2.VVV` branch based on [this](htt
 
 **Note**: If you do not have write access on the repository, ask a release team member to create the pre-release for you.
 
-### Send an announcement email
+### Confirm the automatic RC announcement has been sent
 
-Send an announcement email to the jenkinsci-devforum mailing list. Use [this](https://groups.google.com/g/jenkinsci-dev/c/ox6SCyOQLuE/m/C-dsLZ4vBwAJ) example.
+The [jenkinsci-dev](https://groups.google.com/g/jenkinsci-dev) mailing list and the [community forums](https://community.jenkins.io/c/blog/23) have received an automatic announcement about the RC, once the pre-release has been created on GitHub.
 
 ### Check for security updates
 
