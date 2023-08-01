@@ -7,7 +7,7 @@ metadata:
 spec:
   containers:
     - name: jnlp
-      image: jenkinsciinfra/packaging:2.1.112
+      image: jenkinsciinfra/packaging:2.1.114
       imagePullPolicy: "IfNotPresent"
       env:
         - name: "HOME"
