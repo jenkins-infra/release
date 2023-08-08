@@ -73,7 +73,7 @@ Remember to exchange the LTS version, release date and Jira URLs.
 
 - [ ] Publish changelog (one day prior to the release in case of a security update).
 
-- [ ] Announce the start of the LTS release process in the [#jenkins-release:matrix.org](https://matrix.to/#/#jenkins-release:matrix.org) and [#jenkins-infra](https://matrix.to/#/#jenkins-infra:libera.chat) IRC channels
+- [ ] Announce the start of the LTS release process in the [#jenkins-release:matrix.org](https://matrix.to/#/#jenkins-release:matrix.org) channel.
 - [ ] Run job on [release.ci.jenkins.io](https://release.ci.jenkins.io/job/core/job/stable/job/release/) if no security release for Jenkins is planned.
 
 - [ ] Check [LTS changelog](https://www.jenkins.io/changelog-stable/) is visible on the downloads site.
