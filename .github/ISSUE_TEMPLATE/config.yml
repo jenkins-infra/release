@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
   - name: "💬 Chat"
-    url: https://matrix.to/#/#jenkins-release:libera.chat
-    about: Please ask and answer questions on Matrix (#jenkins-release).
+    url: https://matrix.to/#/#jenkins-release:matrix.org
+    about: Please ask and answer questions on Matrix (#jenkins-release:matrix.org).
