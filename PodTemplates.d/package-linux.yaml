@@ -12,6 +12,10 @@ spec:
       env:
         - name: "HOME"
           value: "/home/jenkins/agent/workspace"
+        - name: "JENKINS_JAVA_BIN"
+          value: "/opt/jdk-17/bin/java"
+        - name: "JENKINS_JAVA_OPTS"
+          value: "-XX:+PrintCommandLineFlags"
       resources:
         limits:
           memory: "1Gi"
