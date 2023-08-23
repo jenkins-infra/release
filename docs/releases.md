@@ -6,7 +6,7 @@ This guide does not aim to be a technical paper, how the release process works i
 
 This document covers the whole release process for initial LTS releases. Point releases (.2, .3) do not require the full process and are indicated to be striked through on the checklist.
 
-Bear in mind, as future release lead, you do not need to work through the release checklist all by yourself. Prior release leads and release team member are there to help you out, just ask for assistence in the [#jenkins-release](https://matrix.to/#/#jenkins-release:libera.chat) chat.
+Bear in mind, as future release lead, you do not need to work through the release checklist all by yourself. Prior release leads and release team member are there to help you out, just ask for assistence in the [#jenkins-release:matrix.org](https://matrix.to/#/#jenkins-release:matrix.org) chat.
 
 ## Table of contents
 * [Glossary](#glossary)
