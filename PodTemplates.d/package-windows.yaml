@@ -8,7 +8,7 @@ metadata:
     jenkins/default-release-jenkins-agent: true
 spec:
   containers:
-  - image: "jenkins/inbound-agent:4.13-2-jdk17-nanoserver-1809"
+  - image: "jenkins/inbound-agent:3142.vcfca_0cd92128-1-jdk17-nanoserver-1809"
     imagePullPolicy: "Always"
     env:
       - name: "JENKINS_JAVA_BIN"
