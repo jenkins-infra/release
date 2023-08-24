@@ -11,6 +11,11 @@ spec:
   - image: "jenkins/inbound-agent:3142.vcfca_0cd92128-1-jdk17-nanoserver-1809"
     imagePullPolicy: "IfNotPresent"
     name: "jnlp"
+    env:
+      - name: "JENKINS_JAVA_BIN"
+        value: "C:/openjdk-17/bin/java"
+      - name: "JENKINS_JAVA_OPTS"
+        value: '"-XX:+PrintCommandLineFlags" --show-version'
     resources:
       limits:
         memory: "4Gi"
