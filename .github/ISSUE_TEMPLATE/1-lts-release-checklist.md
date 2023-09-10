@@ -49,9 +49,10 @@ Remember to exchange the LTS version, release date and Jira URLs.
   - [ ] possible LTS candidates in the [release](https://github.com/jenkins-infra/release/issues?q=is%3Aclosed+label%3Alts-candidate+) repository.
   - [ ] possible LTS candidates in the [packaging](https://github.com/jenkinsci/packaging/issues?q=is%3Aclosed+label%3Alts-candidate) repository.
 
-- [ ] Review ATH and bom integration tests results.
+- [ ] Open a pull request towards the [acceptance test harness](https://github.com/jenkinsci/acceptance-test-harness) and [plugin compatibility test](https://github.com/jenkinsci/bom) to confirm the incremental produced by the backporting PR doesn't contain regressions.  
+The [documentation](https://github.com/jenkins-infra/release/blob/master/docs/releases.md#review-tests) explains which profiles you have to modify in your PR.
 
-- [ ] Update the dependabot branch target in [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins/blob/bacb1c8d2899d161a0995d69ab5c932ca4d3ab30/.github/dependabot.yml#L56) to the new stable branch.
+- [ ] Update the dependabot branch target in [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins/blob/bacb1c8d2899d161a0995d69ab5c932ca4d3ab30/.github/dependabot.yml#L56) to the new stable branch (strike this out for new point release).
 
 - [ ] Prepare [LTS changelog](https://www.jenkins.io/changelog-stable/) based on the [style guide](https://github.com/jenkins-infra/jenkins.io/blob/master/content/_data/changelogs/_STYLEGUIDE.adoc) using the [changelog generator](https://github.com/jenkinsci/core-changelog-generator/blob/master/README.md) - This is normally done by the docs team, ask in [gitter](https://app.gitter.im/#/room/#jenkins/docs:matrix.org).
 

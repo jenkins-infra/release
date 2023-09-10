@@ -28,7 +28,6 @@ Bear in mind, as future release lead, you do not need to work through the releas
 * [Release Candidate Creation](#release-candidate-creation)
   * [⚠️ Merge the backporting PR](#merge-the-backporting-pr)
   * [⚠️ Publish a pre-release](#publish-a-pre-release)
-  * [Announce the release candidate](#send-an-announcement-email)
   * [Check for security updates](#check-for-security-updates)
 * [LTS Release](#lts-release)
   * [Announce the start](#announce-the-start-of-the-lts-process)
@@ -194,11 +193,18 @@ Visit the checklist for more information.
 Additionally, take a look at the [release](https://github.com/jenkins-infra/release/issues?q=is%3Aclosed+label%3Alts-candidate+) and [packaging](https://github.com/jenkinsci/packaging/issues?q=is%3Aclosed+label%3Alts-candidate) repository, for additional LTS candidates.
 
 ### Review tests
-1. Review acceptance tests. Take a look at the checks of your backporting PR from step 10, and make sure, that `Tests / ath / Running ATH / ATH` are green:  
-![acceptance test screenshot](images/jenkins-ath.png)  
-The amount of tests may vary.
-2. Review BOM tests. Make sure, that all tests from your BOM PR are green.
-3. Review JCasC tests. Make sure, that all tests from your JCasC PR are green.
+The following tests need to be reviewed and confirmed to be passing:
+1. **Acceptance tests**: Open a pull request modifying the `jenkins.version` of the `lts` profile in the [acceptance test harness](https://github.com/jenkinsci/acceptance-test-harness/blob/ae19d1e9962f0b162cb3ef9033b24e9629d222c4/pom.xml#L778) suite, to the incremental produced by the backporting pull request in `jenkinsci/jenkins`.
+2. **Plugin compatibility**: Open a pull request modifying the `jenkins.version` in the newest [bom profile](https://github.com/jenkinsci/bom/blob/ce598171d115bfc9dc4d15e6f6c2bbb06e6fe7ed/sample-plugin/pom.xml#L889), to the incremental produced by the backporting pull request in `jenkinsci/jenkins`.  
+Additionally, you need to add a dummy file, to run the full test suite, if you lack triage permissions on the repository to add the corresponding label. To do so, run the following command:
+```sh
+echo 'TODO delete me' > full-test
+git add full-test
+git commit -m 'Run full tests'
+git push
+```
+
+Only if both pull requests are green, the backporting pull request can be merged.
 
 ### Update dependabot stable branch in core
 
