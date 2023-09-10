@@ -195,7 +195,14 @@ Additionally, take a look at the [release](https://github.com/jenkins-infra/rele
 ### Review tests
 The following tests need to be reviewed and confirmed to be passing:
 1. **Acceptance tests**: Open a pull request modifying the `jenkins.version` of the `lts` profile in the [acceptance test harness](https://github.com/jenkinsci/acceptance-test-harness/blob/ae19d1e9962f0b162cb3ef9033b24e9629d222c4/pom.xml#L778) suite, to the incremental produced by the backporting pull request in `jenkinsci/jenkins`.
-2. **Plugin compatibility**: Open a pull request modifying the `jenkins.version` in the newest [bom profile](https://github.com/jenkinsci/bom/blob/ce598171d115bfc9dc4d15e6f6c2bbb06e6fe7ed/sample-plugin/pom.xml#L889), to the incremental produced by the backporting pull request in `jenkinsci/jenkins`.
+2. **Plugin compatibility**: Open a pull request modifying the `jenkins.version` in the newest [bom profile](https://github.com/jenkinsci/bom/blob/ce598171d115bfc9dc4d15e6f6c2bbb06e6fe7ed/sample-plugin/pom.xml#L889), to the incremental produced by the backporting pull request in `jenkinsci/jenkins`.  
+Additionally, you need to add a dummy file, to run the full test suite, if you lack triage permissions on the repository to add the corresponding label. To do so, run the following command:
+```sh
+echo 'TODO delete me' > full-test
+git add full-test
+git commit -m 'Run full tests'
+git push
+```
 
 Only if both pull requests are green, the backporting pull request can be merged.
 
