@@ -49,7 +49,8 @@ Remember to exchange the LTS version, release date and Jira URLs.
   - [ ] possible LTS candidates in the [release](https://github.com/jenkins-infra/release/issues?q=is%3Aclosed+label%3Alts-candidate+) repository.
   - [ ] possible LTS candidates in the [packaging](https://github.com/jenkinsci/packaging/issues?q=is%3Aclosed+label%3Alts-candidate) repository.
 
-- [ ] Review ATH and bom integration tests results.
+- [ ] Open a pull request towards the [acceptance test harness](https://github.com/jenkinsci/acceptance-test-harness) and [plugin compatibility test](https://github.com/jenkinsci/bom) to confirm the incremental produced by the backporting PR doesn't contain regressions.  
+The [documentation](https://github.com/jenkins-infra/release/blob/master/docs/releases.md#review-tests) explains which profiles you have to modify in your PR.
 
 - [ ] Update the dependabot branch target in [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins/blob/bacb1c8d2899d161a0995d69ab5c932ca4d3ab30/.github/dependabot.yml#L56) to the new stable branch.
 
