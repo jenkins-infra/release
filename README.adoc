@@ -398,14 +398,6 @@ To do that, follow these steps:
 .. `GIT_STAGING_REPOSITORY_PROMOTION_ENABLED` set to false (manually merged by security team)
 .. `VALIDATION_ENABLED` set to true
 
-[NOTE]
-====
-You can re-trigger individually the two downstream jobs, release, and packaging.
-
-- Re-triggering the release will do a version bump then push new artifacts.
-- Re-triggering the packaging job won't publish artifacts if they already exist but it will update website html.
-====
-
 == Certificate
 
 The Jenkins project uses a Digicert account provided by CDF to request code signing certificate.
