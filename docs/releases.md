@@ -227,7 +227,7 @@ Merge the backporting PR from the prior step into the `stable-2.VVV` branch. Do 
 If the build passes, obtain the "Incrementals" URL from the "Checks" tab of the stable branch:  
 ![incrementals screenshot](images/incrementals.png)  
 Select `Details` -> `jenkins-war` and obtain the `jenkins-war-2.VVV-rcXXXXX.CCCCCCCCCCCCC.war`
-URL. `C` is the commit hash of the merge commit and acts as placeholder.
+URL. `V` is the LTS version. `X` is the numeric part of the name and is the name of the incremental version. And, `C` is the commit hash of the merge commit and acts as placeholder.
 
 ### Publish a pre-release
 ⚠️ **Requires write access to the repository** ⚠️
