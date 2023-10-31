@@ -1,5 +1,5 @@
 #!/usr/bin/env groovy
-import groovy.xml.XmlSlurper;
+import groovy.xml.*;
 
 class Script {
 
