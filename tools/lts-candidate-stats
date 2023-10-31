@@ -1,5 +1,9 @@
 #!/usr/bin/env groovy
-import groovy.xml.XmlSlurper;
+
+// Intentional wildcard import to allow the script to run on Ubuntu 22.04 groovy and Red Hat 8.8 groovy.
+// https://github.com/jenkins-infra/release/pull/468
+// https://stackoverflow.com/questions/55169114/unable-to-add-xmlslurper-to-eclipse-groovy-project
+import groovy.xml.*;
 
 class Script {
 
