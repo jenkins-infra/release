@@ -383,12 +383,15 @@ function promoteStagingGitRepository() {
 }
 
 function pushCommits() {
-	: "${RELEASE_SCM_TAG:?RELEASE_SCM_TAG not definded}"
+	: "${RELEASE_SCM_TAG:?RELEASE_SCM_TAG not defined}"
 
 	# Ensure we use ssh credentials
 	git config --get remote.origin.url
 	sed -i 's#url = https://github.com/#url = git@github.com:#' .git/config
-	git pull
+	if [[ "${RELEASE_PROFILE" = "weekly" ]]; then
+		git fetch origin
+	fi
+        git merge --no-edit "origin/${RELEASE_GIT_BRANCH}"
 	git push origin "HEAD:${RELEASE_GIT_BRANCH}" "${RELEASE_SCM_TAG}"
 }
 
