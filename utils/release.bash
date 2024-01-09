@@ -388,7 +388,7 @@ function pushCommits() {
 	# Ensure we use ssh credentials
 	git config --get remote.origin.url
 	sed -i 's#url = https://github.com/#url = git@github.com:#' .git/config
-	if [[ "${RELEASE_PROFILE" = "weekly" ]]; then
+	if [[ "${RELEASE_PROFILE}" = "weekly" ]]; then
 		git fetch origin
 	fi
         git merge --no-edit "origin/${RELEASE_GIT_BRANCH}"
