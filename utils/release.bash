@@ -391,7 +391,7 @@ function pushCommits() {
 	if [[ "${RELEASE_PROFILE}" = "weekly" ]]; then
 		git fetch origin
 	fi
-        git merge --no-edit "origin/${RELEASE_GIT_BRANCH}"
+	git merge --no-edit "origin/${RELEASE_GIT_BRANCH}"
 	git push origin "HEAD:${RELEASE_GIT_BRANCH}" "${RELEASE_SCM_TAG}"
 }
 
