@@ -3,7 +3,7 @@
 
 == Introduction
 
-This repository contains everything needed to release https://github.com/jenkinsci/jenkins[Jenkins core] or some Jenkins components libraries.
+This repository contains everything needed to release https://github.com/jenkinsci/jenkins[Jenkins core].
 
 This includes:
 
