@@ -395,11 +395,6 @@ function pushCommits() {
 	git push origin "HEAD:${RELEASE_GIT_BRANCH}" "${RELEASE_SCM_TAG}"
 }
 
-function rollback() {
-	mvn -B -V -ntp release:rollback
-	git push --delete origin "${RELEASE_SCM_TAG}"
-}
-
 function stageRelease() {
 	requireGPGPassphrase
 	requireKeystorePass
@@ -520,7 +515,6 @@ function main() {
 			--showPackagingPlan) echo "Show Packaging Plan" && showPackagingPlan ;;
 			--promoteStagingMavenArtifacts) echo "Promote Staging Maven Artifacts" && promoteStagingMavenArtifacts ;;
 			--promoteStagingGitRepository) echo "Promote Staging Git Repository" && promoteStagingGitRepository ;;
-			--rollback) echo "Rollback release ${RELEASE_SCM_TAG}" && rollback ;;
 			--stageRelease) echo "Stage Release" && stageRelease ;;
 			--packaging) echo 'Execute packaging makefile, quote required around Makefile target' && packaging "$2" ;;
 			--syncMirror) echo 'Trigger mirror synchronization' && syncMirror ;;
