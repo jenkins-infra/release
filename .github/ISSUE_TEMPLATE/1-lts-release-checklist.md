@@ -35,6 +35,8 @@ This role should rotate between LTS releases
 - [ ] Create a pull request to update [bom](https://github.com/jenkinsci/bom) to the weekly version that will be the base of the release line (and strike this out for new point release).
       Assure that the [bom-weekly version number](https://github.com/jenkinsci/bom/blob/master/sample-plugin/pom.xml#L17) is already testing the base of the release line or a version newer than the base of the release line.
 
+- [ ] Review [recent security advisories](https://www.jenkins.io/security/advisories/) for fixes in Jenkins weeklies after the LTS baseline, and ensure there are Jira issues for their backport.
+
 - [ ] Review Jira and GitHub pull requests for additional LTS candidates, adding the `lts-candidate` label, and ensure that all tickets are resolved in Jira.
 
 - [ ] Send a backporting announcement email to the [jenkinsci-dev](https://groups.google.com/g/jenkinsci-dev) mailing list, using the [default](https://groups.google.com/g/jenkinsci-dev/c/sZY2WXoWLWM) template.
@@ -69,6 +71,11 @@ The [documentation](https://github.com/jenkins-infra/release/blob/master/docs/re
 - [ ] Confirm the automatic announcement has been sent to the [jenkinsci-dev](https://groups.google.com/g/jenkinsci-dev) mailing list and [community forums](https://community.jenkins.io/c/blog/23).
 
 - [ ] Check with security team that no security update is planned.  If a security update is planned, revise the checklist after the public pre-announcement to the [jenkinsci-advisories mailing list](https://groups.google.com/g/jenkinsci-advisories).
+
+- [ ] For a new LTS baseline's ".1" release, if there were [recent security advisories](https://www.jenkins.io/security/advisories/) for fixes in Jenkins weeklies after the LTS baseline that had to be backported:
+  - [ ] Update those advisories to mention the new 2.xxx.1 LTS release as an additional fix version ([example](https://github.com/jenkins-infra/jenkins.io/pull/7036))
+  - [ ] Update [warnings metadata](https://github.com/jenkins-infra/update-center2/blob/master/resources/warnings.json) to exclude the ".1" release ([example](https://github.com/jenkins-infra/update-center2/pull/761))
+  - [ ] Inform the Jenkins security team about the need to update CVE metadata to exclude the new LTS line from affected version ranges.
 
 ## LTS release
 
