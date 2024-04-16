@@ -36,7 +36,10 @@ pipeline {
             }
           }
           steps {
-            bat 'java -v'
+            pwsh 'java -version'
+            container('dotnet') {
+                powershell 'msbuild -version'
+            }
           }
         }
       }
