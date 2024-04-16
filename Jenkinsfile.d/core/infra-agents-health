@@ -14,7 +14,9 @@ pipeline {
             }
           }
           steps {
-            sh "mvn -v"
+            sh 'mvn -v'
+            sh 'ls -la /srv/releases/jenkins'
+            sh 'ls -la /var/www/pkg.jenkins.io.staging/'
           }
         }
         stage('Test Linux Agent `release-linux`') {
@@ -24,7 +26,7 @@ pipeline {
             }
           }
           steps {
-            sh "mvn -v"
+            sh 'mvn -v'
           }
         }
         stage('Test Linux Agent `package-windows`') {
@@ -34,7 +36,7 @@ pipeline {
             }
           }
           steps {
-            bat "mvn -v"
+            bat 'mvn -v'
           }
         }
       }
