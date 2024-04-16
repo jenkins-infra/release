@@ -5,35 +5,37 @@ pipeline {
     disableConcurrentBuilds()
   }
   stages {
-    parallel {
-      stage('Test Linux Agent `package-linux`') {
-        agent {
-          kubernetes {
-            yamlFile 'PodTemplates.d/package-linux.yaml'
+    stage('Test Agents Health'){
+      parallel {
+        stage('Test Linux Agent `package-linux`') {
+          agent {
+            kubernetes {
+              yamlFile 'PodTemplates.d/package-linux.yaml'
+            }
+          }
+          steps {
+            sh "mvn -v"
           }
         }
-        steps {
-          sh "mvn -v"
-        }
-      }
-      stage('Test Linux Agent `release-linux`') {
-        agent {
-          kubernetes {
-            yamlFile 'PodTemplates.d/release-linux.yaml'
+        stage('Test Linux Agent `release-linux`') {
+          agent {
+            kubernetes {
+              yamlFile 'PodTemplates.d/release-linux.yaml'
+            }
+          }
+          steps {
+            sh "mvn -v"
           }
         }
-        steps {
-          sh "mvn -v"
-        }
-      }
-      stage('Test Linux Agent `package-windows`') {
-        agent {
-          kubernetes {
-            yamlFile 'PodTemplates.d/package-windows.yaml'
+        stage('Test Linux Agent `package-windows`') {
+          agent {
+            kubernetes {
+              yamlFile 'PodTemplates.d/package-windows.yaml'
+            }
           }
-        }
-        steps {
-          bat "mvn -v"
+          steps {
+            bat "mvn -v"
+          }
         }
       }
     }
