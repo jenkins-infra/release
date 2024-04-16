@@ -29,14 +29,14 @@ pipeline {
             sh 'mvn -v'
           }
         }
-        stage('Test Linux Agent `package-windows`') {
+        stage('Test Windows Agent `package-windows`') {
           agent {
             kubernetes {
               yamlFile 'PodTemplates.d/package-windows.yaml'
             }
           }
           steps {
-            bat 'mvn -v'
+            bat 'java -v'
           }
         }
       }
