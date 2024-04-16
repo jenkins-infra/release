@@ -1,0 +1,45 @@
+pipeline {
+  agent none
+
+  options {
+    disableConcurrentBuilds()
+  }
+  stages {
+    stage('Test Agents Health'){
+      parallel {
+        stage('Test Linux Agent `package-linux`') {
+          agent {
+            kubernetes {
+              yamlFile 'PodTemplates.d/package-linux.yaml'
+            }
+          }
+          steps {
+            sh 'mvn -v'
+            sh 'ls -la /srv/releases/jenkins'
+            sh 'ls -la /var/www/pkg.jenkins.io.staging/'
+          }
+        }
+        stage('Test Linux Agent `release-linux`') {
+          agent {
+            kubernetes {
+              yamlFile 'PodTemplates.d/release-linux.yaml'
+            }
+          }
+          steps {
+            sh 'mvn -v'
+          }
+        }
+        stage('Test Linux Agent `package-windows`') {
+          agent {
+            kubernetes {
+              yamlFile 'PodTemplates.d/package-windows.yaml'
+            }
+          }
+          steps {
+            bat 'mvn -v'
+          }
+        }
+      }
+    }
+  }
+}
