@@ -40,3 +40,21 @@ Remember to:
     Push the branch
         $ git push --set-upstream ${remote_name} ${branch_name}
 EOF
+
+# Modify release profiles
+release_repo="$(mktemp -d /tmp/jenkins-lts-rc-release-XXXXXXXX)"
+trap "rm -rf '$release_repo'" EXIT
+git clone git@github.com:jenkins-infra/release.git "$release_repo"
+pushd "$release_repo"
+git checkout -b "stable-${baseline}"
+
+sed -i "" "s/PACKAGING_GIT_BRANCH      = 'master'/PACKAGING_GIT_BRANCH      = 'stable-${baseline}'/g" Jenkinsfile.d/core/package
+
+sed -i "" "s/RELEASE_GIT_BRANCH=master/RELEASE_GIT_BRANCH=stable-${baseline}/g" profile.d/stable
+echo "JENKINS_VERSION=${baseline}.1" >> profile.d/stable
+
+git add Jenkinsfile.d/core/package profile.d/stable
+git commit -m "Initiate ${baseline}.1"
+git push origin "stable-${baseline}"
+rm -f Jenkinsfile.d/core/package.bak
+popd
