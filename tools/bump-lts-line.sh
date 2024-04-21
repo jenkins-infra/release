@@ -21,7 +21,7 @@ fi
 
 new_version="${version_parts[0]}.${version_parts[1]}.${version_parts[2]}"
 
-sed -i '' -e '$d' $file
+sed -i'' -e '$d' $file
 echo "JENKINS_VERSION=$new_version" >> $file
 git add $file
 git commit -m "Bump LTS version from $version to $new_version"
