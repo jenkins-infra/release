@@ -14,7 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup updatecli
-        uses: updatecli/updatecli-action@eb158f6fd9e425b940a6750d6318f98e050ac390 # v2.61.0
+        uses: updatecli/updatecli-action@8189f9f0e590d265fee517279fa4416eea5459ca # v2.62.0
       - name: Diff
         run: updatecli diff --config ./updatecli/updatecli.d --values ./updatecli/values.github-action.yaml
         env:
