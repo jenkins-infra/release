@@ -49,7 +49,7 @@ function configureGPG() {
 			fi
 			if ! grep -E '^pinentry-mode loopback' "${HOME}/.gnupg/gpg.conf"; then
 				if grep -E '^pinentry-mode' "${HOME}/.gnupg/gpg.conf"; then
-					sed -i '/^pinentry-mode/d' "${HOME}/.gnupg/gpg.conf"
+					sed -i'' '/^pinentry-mode/d' "${HOME}/.gnupg/gpg.conf"
 				fi
 				## --pinenty-mode is needed to avoid gpg prompt during maven release
 				echo 'pinentry-mode loopback' >>"${HOME}/.gnupg/gpg.conf"
