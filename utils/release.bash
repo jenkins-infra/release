@@ -118,10 +118,12 @@ function downloadAzureKeyvaultSecret() {
 		--file "${SIGN_CERTIFICATE}"
 }
 
-# JENKINS_VERSION: Define which version will be package where:
+# JENKINS_VERSION: Define which version will be packaged where:
 # * \'latest\' means the latest version available
-# * <version> represents any valid existing version like 2.176.3 available at JENKINS_DOWNLOAD_URL
+# * <version> represents any valid existing version like 2.440.3 available at JENKINS_DOWNLOAD_URL
 # JENKINS_DOWNLOAD_URL: Specify the endpoint to use for downloading jenkins.war
+# MAVEN_REPOSITORY_USERNAME: optional username for repository access
+# MAVEN_REPOSITORY_PASSWORD: optional password for repository access
 function downloadJenkinsWar() {
 	jv download
 }
