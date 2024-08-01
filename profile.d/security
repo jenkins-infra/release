@@ -26,3 +26,9 @@ RELEASE_GIT_PRODUCTION_BRANCH=master
 #         as retrieved from ./utils/getJenkinsVersion.py
 
 MAVEN_REPOSITORY_PRODUCTION_NAME=releases
+
+# Most settings above are unused
+RELEASE_GIT_BRANCH=security-stable-2.452
+MAVEN_REPOSITORY_NAME=cabum
+JENKINS_VERSION=2.452.4
+RELEASELINE=-stable
