@@ -68,7 +68,7 @@ The [documentation](https://github.com/jenkins-infra/release/blob/master/docs/re
 
 - [ ] Publish a pre-release [Github release](https://github.com/jenkinsci/jenkins/releases), e.g. [sample](https://github.com/jenkinsci/jenkins/releases/tag/jenkins-2.387.1-rc) currently we don't have a changelog for RCs.
 
-- [ ] Confirm the automatic announcement has been sent to the [jenkinsci-dev](https://groups.google.com/g/jenkinsci-dev) mailing list and [community forums](https://community.jenkins.io/c/blog/23).
+- [ ] Confirm the automatic announcement has been sent to the [jenkinsci-dev](https://groups.google.com/g/jenkinsci-dev) mailing list and [community forums](https://community.jenkins.io/c/blog/23). If the automatic announcement is not sent, compose and send the announcement yourself.
 
 - [ ] Check with security team that no security update is planned.  If a security update is planned, revise the checklist after the public pre-announcement to the [jenkinsci-advisories mailing list](https://groups.google.com/g/jenkinsci-advisories).
 
