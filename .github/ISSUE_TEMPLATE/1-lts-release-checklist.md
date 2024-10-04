@@ -22,6 +22,8 @@ This role should rotate between LTS releases
 ## Prep work
 
 - [ ] LTS baseline discussed and selected in the [Jenkins developers mailing list](https://groups.google.com/g/jenkinsci-dev).
+    If the last release of the preceding LTS line is a security release, consider making the matching weekly release the [new LTS baseline](https://groups.google.com/g/jenkinsci-dev/c/ca7Lp0x6Kqs/m/QwHj66hZAgAJ).
+    For example, 2.462.3 LTS and 2.479 were security releases and it is simpler to use 2.479 as baseline than 2.477.
 
 - [ ] Create or update release branch in [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins), e.g. `stable-2.387`, use the [init-lts-line](https://github.com/jenkins-infra/release/blob/master/tools/init-lts-line) script or carry out the equivalent steps therein.
 
