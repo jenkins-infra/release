@@ -54,8 +54,8 @@ This document uses the following generic terms, which may need a clarification:
 - bash 5.2 or newer
   - groovy 2.x or newer available in your local packages
   - xdg-utils in your local packages (to be removed in the future, not available on homebrew/macOS)
-- maven 3.6.3 or newer
-- openjdk 11 or 17
+- maven 3.9.6 or newer
+- openjdk 17 or 21
 
 ## Knowledge Prerequisites:
 - Novice knowledge about GitHub, how to create branches, pull requests and releases.
@@ -108,7 +108,8 @@ You'll need to update several files, see to the LTS checklist.
 
 ### Update the bill of materials (BOM)
 
-Create a PR updating the [BOM](https://github.com/jenkinsci/bom) to the weekly release, the LTS release is based upon.
+Create a pull request updating the [BOM](https://github.com/jenkinsci/bom) to the weekly release, the LTS release is based upon.
+Refer to [previous pull requests](https://github.com/jenkinsci/bom/pulls?q=is%3Apr+is%3Aclosed+Add+release+line+remove) for additional changes that are required.
 
 1. Modify the newest `bom-2.VVV.x/pom.xml` to declare the LTS line you are initiating.  
 This is done by replacing `<artifactId>bom-weekly</artifactId>` in the `<dependencyManagement>` block to `<artifactId>bom-2.VVV.x</artifactId>`.  
