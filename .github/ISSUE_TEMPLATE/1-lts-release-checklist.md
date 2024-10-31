@@ -85,6 +85,7 @@ The [documentation](https://github.com/jenkins-infra/release/blob/master/docs/re
 
 - [ ] Announce the start of the LTS release process in the [#jenkins-release:matrix.org](https://matrix.to/#/#jenkins-release:matrix.org) channel.
 - [ ] Run job on [release.ci.jenkins.io](https://release.ci.jenkins.io/job/core/job/stable/job/release/) if no security release for Jenkins is planned.
+  - [ ] If this is the first release of a new LTS line, the packaging job will fail on its first run.  Either run the packaging job once and cancel it before the primary release job is run or accept that the packaging job on the first release of a new LTS line will need to be run a second time after it fails the initial run.
 
 - [ ] Check [LTS changelog](https://www.jenkins.io/changelog-stable/) is visible on the downloads site.
 
