@@ -13,20 +13,7 @@ pipeline {
   stages {
     stage("Release"){
       steps {
-        build job: "core/release/${ BRANCH_NAME }", parameters: [
-          booleanParam(name: "VALIDATION_ENABLED", value: false),
-          string(name: "RELEASE_PROFILE", value: "weekly")
-        ]
-      }
-    }
-
-    stage("Package"){
-      steps {
-        build job: "core/package/${ BRANCH_NAME }", parameters: [
-          booleanParam(name: "VALIDATION_ENABLED", value: false),
-          string(name: "RELEASE_PROFILE", value: "weekly"),
-          string(name: "JENKINS_VERSION", value: "latest")
-        ]
+        echo "Release build is disabled for end of year break"
       }
     }
   }
