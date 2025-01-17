@@ -26,7 +26,7 @@ git commit -m "Towards ${baseline}.1"
 
 # Create dedicated packaging branch
 packaging="$(mktemp -d /tmp/jenkins-lts-rc-packaging-XXXXXXXX)"
-# trap "rm -rf '$packaging'" EXIT
+trap "rm -rf '$packaging'" EXIT
 git clone git@github.com:jenkinsci/packaging.git "$packaging"
 pushd "$packaging"
 git checkout -b "$branch_name" master
