@@ -92,7 +92,7 @@ The [documentation](https://github.com/jenkins-infra/release/blob/master/docs/re
 
 - [ ] Publish [GitHub release](https://github.com/jenkinsci/jenkins/releases) pointing to LTS changelog, [sample](https://github.com/jenkinsci/jenkins/releases/tag/jenkins-2.387.1).
 
-- [ ] Confirm that all Packages are available on the Datadog page.
+- [ ] Confirm that all Packages are available on the [Datadog page](https://p.datadoghq.com/sb/0Igb9a-e6849e5e019250ef5aaea3589297fe8b).
 
 - [ ] Confirm the [Debian installer acceptance test](https://ci.jenkins.io/job/Infra/job/acceptance-tests/job/install-lts-debian-package/) is passing.
   For good measures, check the console log to confirm that the correct release package was used (e.g. search for `2.387`. If not, launch tests again).
