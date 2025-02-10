@@ -56,8 +56,6 @@ Remember to exchange the LTS version, release date and Jira URLs.
 - [ ] Open a pull request towards the [acceptance test harness](https://github.com/jenkinsci/acceptance-test-harness) and [plugin compatibility test](https://github.com/jenkinsci/bom) to confirm the incremental produced by the backporting PR doesn't contain regressions.
 The [documentation](https://github.com/jenkins-infra/release/blob/master/docs/releases.md#review-tests) explains which profiles you have to modify in your PR.
 
-- [ ] Update the dependabot branch target in [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins/blob/bacb1c8d2899d161a0995d69ab5c932ca4d3ab30/.github/dependabot.yml#L56) to the new stable branch (strike this out for new point release).
-
 - [ ] Prepare [LTS changelog](https://www.jenkins.io/changelog-stable/) based on the [style guide](https://github.com/jenkins-infra/jenkins.io/blob/master/content/_data/changelogs/_STYLEGUIDE.adoc) using the [changelog generator](https://github.com/jenkinsci/core-changelog-generator/blob/master/README.md) - This is normally done by the docs team, ask in [gitter](https://app.gitter.im/#/room/#jenkins/docs:matrix.org).
 
 - [ ] Prepare [LTS upgrade guide](https://www.jenkins.io/doc/upgrade-guide/) based on [previous upgrade guides](https://github.com/jenkins-infra/jenkins.io/tree/master/content/_data/upgrades)  - This is normally done by the docs team, ask in [gitter](https://app.gitter.im/#/room/#jenkins/docs:matrix.org).
@@ -84,20 +82,23 @@ The [documentation](https://github.com/jenkins-infra/release/blob/master/docs/re
 - [ ] Publish changelog (one day prior to the release in case of a security update).
 
 - [ ] Announce the start of the LTS release process in the [#jenkins-release:matrix.org](https://matrix.to/#/#jenkins-release:matrix.org) channel.
-- [ ] Run job on [release.ci.jenkins.io](https://release.ci.jenkins.io/job/core/job/stable/job/release/) if no security release for Jenkins is planned.
+- [ ] Launch job on [release.ci.jenkins.io](https://release.ci.jenkins.io/job/core/job/stable/job/release/) if no security release for Jenkins is planned.
+  - [ ] Manually review and approve the child release job after carefully checking the "Plan" stage (you can compare with previous stable line).
   - [ ] If this is the first release of a new LTS line, the packaging job will fail on its first run.  Either run the packaging job once and cancel it before the primary release job is run or accept that the packaging job on the first release of a new LTS line will need to be run a second time after it fails the initial run.
+  - [ ] ~3 to 4 hours after the beginning of release job, manually review and approve the child packaging job.
+- [ ] Wait for successful job completion (release: ~3 to 4 hours, packaging ~30 minutes).
 
 - [ ] Check [LTS changelog](https://www.jenkins.io/changelog-stable/) is visible on the downloads site.
 
 - [ ] Publish [GitHub release](https://github.com/jenkinsci/jenkins/releases) pointing to LTS changelog, [sample](https://github.com/jenkinsci/jenkins/releases/tag/jenkins-2.387.1).
 
-- [ ] Confirm [Datadog checks](https://p.datadoghq.com/sb/0Igb9a-e6849e5e019250ef5aaea3589297fe8b) are passing.
+- [ ] Confirm that all Packages are available on the [Datadog page](https://p.datadoghq.com/sb/0Igb9a-e6849e5e019250ef5aaea3589297fe8b).
 
 - [ ] Confirm the [Debian installer acceptance test](https://ci.jenkins.io/job/Infra/job/acceptance-tests/job/install-lts-debian-package/) is passing.
-  For good measures, check the console log to confirm that the correct release package was used (e.g. search for `2.387`).
+  For good measures, check the console log to confirm that the correct release package was used (e.g. search for `2.387`. If not, launch tests again).
 
 - [ ] Confirm the [Red Hat installer acceptance test](https://ci.jenkins.io/job/Infra/job/acceptance-tests/job/install-lts-redhat-rpm/) is passing.
-  For good measures, check the console log to confirm that the correct release package was used (e.g. search for `2.387`).
+  For good measures, check the console log to confirm that the correct release package was used (e.g. search for `2.387`. If not, launch tests again).
 
 - [ ] Adjust state and `Released As` of [Jira issues](https://issues.jenkins.io/) fixed in the release (see the [changelog](https://www.jenkins.io/changelog-stable) for issue links).
 
