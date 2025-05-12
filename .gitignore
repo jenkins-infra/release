@@ -1,3 +1,4 @@
 .vscode/
 sandbox.env
 .idea
+.DS_Store
