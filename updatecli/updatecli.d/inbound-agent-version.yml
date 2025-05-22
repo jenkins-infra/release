@@ -21,7 +21,17 @@ sources:
       # Match the format used by jenkins/inbound-agent tags
       tagfilter: ^\d+\.v[a-f0-9_]+-\d+-jdk21-nanoserver-1809$
 
-# Not needed, right?
+  jenkins/inbound-agent-full:
+    name: '[jenkins/inbound-agent] Full image reference with prefix'
+    kind: dockerimage
+    spec:
+      image: "jenkins/inbound-agent"
+      # Match the format used by jenkins/inbound-agent tags
+      tagfilter: ^\d+\.v[a-f0-9_]+-\d+-jdk21-nanoserver-1809$
+    transformers:
+      - addprefix: "jenkins/inbound-agent"
+      - quote: true
+
 conditions:
   testDockerImagePublished:
     name: "Has the Docker image jenkins/inbound-agent (with the last discovered tag) been published?"
@@ -37,8 +47,8 @@ targets:
     spec:
       file: PodTemplates.d/package-windows.yaml
       key: "$.spec.containers[0].image"
-      valueQuoted: 'jenkins/inbound-agent:{{ source "jenkins/inbound-agent" }}'
-    sourceid: jenkins/inbound-agent
+      value: '{{ source "jenkins/inbound-agent-full" }}'
+    sourceid: jenkins/inbound-agent-full
     conditions:
       - testDockerImagePublished
 
