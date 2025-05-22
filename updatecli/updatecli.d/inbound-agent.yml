@@ -30,7 +30,6 @@ sources:
       tagfilter: ^\d+\.v[a-f0-9_]+-\d+-jdk21-nanoserver-1809$
     transformers:
       - addprefix: "jenkins/inbound-agent:"
-      - quote: true
 
 conditions:
   testDockerImagePublished:
