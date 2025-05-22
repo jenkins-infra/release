@@ -24,22 +24,22 @@ sources:
         kind: regex
         pattern: '.*'
 
+# Not needed, right?
 conditions:
   testDockerImagePublished:
-    name: "Does the Docker image jenkins/inbound-agent with the last discovered tag is published?"
+    name: "Has the Docker image jenkins/inbound-agent (with the last discovered tag) been published?"
     kind: dockerimage
     sourceid: jenkins/inbound-agent
     spec:
       image: "jenkins/inbound-agent"
-      ## tag come from the input source
 
 targets:
   updateInboundAgentVersion:
-    name: Update inbound agent version in package-windows.yaml
+    name: Update jenkins/inbound agent version in package-windows.yaml
     kind: yaml
     spec:
       file: PodTemplates.d/package-windows.yaml
-      key: "$.spec.containers[0].image" # Adjust this path to match the actual YAML structure
+      key: "$.spec.containers[0].image"
       value: 'jenkins/inbound-agent:{{ source "jenkins/inbound-agent" }}'
     sourceid: jenkins/inbound-agent
     conditions:
