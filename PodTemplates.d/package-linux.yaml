@@ -7,13 +7,13 @@ metadata:
 spec:
   containers:
     - name: jnlp
-      image: jenkinsciinfra/packaging:6.0.54
+      image: jenkinsciinfra/packaging:7.0.1
       imagePullPolicy: "IfNotPresent"
       env:
         - name: "HOME"
           value: "/home/jenkins/agent/workspace"
         - name: "JENKINS_JAVA_BIN"
-          value: "/opt/jdk-17/bin/java"
+          value: "/opt/jdk-21/bin/java"
         - name: "JENKINS_JAVA_OPTS"
           value: "-XX:+PrintCommandLineFlags"
       resources:
