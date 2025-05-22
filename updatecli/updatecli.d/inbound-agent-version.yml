@@ -43,7 +43,7 @@ targets:
       value: 'jenkins/inbound-agent:{{ source "jenkins/inbound-agent" }}'
     sourceid: jenkins/inbound-agent
     conditions:
-      - packageWindowsYaml
+      - testDockerImagePublished
 
 actions:
   default:
