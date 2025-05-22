@@ -19,7 +19,7 @@ sources:
     spec:
       image: jenkins/inbound-agent
       # Match the format used by jenkins/inbound-agent tags
-      tagfilter: ^\d+\.v[a-f0-9_]+-\d+$
+      tagfilter: ^\d+\.v[a-f0-9_]+-\d+-jdk21-nanoserver-1809$
       versionfilter:
         kind: regex
         pattern: '.*'
