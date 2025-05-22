@@ -18,11 +18,11 @@ sources:
     kind: dockerimage
     spec:
       image: jenkins/inbound-agent
-      # Use \d+ to ensure major, minor, patch are present
-      tagfilter: ^\d+\.\d+\.\d+$
+      # Match the format used by jenkins/inbound-agent tags
+      tagfilter: ^\d+\.v[a-f0-9_]+-\d+$
       versionfilter:
-        kind: semver
-        pattern: '>=0.0.0-0'
+        kind: regex
+        pattern: '.*'
 
 conditions:
   testDockerImagePublished:
@@ -39,7 +39,7 @@ targets:
     kind: yaml
     spec:
       file: PodTemplates.d/package-windows.yaml
-      key: "spec.containers[0].image" # Adjust this path to match the actual YAML structure
+      key: "$.spec.containers[0].image" # Adjust this path to match the actual YAML structure
       value: 'jenkins/inbound-agent:{{ source "jenkins/inbound-agent" }}'
     sourceid: jenkins/inbound-agent
     conditions:
