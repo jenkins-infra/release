@@ -51,6 +51,7 @@ targets:
     sourceid: jenkins/inbound-agent-full
     conditions:
       - testDockerImagePublished
+    scmid: default
 
 actions:
   default:
