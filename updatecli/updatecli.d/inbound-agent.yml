@@ -32,6 +32,8 @@ conditions:
     sourceid: jenkins/inbound-agent
     spec:
       image: "jenkins/inbound-agent"
+    transformers:
+      - addsuffix: "-jdk21-nanoserver-1809"
 
 targets:
   updateInboundAgentVersion:
