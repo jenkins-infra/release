@@ -14,7 +14,7 @@ scms:
 
 sources:
   jenkins/inbound-agent:
-    name: '[jenkins/inbound-agent] Get latest Docker image tag'
+    name: '[jenkins/inbound-agent] Get latest GitHub release'
     kind: githubrelease
     spec:
       owner: "jenkinsci"
