@@ -44,8 +44,6 @@ targets:
       key: "$.spec.containers[0].image"
       value: 'jenkins/inbound-agent:{{ source "jenkins/inbound-agent" }}-jdk21-nanoserver-1809'
     sourceid: jenkins/inbound-agent
-    conditions:
-      - testDockerImagePublished
     scmid: default
 
 actions:
