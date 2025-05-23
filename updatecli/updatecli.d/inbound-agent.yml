@@ -50,7 +50,7 @@ actions:
   default:
     kind: github/pullrequest
     scmid: default
-    title: Bump `jenkins/inbound-agent` Docker image version to {{ source "jenkins/inbound-agent" }}
+    title: Bump `jenkins/inbound-agent` Docker image version to {{ source "jenkins/inbound-agent" }}-jdk21-nanoserver-1809
     spec:
       labels:
         - dependencies
