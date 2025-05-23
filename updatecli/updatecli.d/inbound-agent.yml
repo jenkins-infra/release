@@ -1,4 +1,3 @@
-{{ $suffix := "-jdk21-nanoserver-1809" }}
 ---
 name: Bump `jenkins/inbound-agent` Docker image version
 
@@ -23,9 +22,8 @@ sources:
       repository: "docker-agent"
       token: "{{ requiredEnv .github.token }}"
       username: "{{ .github.username }}"
-      versionfilter:
-        kind: regex
-        pattern: ^\d+\.v[a-f0-9_]+-\d+$
+    transformers:
+      - addsuffix: -jdk21-nanoserver-1809
 
 conditions:
   testDockerImagePublished:
@@ -33,18 +31,17 @@ conditions:
     kind: dockerimage
     sourceid: jenkins/inbound-agent
     spec:
-      image: "jenkins/inbound-agent"
-    transformers:
-      - addsuffix: {{ $suffix }}
+      image: jenkins/inbound-agent
 
 targets:
   updateInboundAgentVersion:
     name: "Update jenkins/inbound agent version in package-windows.yaml"
     kind: yaml
+    transformers:
+      - addprefix: 'jenkins/inbound-agent:'
     spec:
       file: PodTemplates.d/package-windows.yaml
-      key: "$.spec.containers[0].image"
-      value: 'jenkins/inbound-agent:{{ source "jenkins/inbound-agent" }}{{ $suffix }}'
+      key: $.spec.containers[0].image
     sourceid: jenkins/inbound-agent
     scmid: default
 
@@ -52,7 +49,7 @@ actions:
   default:
     kind: github/pullrequest
     scmid: default
-    title: Bump `jenkins/inbound-agent` Docker image version to {{ source "jenkins/inbound-agent" }}{{ $suffix }}
+    title: Bump `jenkins/inbound-agent` Docker image version to {{ source "jenkins/inbound-agent" }}
     spec:
       labels:
         - dependencies
