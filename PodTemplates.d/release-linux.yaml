@@ -5,6 +5,7 @@ metadata:
     jenkins: "agent"
     job: "release"
 spec:
+  serviceAccountName: jenkins-release-agents
   containers:
     - name: jnlp
       image: jenkinsciinfra/packaging:8.0.4
