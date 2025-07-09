@@ -102,8 +102,6 @@ The [documentation](https://github.com/jenkins-infra/release/blob/master/docs/re
 
 - [ ] Adjust state and `Released As` of [Jira issues](https://issues.jenkins.io/) fixed in the release (see the [changelog](https://www.jenkins.io/changelog-stable) for issue links).
 
-- [ ] Create pull request to update the `lts` Maven profile in [ATH](https://github.com/jenkinsci/acceptance-test-harness) to the newly released version
-
 - [ ] Create pull request to update the `jenkins.version` in the most recent release profile in [plugin BOM](https://github.com/jenkinsci/bom) to the newly released version.
   Refer to [first step before the release](https://github.com/jenkinsci/bom/pull/3374) and [second step after the release](https://github.com/jenkinsci/bom/pull/3447) for examples
 
