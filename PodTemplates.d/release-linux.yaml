@@ -7,7 +7,6 @@ metadata:
     #Following label is required by the workload identity process https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview?tabs=dotnet#pod-labels
     azure.workload.identity/use: "true"
 spec:
-  # TODO: track with updatecli from the terraform reports (ref. jenkins-infra/azure#1097 (review))
   serviceAccountName: jenkins-release-agents
   containers:
     - name: jnlp
