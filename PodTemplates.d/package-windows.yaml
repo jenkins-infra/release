@@ -9,7 +9,6 @@ metadata:
     #Following label is required by the NetworkPolicy managed by stable/jenkins helm chart and configured from jenkins-infra/charts
     jenkins/default-release-jenkins-agent: true
 spec:
-  # TODO: track with updatecli from the terraform reports (ref. jenkins-infra/azure#1097 (review))
   serviceAccountName: jenkins-release-agents
   containers:
   - image: jenkins/inbound-agent:3324.vea_eda_e98cd69-1-jdk21-nanoserver-1809
