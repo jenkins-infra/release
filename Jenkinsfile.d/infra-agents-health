@@ -1,0 +1,84 @@
+pipeline {
+  agent none
+
+  options {
+    disableConcurrentBuilds()
+  }
+
+  environment {
+    RELEASE_PROFILE           = 'weekly'
+    AZURE_VAULT_NAME          = 'prodreleasecore'
+    AZURE_VAULT_CERT          = 'prodreleasecore-2023'
+    SIGN_KEYSTORE_FILENAME    = 'jenkins.pfx'
+    SIGN_STOREPASS            = credentials('signing-cert-pass-2023')
+    GPG_FILE                  = 'jenkins-release.gpg'
+    AZURE_VAULT_CLIENT_ID     = credentials('azure-vault-client-id')
+    AZURE_VAULT_CLIENT_SECRET = credentials('azure-vault-client-secret')
+    AZURE_VAULT_TENANT_ID     = credentials('azure-vault-tenant-id')
+  }
+
+  stages {
+    stage('Test Agents Health'){
+      parallel {
+        stage('Test Linux Agent `package-linux`') {
+          agent {
+            kubernetes {
+              yamlFile 'PodTemplates.d/package-linux.yaml'
+            }
+          }
+          steps {
+            // Ensure we can get the secondary git repository used for packaging
+            dir ('./release'){
+              git branch: 'master', credentialsId: 'release-key', url: 'git@github.com:jenkinsci/packaging.git'
+            }
+            // Ensure we can retrieve the Code Signing Certificate'
+            sh '''
+            utils/release.bash --downloadAzureKeyvaultSecret
+            utils/release.bash --configureKeystore
+            utils/release.bash --getGPGKeyFromAzure
+            '''
+            // Ensure we get the correct Java and Maven versions
+            sh 'mvn -v'
+            // Ensure the correct storage is mounted in expected paths
+            sh 'ls -la /srv/releases/jenkins'
+            sh 'ls -la /var/www/pkg.jenkins.io.staging/'
+          }
+        }
+        stage('Test Linux Agent `release-linux`') {
+          agent {
+            kubernetes {
+              yamlFile 'PodTemplates.d/release-linux.yaml'
+            }
+          }
+          steps {
+            // Ensure we can clone the secondary git repository used for releases
+            sshagent(['release-key']) {
+              sh 'utils/release.bash --cloneReleaseGitRepository'
+            }
+            // Ensure we can retrieve the Code Signing Certificate'
+            sh '''
+            utils/release.bash --downloadAzureKeyvaultSecret
+            utils/release.bash --configureKeystore
+            utils/release.bash --getGPGKeyFromAzure
+            '''
+            // Ensure we get the correct Java and Maven versions
+            sh 'mvn -v'
+          }
+        }
+        stage('Test Windows Agent `package-windows`') {
+          agent {
+            kubernetes {
+              yamlFile 'PodTemplates.d/package-windows.yaml'
+            }
+          }
+          steps {
+            pwsh 'java -version'
+            container('dotnet') {
+                powershell 'msbuild -version'
+            }
+          }
+        }
+      }
+    }
+  }
+}
