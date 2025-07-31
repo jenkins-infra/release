@@ -7,7 +7,7 @@ metadata:
     #Following label is required by the workload identity process https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview?tabs=dotnet#pod-labels
     azure.workload.identity/use: "true"
 spec:
-  serviceAccountName: jenkins-release-agents
+  serviceAccountName: release-ci-jenkins-io-agents
   containers:
     - name: jnlp
       image: jenkinsciinfra/packaging:8.1.7

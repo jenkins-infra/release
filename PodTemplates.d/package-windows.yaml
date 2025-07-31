@@ -9,7 +9,7 @@ metadata:
     #Following label is required by the NetworkPolicy managed by stable/jenkins helm chart and configured from jenkins-infra/charts
     jenkins/default-release-jenkins-agent: true
 spec:
-  serviceAccountName: jenkins-release-agents
+  serviceAccountName: release-ci-jenkins-io-agents
   containers:
   - image: jenkins/inbound-agent:3327.v868139a_d00e0-2-jdk21-nanoserver-1809
     imagePullPolicy: "IfNotPresent"
