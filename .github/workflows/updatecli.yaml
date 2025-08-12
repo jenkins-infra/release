@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Setup updatecli
         uses: updatecli/updatecli-action@419b75cb4d4bd6b50b03da7b33e1e0065d383eaf # v2.89.0
       - name: Diff
