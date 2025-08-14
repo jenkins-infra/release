@@ -478,9 +478,9 @@ function showPackagingPlan() {
 }
 
 function syncMirror() {
-	# Convert PKGSERVER_SSH_OPTS to an array
-	IFS=" " read -r -a PKGSERVER_SSH_OPTS <<<"${PKGSERVER_SSH_OPTS}"
-	ssh "${PKGSERVER_SSH_OPTS[@]}" "${PKGSERVER}" /srv/releases/sync.sh
+	## TODO (short term): rsync data from (??) to /get.jenkins.io/mirrorbits
+	## TODO (long term): trigger a mirrorbits refresh
+	echo NOOP
 }
 
 function main() {
