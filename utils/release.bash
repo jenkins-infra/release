@@ -478,9 +478,28 @@ function showPackagingPlan() {
 }
 
 function syncMirror() {
-	# Convert PKGSERVER_SSH_OPTS to an array
-	IFS=" " read -r -a PKGSERVER_SSH_OPTS <<<"${PKGSERVER_SSH_OPTS}"
+	source_dir=/srv/releases/jenkins/
+
+	# Step 1/2: copy binaries from local directory to remote server
+	# TODO: copy to archives.jenkins.io instead of pkg. Requires the same on update center/crawler at the same time.
+	rsync --recursive \
+		--links `# Copy symlinks as symlinks: destination is a Linux filesystem` \
+		--perms `# Preserve permissions: destination is a Linux filesystem` \
+		--devices --specials `# Preserve special files: destination is a Linux filesystem` \
+		--compress `# CPU is cheap, bandwidth is not` \
+		--verbose \
+		--times `# Preserve timestamps` \
+		--exclude=/updates `# populated by https://github.com/jenkins-infra/crawler` \
+		--exclude=/plugins `# populated by https://github.com/jenkins-infra/update-center2` \
+		-e "ssh ${PKGSERVER_SSH_OPTS[*]}" \
+		"${source_dir}" \
+		"${PKGSERVER}":/srv/releases/jenkins/ `# destination`
+
+	# Step 2/2: trigger remote sync script (generate symlinks, copy to archives and promote staging webdir to production)
+	# TODO: Remove the copy to archive in remote script and generate symlinks here
 	ssh "${PKGSERVER_SSH_OPTS[@]}" "${PKGSERVER}" /srv/releases/sync.sh
+
+	## TODO (long term): trigger a mirrorbits refresh
 }
 
 function main() {

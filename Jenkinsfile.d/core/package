@@ -343,11 +343,9 @@ pipeline {
         FASTLY_SERVICE_ID = credentials('fastly_pkgserver_service_id')
       }
       steps{
-        sshagent(['pkgserver']) {
-          sh '''
-            ./utils/release.bash --invalidateFastlyCache
-          '''
-        }
+        sh '''
+          ./utils/release.bash --invalidateFastlyCache
+        '''
       }
     }
   }
