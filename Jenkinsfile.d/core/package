@@ -330,9 +330,11 @@ pipeline {
     // Force mirror synchronization
     stage('Synchronize mirror'){
       steps{
-        sh '''
-          ./utils/release.bash --syncMirror
-        '''
+        sshagent(['pkgserver']) {
+          sh '''
+            ./utils/release.bash --syncMirror
+          '''
+        }
       }
     }
     stage('Invalidate Fastly Cache'){
