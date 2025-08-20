@@ -28,17 +28,16 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
       volumeMounts:
-        - name: binary-core-packages
+        - name: data-storage-jenkins-io
           mountPath: /srv/releases/jenkins
-        - name: website-core-packages
-          mountPath: /var/www/pkg.jenkins.io.staging/
+          subPath: ./get.jenkins.io/mirrorbits/
+        - name: data-storage-jenkins-io
+          mountPath: /var/www/pkg.jenkins.io.staging
+          subPath: ./pkg.jenkins.io/staging/
   volumes:
-    - name: binary-core-packages
+    - name: data-storage-jenkins-io
       persistentVolumeClaim:
-        claimName: binary-core-packages
-    - name: website-core-packages
-      persistentVolumeClaim:
-        claimName: website-core-packages
+        claimName: data-storage-jenkins-io
   nodeSelector:
     kubernetes.azure.com/agentpool: releasepool
     kubernetes.io/os: linux
