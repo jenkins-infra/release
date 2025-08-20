@@ -493,7 +493,7 @@ function syncMirror() {
 		--exclude=/plugins `# populated by https://github.com/jenkins-infra/update-center2` \
 		-e "ssh ${PKGSERVER_SSH_OPTS[*]}" \
 		"${source_dir}" \
-		"${PKGSERVER}":/srv/releases/ `# destination`
+		"${PKGSERVER}":/srv/releases/jenkins/ `# destination`
 
 	# Step 2/2: trigger remote sync script (generate symlinks, copy to archives and promote staging webdir to production)
 	# TODO: Remove the copy to archive in remote script and generate symlinks here
