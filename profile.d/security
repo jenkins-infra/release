@@ -26,3 +26,8 @@ RELEASE_GIT_PRODUCTION_BRANCH=master
 #         as retrieved from ./utils/getJenkinsVersion.py
 
 MAVEN_REPOSITORY_PRODUCTION_NAME=releases
+
+RELEASE_GIT_BRANCH=security-master
+MAVEN_REPOSITORY_NAME=caparezza
+JENKINS_VERSION=2.528
+RELEASELINE=
