@@ -54,8 +54,7 @@ fetch_postponed_candidates() {
 }
 
 echo -e "\nFixed:\n------------------"
-fetch_issues "${PREFIX}labels+in+%28${label_version_dash}-fixed%29"
-fetch_issues "${PREFIX}labels+in+%28${label_version_dot}-fixed%29"
+fetch_issues "${PREFIX}labels%3D${label_version_dot}-fixed"
 
 echo -e "\nPostponed:\n------------------"
 fetch_postponed_candidates "https://issues.jenkins.io/sr/jira.issueviews:searchrequest-xml/12146/SearchRequest-12146.xml?tempMax=1000"
