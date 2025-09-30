@@ -37,7 +37,7 @@ fetch_postponed_candidates() {
     awk -v rejected="${label_version_dot}-rejected" '
     /<item/ {initem=1; title=""; link=""; labels=""}
     /<\/item>/ {
-        if (title && link && !(labels ~ postponed && labels ~ cand))
+        if (title && link && label ~ rejected)
             print "- " title " (" link ")";
         initem=0
     }
