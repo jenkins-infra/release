@@ -43,7 +43,13 @@ fetch_postponed_candidates() {
     }
     initem && /<title>/ {sub(/.*<title>/,""); sub(/<\/title>.*/,""); title=$0}
     initem && /<link>/ {sub(/.*<link>/,""); sub(/<\/link>.*/,""); link=$0}
-    initem && /<labels>/ {sub(/.*<labels>/,""); sub(/<\/labels>.*/,""); labels=$0}
+    initem && /<label>.*<\/label>/ {
+        sub(/.*<label>/,"");
+        sub(/<\/label>.*/,"");
+        if ($0 ~ rejected) {
+            label=$1;
+        }
+    }
     '
 }
 
