@@ -183,13 +183,13 @@ Add `2.VVV.p-fixed` and remove `lts-candidate` or add `2.VVV.p-rejected` and ret
 
 ### Backport changes
 
-Run the [list-issue-commits script](https://github.com/jenkins-infra/release/blob/master/tools/list-issue-commits) to locate commits via jira ID and backport them via `cherry-pick -x $commit` into a separate branch based on `stable-2.VVV`.  
+Run the [list-issue-commits script](https://github.com/jenkins-infra/release/blob/master/tools/list-issue-commits.sh) to locate commits via jira ID and backport them via `cherry-pick -x $commit` into a separate branch based on `stable-2.VVV`.  
 Incase there are conflicting commits, pick an [appropriate merge strategy](https://git-scm.com/docs/merge-strategies) to address the conflicts without undoing the change or merging in newer content.
 
 ### Open a backporting PR
 
 Open a PR against the `stable-2.VVV` branch from your separate backporting branch from the prior step.  
-Use the [list-issue-commits script](https://github.com/jenkins-infra/release/blob/master/tools/list-issue-commits) to generate a list of issues to include in the PR description.  
+Use the [list-issue-commits script](https://github.com/jenkins-infra/release/blob/master/tools/list-issue-commits.sh) to generate a list of issues to include in the PR description.  
 Visit the checklist for more information.  
 Additionally, take a look at the [release](https://github.com/jenkins-infra/release/issues?q=is%3Aclosed+label%3Alts-candidate+) and [packaging](https://github.com/jenkinsci/packaging/issues?q=is%3Aclosed+label%3Alts-candidate) repository, for additional LTS candidates.
 
