@@ -2,10 +2,15 @@
 
 set -e
 
+if [ -z "$(command -v xmllint)" ]; then
+    echo "Error: xmllint is not installed. Please install it to continue." >&2
+    exit 1
+fi
+
 PREFIX="https://issues.jenkins.io/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?tempMax=1000&jqlQuery="
 
 if [ "$#" -ne 1 ]; then
-    echo "Usage: lts-candidate-stats <version>" >&2
+    echo "Usage: ./lts-candidate-stats.sh <version>" >&2
     exit 1
 fi
 
