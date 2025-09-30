@@ -34,7 +34,7 @@ fetch_issues() {
 fetch_postponed_candidates() {
     local url="$1"
     curl -s "$url" | xmllint --xpath "//*[local-name()='item']" - 2>/dev/null | \
-    awk -v postponed="${label_version_dash}-postponed" -v cand="lts-candidate" '
+    awk -v rejected="${label_version_dot}-rejected" '
     /<item/ {initem=1; title=""; link=""; labels=""}
     /<\/item>/ {
         if (title && link && !(labels ~ postponed && labels ~ cand))
