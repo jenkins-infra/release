@@ -9,9 +9,7 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
-version="$1"
-label_version_dash="${version//./-}"
-label_version_dot="$version"
+label_version_dot="$1"
 
 targetVersion=$(echo 'VERSION=${project.version}' | mvn help:evaluate | sed -n 's/^VERSION=//p')
 if [[ "$targetVersion" != *"$version"* ]]; then
