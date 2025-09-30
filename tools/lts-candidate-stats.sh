@@ -11,7 +11,7 @@ fi
 
 label_version_dot="$1"
 
-targetVersion=$(echo 'VERSION=${project.version}' | mvn help:evaluate | sed -n 's/^VERSION=//p')
+targetVersion=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout --batch-mode)
 if [[ "$targetVersion" != *"$version"* ]]; then
     echo "The previous version does not appear to be released yet: $targetVersion" >&2
     exit 1
