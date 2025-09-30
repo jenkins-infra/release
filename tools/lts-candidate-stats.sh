@@ -35,7 +35,7 @@ fetch_postponed_candidates() {
     local url="$1"
     curl -s "$url" | xmllint --xpath "//*[local-name()='item']" - 2>/dev/null | \
     awk -v rejected="${label_version_dot}-rejected" '
-    /<item/ {initem=1; title=""; link=""; labels=""}
+    /<item/ {initem=1; title=""; link=""; label=""}
     /<\/item>/ {
         if (title && link && label ~ rejected)
             print "- " title " (" link ")";
