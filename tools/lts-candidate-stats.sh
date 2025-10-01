@@ -2,15 +2,9 @@
 
 set -e
 
-if [ -z "$(command -v xmllint)" ]; then
-    echo "Error: xmllint is not installed. Please install it to continue." >&2
-    exit 1
-fi
-
-PREFIX="https://issues.jenkins.io/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?tempMax=1000&jqlQuery="
-
 if [ "$#" -ne 1 ]; then
     echo "Usage: ./lts-candidate-stats.sh <version>" >&2
+    echo "       ./lts-candidate-stats.sh 2.528.1" >&2
     exit 1
 fi
 
@@ -27,7 +21,7 @@ echo "Latest core version: $(git describe master --abbrev=0)"
 
 fetch_issues() {
     local url="$1"
-    curl -s "$url" | xmllint --xpath "//*[local-name()='item']" - 2>/dev/null | \
+    curl -s "$url" | \
     awk '
     /<item/ {initem=1; title=""; link=""}
     /<\/item>/ {if (title && link) print "- " title " (" link ")"; initem=0}
@@ -38,7 +32,7 @@ fetch_issues() {
 
 fetch_postponed_candidates() {
     local url="$1"
-    curl -s "$url" | xmllint --xpath "//*[local-name()='item']" - 2>/dev/null | \
+    curl -s "$url" | \
     awk -v rejected="${label_version_dot}-rejected" '
     /<item/ {initem=1; title=""; link=""; label=""}
     /<\/item>/ {
@@ -59,7 +53,7 @@ fetch_postponed_candidates() {
 }
 
 echo -e "\nFixed:\n------------------"
-fetch_issues "${PREFIX}labels%3D${label_version_dot}-fixed"
+fetch_issues "https://issues.jenkins.io/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?tempMax=1000&jqlQuery=labels%3D${label_version_dot}-fixed&field=title&field=link"
 
 echo -e "\nPostponed:\n------------------"
-fetch_postponed_candidates "https://issues.jenkins.io/sr/jira.issueviews:searchrequest-xml/12146/SearchRequest-12146.xml?tempMax=1000"
+fetch_postponed_candidates "https://issues.jenkins.io/sr/jira.issueviews:searchrequest-xml/12146/SearchRequest-12146.xml?tempMax=1000&field=title&field=link&field=labels"
