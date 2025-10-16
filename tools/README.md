@@ -14,11 +14,11 @@ There is a couple of manual tasks that needs to follow described in the output.
 
 ### Backporting
 
-Process through [LTS Candidates](https://issues.jenkins.io/issues/?filter=12146) and update label `lts-candidate` to `${VERSION}-fixed` or `${VERSION}-rejected`. See `lts-candidate-stats <next_lts_version>` for status report.
+Process through [LTS Candidates](https://issues.jenkins.io/issues/?filter=12146) and update label `lts-candidate` to `${VERSION}-fixed` or `${VERSION}-rejected`. See `./lts-candidate-stats.sh <next_lts_version>` for status report.
 
 #### Identify issue commits
 
-`list-issue-commits <jira_id>` can be used to identify what (properly labeled) commits are
+`./list-issue-commits.sh <jira_id>` can be used to identify what (properly labeled) commits are
 
 - Common for master branch and current branch (no need to backport)
 - On master branch only (needs to be backported). The script reports the number of weekly releases the commit is part of in parentheses.
