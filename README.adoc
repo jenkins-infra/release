@@ -152,18 +152,8 @@ More information in https://github.com/jenkins-infra/release/blob/master/utils/g
 |
 | x
 
-| `PKGSERVER`
-| Defines where the different packages will be published.
-|
-| x
-
-| `PKGSERVER_SSH_OPTS`
-| Defines custom ssh options used to connect to `PKGSERVER`.
-|
-| x
-
 | `PROMOTE_STAGING_MAVEN_ARTIFACTS_ARGS`
-| Defines parameters used by `promoteMavenArtifacts.py`.   
+| Defines parameters used by `promoteMavenArtifacts.py`.
 
 Default value is set to `item --mode copy --source $MAVEN_REPOSITORY_NAME --destination $MAVEN_REPOSITORY_PRODUCTION_NAME --url $MAVEN_REPOSITORY_URL --username $MAVEN_REPOSITORY_USERNAME --password $MAVEN_REPOSITORY_PASSWORD --search '/org/jenkins-ci/main' $(./utils/getJenkinsVersion.py --version)}"`
 
@@ -435,16 +425,16 @@ Show certificate information
   openssl x509 -in jenkins-release.crt -text -noout
 
 Convert p7b to pkcs12
-  
+
   # Based from https://knowledge.digicert.com/solution/SO26449.html and https://github.com/jenkins-infra/release/blob/7a03f98eff839d4fed75ea96cf7bebbc963e3a91/README.adoc#certificate
   # P7B to PFX: 1/2
   openssl pkcs7 -print_certs -in digicert.p7b -out jenkins-release.crt
     ## Asks for the Export password, transmitted by Digicert from another channel
     ## Asks for the `jenkins-release.key` private key passphrase
-  
+
   # Check for the intermediate certificate attributes
   openssl x509 -in jenkins-release.crt -text -noout
-  
+
   # P7B to PFX: 2/2
   openssl pkcs12 -export -in jenkins-release.crt -inkey jenkins-release.key -out jenkins-release.pfx
     ## Asks for an Export password: do not set any (type enter only)

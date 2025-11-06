@@ -83,7 +83,7 @@ pipeline {
     GPG_FILE                  = 'jenkins-release.gpg'
     GPG_PASSPHRASE            = credentials('release-gpg-passphrase-2023')
     PACKAGING_GIT_REPOSITORY  = 'git@github.com:jenkinsci/packaging.git'
-    PACKAGING_GIT_BRANCH      = 'master'
+    PACKAGING_GIT_BRANCH      = 'helpdesk-4774' // TODO: back to master
     SIGN_KEYSTORE_FILENAME    = 'jenkins.pfx'
     SIGN_STOREPASS            = credentials('signing-cert-pass-2023')
     WAR_FILENAME              = 'jenkins.war'
@@ -305,11 +305,14 @@ pipeline {
       }
     }
     // Force mirror synchronization
-    stage('Synchronize mirror'){
+    stage('Promote Packages and sync mirrors'){
       steps{
-        sshagent(['pkgserver']) {
+        sshagent(credentials: [
+          'pkgserver',
+          'archives.jenkins.io',
+        ]) {
           sh '''
-            ./utils/release.bash --syncMirror
+            ./utils/release.bash --promotePackages
           '''
         }
       }
