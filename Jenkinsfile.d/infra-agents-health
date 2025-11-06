@@ -40,8 +40,10 @@ pipeline {
             // Ensure we get the correct Java and Maven versions
             sh 'mvn -v'
             // Ensure the correct storage is mounted in expected paths
-            sh 'ls -la /srv/releases/jenkins'
             sh 'ls -la /var/www/pkg.jenkins.io.staging/'
+            sh 'ls -la /var/www/pkg.jenkins.io.production/'
+            sh 'ls -la /var/www/get.jenkins.io.staging/'
+            sh 'ls -la /var/www/get.jenkins.io.production/'
           }
         }
         stage('Test Linux Agent `release-linux`') {
