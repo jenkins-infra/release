@@ -335,12 +335,18 @@ function packaging() {
 	make "$@"
 }
 
+function prepareChangelist() {
+	# Clear the changelist in a format acceptable to spotless
+	sed -i'' -e 's,<changelist>.*</changelist>,<changelist />,g' pom.xml
+}
+
 function prepareRelease() {
 	requireGPGPassphrase
 	requireKeystorePass
 	generateSettingsXml
 
 	printf '\n Prepare Jenkins Release\n\n'
+	prepareChangelist
 	mvn -B -V -s settings-release.xml -ntp release:prepare
 }
 
