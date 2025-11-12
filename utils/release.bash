@@ -20,7 +20,7 @@ function requireAzureKeyvaultCredentials() {
 }
 
 function clean() {
-	mvn -Dmaven-release-plugin.version=3.1.1 -B -V -s settings-release.xml -ntp release:clean
+	mvn -B -V -s settings-release.xml -ntp release:clean
 }
 
 function cloneReleaseGitRepository() {
@@ -335,13 +335,19 @@ function packaging() {
 	make "$@"
 }
 
+function prepareChangelist() {
+	# Clear the changelist in a format acceptable to spotless
+	sed -i'' -e 's,<changelist>.*</changelist>,<changelist />,g' pom.xml
+}
+
 function prepareRelease() {
 	requireGPGPassphrase
 	requireKeystorePass
 	generateSettingsXml
 
 	printf '\n Prepare Jenkins Release\n\n'
-	mvn -Dmaven-release-plugin.version=3.1.1 -B -V -s settings-release.xml -ntp release:prepare
+	prepareChangelist
+	mvn -B -V -s settings-release.xml -ntp release:prepare
 }
 
 function promoteStagingMavenArtifacts() {
@@ -402,7 +408,7 @@ function stageRelease() {
 	requireKeystorePass
 
 	printf '\n Stage Jenkins Release\n\n'
-	mvn -Dmaven-release-plugin.version=3.1.1 -B -V \
+	mvn -B -V \
 		"-DstagingRepository=${MAVEN_REPOSITORY_NAME}::${MAVEN_REPOSITORY_URL}/${MAVEN_REPOSITORY_NAME}" \
 		-s settings-release.xml \
 		-ntp \
@@ -414,7 +420,7 @@ function performRelease() {
 	requireKeystorePass
 
 	printf '\n Perform Jenkins Release\n\n'
-	mvn -Dmaven-release-plugin.version=3.1.1 -B -V -s settings-release.xml -ntp release:perform
+	mvn -B -V -s settings-release.xml -ntp release:perform
 }
 
 function validateKeystore() {
