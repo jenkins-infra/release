@@ -200,7 +200,7 @@ pipeline {
             }
           }
         }
-        stage('Redhat') {
+        stage('RPM') {
           stages {
             stage('Build'){
               steps {
@@ -217,29 +217,6 @@ pipeline {
                 sshagent(['pkgserver']) {
                   sh '''
                     ./utils/release.bash --packaging rpm.publish
-                  '''
-                }
-              }
-            }
-          }
-        }
-        stage('Suse') {
-          stages {
-            stage('Build'){
-              steps {
-                sh '''
-                  ./utils/release.bash --packaging suse
-                '''
-                dir (WORKING_DIRECTORY){
-                  archiveArtifacts artifacts: "target/suse/*.rpm"
-                }
-              }
-            }
-            stage('Publish'){
-              steps {
-                sshagent(['pkgserver']) {
-                  sh '''
-                    ./utils/release.bash --packaging suse.publish
                   '''
                 }
               }
