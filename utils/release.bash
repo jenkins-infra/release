@@ -307,7 +307,7 @@ function configurePackagingEnv() {
 	: "${BRAND:=$WORKSPACE/$WORKING_DIRECTORY/branding/common}"
 	: "${RELEASELINE:=}"
 	: "${ORGANIZATION:=jenkins.io}"
-	: "${BUILDENV:=$WORKSPACE/$WORKING_DIRECTORY/env/release.mk}"
+	: "${BUILDENV:=$WORKSPACE/env/package.mk}"
 	: "${CREDENTIAL:=$BRAND}" # For now, we just want this variable to be set to not empty
 	: "${GPG_PASSPHRASE_FILE:=$WORKSPACE/$WORKING_DIRECTORY/$GPG_KEYNAME.pass}"
 
@@ -326,7 +326,7 @@ function cleanPackagingEnv() {
 }
 
 function packaging() {
-	# Still function need an access to this Makefile
+	# This function need an access to this Makefile
 	# https://github.com/jenkinsci/packaging/blob/master/Makefile
 	# if more than parameter is needed then they have to be quoted
 	# example: `utils/release.bash --packaging "deb rpm suse"`

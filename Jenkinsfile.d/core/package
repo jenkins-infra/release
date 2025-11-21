@@ -70,7 +70,7 @@ pipeline {
   }
 
 //  ENV JENKINS_VERSION
-//    stable: It represents the latest stable version that satifies version pattern X.Y.Z
+//    stable: It represents the latest stable version that satisfies version pattern X.Y.Z
 //    weekly: It represents the latest weekly version that satisfies version pattern X.Y
 //    <version>: where version represent any valid existing version like 2.176.2
 
@@ -119,10 +119,9 @@ pipeline {
 
     }
     stage('Get GPG key') {
-
       steps {
         checkout scm
-        dir (WORKING_DIRECTORY){
+        dir (WORKING_DIRECTORY) {
           git branch: PACKAGING_GIT_BRANCH, credentialsId: 'release-key', url: PACKAGING_GIT_REPOSITORY
         }
 
@@ -130,7 +129,7 @@ pipeline {
           ./utils/release.bash --getGPGKeyFromAzure
         '''
 
-        dir (WORKING_DIRECTORY){
+        dir (WORKING_DIRECTORY) {
           stash includes: GPG_FILE , name: 'GPG'
         }
 
@@ -139,7 +138,6 @@ pipeline {
     }
 
     stage('Get Code Signing Certificate') {
-
       steps {
         sh '''
           utils/release.bash --downloadAzureKeyvaultSecret
@@ -150,23 +148,23 @@ pipeline {
       }
     }
 
-    stage('Download WAR archive to package'){
+    stage('Download WAR archive to package') {
       steps{
         sh '''
           ./utils/release.bash --downloadJenkins
         '''
-        dir (WORKING_DIRECTORY){
+        dir (WORKING_DIRECTORY) {
           stash includes: WAR_FILENAME, name: "WAR"
           archiveArtifacts artifacts: "*.war"
         }
       }
     }
-    stage('Package'){
+    stage('Package') {
       failFast false
       parallel {
         stage('WAR') {
           stages {
-            stage('Publish'){
+            stage('Publish') {
               steps {
                 sshagent(['pkgserver']) {
                   sh '''
@@ -177,161 +175,184 @@ pipeline {
             }
           }
         }
-        stage('Debian') {
-          stages {
-            stage('Build'){
-              steps {
-                sh '''
-                  ./utils/release.bash --packaging deb
-                '''
-                dir (WORKING_DIRECTORY){
-                  archiveArtifacts artifacts: "target/debian/*.deb"
-                }
-              }
-            }
-            stage('Publish'){
-              steps {
-                sshagent(['pkgserver']) {
-                  sh '''
-                    ./utils/release.bash --packaging deb.publish
-                  '''
-                }
-              }
-            }
-          }
-        }
-        stage('RPM') {
-          stages {
-            stage('Build'){
-              steps {
-                sh '''
-                  ./utils/release.bash --packaging rpm
-                '''
-                dir (WORKING_DIRECTORY){
-                  archiveArtifacts artifacts: "target/rpm/*.rpm"
-                }
-              }
-            }
-            stage('Publish'){
-              steps {
-                sshagent(['pkgserver']) {
-                  sh '''
-                    ./utils/release.bash --packaging rpm.publish
-                  '''
-                }
-              }
-            }
-          }
-        }
-        stage('Windows') {
-          when {
-            environment name: 'WINDOWS_PACKAGING_ENABLED', value: 'true'
-          }
-          stages {
-            stage('Build') {
-              // Windows requirement: Every steps need to be executed inside default jnlp
-              // as the step 'container' is known to not be working
-              agent {
-                kubernetes {
-                  yamlFile 'PodTemplates.d/package-windows.yaml'
-                }
-              }
-              steps {
-                container('dotnet') {
-                  checkout scm
-                  dir (WORKING_DIRECTORY){
-                    git branch: PACKAGING_GIT_BRANCH, credentialsId: 'release-key', url: PACKAGING_GIT_REPOSITORY
+        // stage('Debian') {
+        //   stages {
+        //     stage('Build') {
+        //       steps {
+        //         sh '''
+        //           ./utils/release.bash --packaging deb
+        //         '''
+        //         dir (WORKING_DIRECTORY) {
+        //           archiveArtifacts artifacts: "target/debian/*.deb"
+        //         }
+        //       }
+        //     }
+        //     stage('Publish') {
+        //       steps {
+        //         sshagent(['pkgserver']) {
+        //           sh '''
+        //             ./utils/release.bash --packaging deb.publish
+        //           '''
+        //         }
+        //       }
+        //     }
+        //   }
+        // }
+        // stage('Redhat') {
+        //   stages {
+        //     stage('Build') {
+        //       steps {
+        //         sh '''
+        //           ./utils/release.bash --packaging rpm
+        //         '''
+        //         dir (WORKING_DIRECTORY) {
+        //           archiveArtifacts artifacts: "target/rpm/*.rpm"
+        //         }
+        //       }
+        //     }
+        //     stage('Publish') {
+        //       steps {
+        //         sshagent(['pkgserver']) {
+        //           sh '''
+        //             ./utils/release.bash --packaging rpm.publish
+        //           '''
+        //         }
+        //       }
+        //     }
+        //   }
+        // }
+        // stage('Suse') {
+        //   stages {
+        //     stage('Build') {
+        //       steps {
+        //         sh '''
+        //           ./utils/release.bash --packaging suse
+        //         '''
+        //         dir (WORKING_DIRECTORY) {
+        //           archiveArtifacts artifacts: "target/suse/*.rpm"
+        //         }
+        //       }
+        //     }
+        //     stage('Publish') {
+        //       steps {
+        //         sshagent(['pkgserver']) {
+        //           sh '''
+        //             ./utils/release.bash --packaging suse.publish
+        //           '''
+        //         }
+        //       }
+        //     }
+        //   }
+        // }
+        // stage('Windows') {
+        //   when {
+        //     environment name: 'WINDOWS_PACKAGING_ENABLED', value: 'true'
+        //   }
+        //   stages {
+        //     stage('Build') {
+        //       // Windows requirement: Every steps need to be executed inside default jnlp
+        //       // as the step 'container' is known to not be working
+        //       agent {
+        //         kubernetes {
+        //           yamlFile 'PodTemplates.d/package-windows.yaml'
+        //         }
+        //       }
+        //       steps {
+        //         container('dotnet') {
+        //           checkout scm
+        //           dir (WORKING_DIRECTORY) {
+        //             git branch: PACKAGING_GIT_BRANCH, credentialsId: 'release-key', url: PACKAGING_GIT_REPOSITORY
 
-                    unstash 'GPG'
-                    unstash 'WAR'
-                    unstash 'KEYSTORE'
+        //             unstash 'GPG'
+        //             unstash 'WAR'
+        //             unstash 'KEYSTORE'
 
-                    powershell '''
-                      Get-ChildItem env:
-                      $env:WAR=(Resolve-Path .\\jenkins.war).Path
-                      & .\\make.ps1
-                    '''
-                    // Don't archive the full path
-                    dir('msi\\build\\bin\\Release\\en-US') {
-                      archiveArtifacts '*.msi*'
-                    }
+        //             powershell '''
+        //               Get-ChildItem env:
+        //               $env:WAR=(Resolve-Path .\\jenkins.war).Path
+        //               & .\\make.ps1
+        //             '''
+        //             // Don't archive the full path
+        //             dir('msi\\build\\bin\\Release\\en-US') {
+        //               archiveArtifacts '*.msi*'
+        //             }
 
-                  }
-                }
-              }
-            }
-            stage('Publish'){
-              steps {
-                unarchive mapping: ['*.msi*': WORKING_DIRECTORY]
-                sshagent(['pkgserver']) {
-                  sh '''
-                    ./utils/release.bash --packaging msi.publish
-                  '''
-                }
-              }
-            }
-          }
-        }
+        //           }
+        //         }
+        //       }
+        //     }
+        //     stage('Publish') {
+        //       steps {
+        //         unarchive mapping: ['*.msi*': WORKING_DIRECTORY]
+        //         sshagent(['pkgserver']) {
+        //           sh '''
+        //             ./utils/release.bash --packaging msi.publish
+        //           '''
+        //         }
+        //       }
+        //     }
+        //   }
+        // }
       }
     }
-    stage('Promote'){
-      failFast true
-      parallel {
-        stage('Maven Repository') {
-          when {
-            environment name: 'MAVEN_STAGING_REPOSITORY_PROMOTION_ENABLED', value: 'true'
-          }
+    // stage('Promote') {
+    //   failFast true
+    //   parallel {
+    //     stage('Maven Repository') {
+    //       when {
+    //         environment name: 'MAVEN_STAGING_REPOSITORY_PROMOTION_ENABLED', value: 'true'
+    //       }
 
-          steps {
-            sshagent(['pkgserver']) {
-              sh '''
-                ./utils/release.bash --promoteStagingMavenArtifacts
-              '''
-            }
-          }
-        }
-        stage('Git Repository') {
-          when {
-            environment name: 'GIT_STAGING_REPOSITORY_PROMOTION_ENABLED', value: 'true'
-          }
-          steps {
-            sshagent(['pkgserver']) {
-              sh '''
-                ./utils/release.bash --promoteStagingGitRepository
-              '''
-            }
-          }
-        }
-      }
-    }
-    // Force mirror synchronization
-    stage('Promote Packages and sync mirrors'){
-      steps{
-        sshagent(credentials: [
-          'pkgserver',
-          'archives.jenkins.io',
-        ]) {
-          sh '''
-            ./utils/release.bash --promotePackages
-          '''
-        }
-      }
-    }
-    stage('Invalidate Fastly Cache'){
-      environment {
-        FASTLY_API_TOKEN = credentials('fastly-api-token')
-        FASTLY_SERVICE_ID = credentials('fastly_pkgserver_service_id')
-      }
-      steps{
-        sh '''
-          ./utils/release.bash --invalidateFastlyCache
-        '''
-      }
+    //       steps {
+    //         sshagent(['pkgserver']) {
+    //           sh '''
+    //             ./utils/release.bash --promoteStagingMavenArtifacts
+    //           '''
+    //         }
+    //       }
+    //     }
+    //     stage('Git Repository') {
+    //       when {
+    //         environment name: 'GIT_STAGING_REPOSITORY_PROMOTION_ENABLED', value: 'true'
+    //       }
+    //       steps {
+    //         sshagent(['pkgserver']) {
+    //           sh '''
+    //             ./utils/release.bash --promoteStagingGitRepository
+    //           '''
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
+    // // Force mirror synchronization
+    // stage('Promote Packages and sync mirrors') {
+    //   steps{
+    //     sshagent(credentials: [
+    //       'pkgserver',
+    //       'archives.jenkins.io',
+    //     ]) {
+    //       sh '''
+    //         ./utils/release.bash --promotePackages
+    //       '''
+    //     }
+    //   }
+    // }
+    // stage('Invalidate Fastly Cache') {
+    //   environment {
+    //     FASTLY_API_TOKEN = credentials('fastly-api-token')
+    //     FASTLY_SERVICE_ID = credentials('fastly_pkgserver_service_id')
+    //   }
+    //   steps{
+    //     sh '''
+    //       ./utils/release.bash --invalidateFastlyCache
+    //     '''
+    //   }
+    // }
+  }
+  post {
+    failure {
+      input '''Can I delete the pod? '''
     }
   }
-    post {
-      failure {
-        input '''Can I delete the pod? '''
-      }
-    }
 }
