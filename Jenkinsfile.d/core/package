@@ -175,29 +175,29 @@ pipeline {
             }
           }
         }
-        // stage('Debian') {
-        //   stages {
-        //     stage('Build') {
-        //       steps {
-        //         sh '''
-        //           ./utils/release.bash --packaging deb
-        //         '''
-        //         dir (WORKING_DIRECTORY) {
-        //           archiveArtifacts artifacts: "target/debian/*.deb"
-        //         }
-        //       }
-        //     }
-        //     stage('Publish') {
-        //       steps {
-        //         sshagent(['pkgserver']) {
-        //           sh '''
-        //             ./utils/release.bash --packaging deb.publish
-        //           '''
-        //         }
-        //       }
-        //     }
-        //   }
-        // }
+        stage('Debian') {
+          stages {
+            stage('Build') {
+              steps {
+                sh '''
+                  ./utils/release.bash --packaging deb
+                '''
+                dir (WORKING_DIRECTORY) {
+                  archiveArtifacts artifacts: "target/debian/*.deb"
+                }
+              }
+            }
+            stage('Publish') {
+              steps {
+                sshagent(['pkgserver']) {
+                  sh '''
+                    ./utils/release.bash --packaging deb.publish
+                  '''
+                }
+              }
+            }
+          }
+        }
         // stage('Redhat') {
         //   stages {
         //     stage('Build') {

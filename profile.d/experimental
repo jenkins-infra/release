@@ -12,5 +12,3 @@ SIGN_ALIAS=jenkins
 
 # PACKAGING ENV used from jenkinsci/packaging
 RELEASELINE="-experimental"
-
-BUILDENV=env/azure.mk
