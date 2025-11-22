@@ -198,52 +198,29 @@ pipeline {
             }
           }
         }
-        // stage('Redhat') {
-        //   stages {
-        //     stage('Build') {
-        //       steps {
-        //         sh '''
-        //           ./utils/release.bash --packaging rpm
-        //         '''
-        //         dir (WORKING_DIRECTORY) {
-        //           archiveArtifacts artifacts: "target/rpm/*.rpm"
-        //         }
-        //       }
-        //     }
-        //     stage('Publish') {
-        //       steps {
-        //         sshagent(['pkgserver']) {
-        //           sh '''
-        //             ./utils/release.bash --packaging rpm.publish
-        //           '''
-        //         }
-        //       }
-        //     }
-        //   }
-        // }
-        // stage('Suse') {
-        //   stages {
-        //     stage('Build') {
-        //       steps {
-        //         sh '''
-        //           ./utils/release.bash --packaging suse
-        //         '''
-        //         dir (WORKING_DIRECTORY) {
-        //           archiveArtifacts artifacts: "target/suse/*.rpm"
-        //         }
-        //       }
-        //     }
-        //     stage('Publish') {
-        //       steps {
-        //         sshagent(['pkgserver']) {
-        //           sh '''
-        //             ./utils/release.bash --packaging suse.publish
-        //           '''
-        //         }
-        //       }
-        //     }
-        //   }
-        // }
+        stage('RPM') {
+          stages {
+            stage('Build'){
+              steps {
+                sh '''
+                  ./utils/release.bash --packaging rpm
+                '''
+                dir (WORKING_DIRECTORY){
+                  archiveArtifacts artifacts: "target/rpm/*.rpm"
+                }
+              }
+            }
+            stage('Publish'){
+              steps {
+                sshagent(['pkgserver']) {
+                  sh '''
+                    ./utils/release.bash --packaging rpm.publish
+                  '''
+                }
+              }
+            }
+          }
+        }
         // stage('Windows') {
         //   when {
         //     environment name: 'WINDOWS_PACKAGING_ENABLED', value: 'true'

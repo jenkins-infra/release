@@ -12,7 +12,7 @@ export RPMDIR=${BASE_BIN_DIR}/rpm${RELEASELINE}
 # where to put repository index and other web contents
 export BASE_PKG_DIR=/var/www/pkg.jenkins.io.staging
 export RPM_WEBDIR=${BASE_PKG_DIR}/rpm${RELEASELINE}
-# export MSI_WEBDIR=${BASE_PKG_DIR}/windows${RELEASELINE}
+export MSI_WEBDIR=${BASE_PKG_DIR}/windows${RELEASELINE}
 export DEB_WEBDIR=${BASE_PKG_DIR}/debian${RELEASELINE}
 
 # URL to the aforementioned webdir.
