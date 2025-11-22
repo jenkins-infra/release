@@ -12,9 +12,3 @@ SIGN_ALIAS=jenkins
 
 # PACKAGING ENV used from jenkinsci/packaging
 RELEASELINE="-experimental"
-
-BUILDENV=env/azure.mk
-
-# Define endpoint used to force mirror synchronization
-PKGSERVER=mirrorbrain@20.186.155.37
-PKGSERVER_SSH_OPTS="-p 22 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
