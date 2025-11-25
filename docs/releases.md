@@ -19,9 +19,9 @@ Bear in mind, as future release lead, you do not need to work through the releas
   * [⚠️ Prepare release repository](#prepare-the-release-repository)
   * [Update the Bill of Materials](#update-the-bill-of-materials-bom)
   * [Update JCasC integration tests](#update-configurations-as-code-jcasc-integration-tests)
-  * [Review Jira issues and GitHub PRs](#review-jira-issues-and-github-prs)
+  * [Review Issues and Pull requests](#review-issues-and-pull-requests)
   * [Announce the backporting process](#announce-the-backporting)
-  * [Update Jira issues for backporting](#update-jira-issues-for-backporting)
+  * [Update issues for backporting](#update-issues-for-backporting)
   * [Backporting changes](#backport-changes)
   * [Open a backporting PR](#open-a-backporting-pr)
   * [Review tests](#review-tests)
@@ -34,7 +34,6 @@ Bear in mind, as future release lead, you do not need to work through the releas
   * [⚠️ Start the build](#start-the-lts-build)
   * [⚠️ Publish the GitHub release](#publish-the-github-release)
   * [Confirm acceptance tests](#confirm-acceptance-tests)
-  * [Update Jira issues](#update-jira-issues)
   * [⚠️ Publish Docker image](#publish-docker-image)
   * [Check docker images](#check-docker-images)
   * [Prepare Jenkins infrastructure for updates](#prepare-infrastructure-for-the-next-release)
@@ -166,25 +165,25 @@ Keep in mind to replace VVV with the LTS baseline again.
 Create a PR to update the [JCasC](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/integrations/pom.xml) integration tests to the weekly release, the LTS release is based upon.  
 This is done by replacing the `jenkins.version` property in the `<properties>` block to the version of the weekly release you are basing the LTS line on.
 
-### Review Jira issues and GitHub PRs
+### Review Issues and GitHub Pull Requests
 
-Make sure that all the Jira issues and GitHub PRs are in the correct state and that Jira issues are labeled with `lts-candidate`. Visit the checklist for more information.
+Make sure that all the issues and pull requests are in the correct state and that issues are labeled with `lts-candidate`. Visit the checklist for more information.
 
 ### Announce the backporting
 
 Send a backporting announcement email to the [jenkinsci-dev](https://groups.google.com/g/jenkinsci-dev) mailing list, using the [default](https://groups.google.com/g/jenkinsci-dev/c/sZY2WXoWLWM) template.
-Remember to exchange the LTS version, release date and Jira URLs.
+Remember to exchange the LTS version, release date and GitHub URLs.
 
-### Update Jira issues for backporting
+### Update issues for backporting
 
-Use the [LTS candidates](https://issues.jenkins.io/issues/?filter=12146) query to list issues eligible for a backport.  
+Use the [LTS candidates](https://github.com/jenkinsci/jenkins/issues?q=is%3Aclosed%20label%3Alts-candidate) query to list issues eligible for a backport.  
 Add `2.VVV.p-fixed` and remove `lts-candidate` or add `2.VVV.p-rejected` and retain the `lts-candidate` label.  
 .p stands for patch release, like .1, .2, or .3.
 
 ### Backport changes
 
-Run the [list-issue-commits script](https://github.com/jenkins-infra/release/blob/master/tools/list-issue-commits.sh) to locate commits via jira ID and backport them via `cherry-pick -x $commit` into a separate branch based on `stable-2.VVV`.  
-Incase there are conflicting commits, pick an [appropriate merge strategy](https://git-scm.com/docs/merge-strategies) to address the conflicts without undoing the change or merging in newer content.
+Identify the commits linked to the selected issues and pull requests and backport them via `cherry-pick -x $commit` into a separate branch based on `stable-2.VVV`.  
+In case there are conflicting commits, pick an [appropriate merge strategy](https://git-scm.com/docs/merge-strategies) to address the conflicts without undoing the change or merging in newer content.
 
 ### Open a backporting PR
 
@@ -276,10 +275,6 @@ If the release build passes, confirm if all acceptance tests are green:
 3. Confirm [Red Hat installer acceptance tests](https://ci.jenkins.io/job/Infra/job/acceptance-tests/job/install-lts-redhat-rpm/) are passing.
 
 For good measures, check the console log to confirm that the correct release package was used (e.g. search for `2.VVV`).
-
-### Update Jira issues
-
-Adjust state and `Released As` of [Jira issues](https://issues.jenkins.io/) fixed in the release (see the [changelog](https://www.jenkins.io/changelog-stable) for issue links)
 
 ### Publish Docker image
 ⚠️ **Requires write access to the [jenkinsci/docker repository](https://github.com/jenkinsci/docker) ** ⚠️
