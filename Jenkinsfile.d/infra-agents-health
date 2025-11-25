@@ -26,6 +26,10 @@ pipeline {
               yamlFile 'PodTemplates.d/package-linux.yaml'
             }
           }
+          environment {
+            SSH_HOSTKEY_ARCHIVES_JENKINS_IO = credentials('ssh-hostkey-archives.jenkins.io')
+            SSH_HOSTKEY_PKG_ORIGIN_JENKINS_IO = credentials('ssh-hostkey-pkg.origin.jenkins.io')
+          }
           steps {
             // Ensure we can get the secondary git repository used for packaging
             dir ('./release'){
@@ -40,8 +44,23 @@ pipeline {
             // Ensure we get the correct Java and Maven versions
             sh 'mvn -v'
             // Ensure the correct storage is mounted in expected paths
-            sh 'ls -la /srv/releases/jenkins'
             sh 'ls -la /var/www/pkg.jenkins.io.staging/'
+            sh 'ls -la /var/www/pkg.jenkins.io.production/'
+            sh 'ls -la /var/www/get.jenkins.io.staging/'
+            sh 'ls -la /var/www/get.jenkins.io.production/'
+
+            // Ensure we can SSH-connect to required remote servers
+            sshagent(credentials: [
+              'pkgserver',
+              'archives.jenkins.io'
+            ]) {
+              sh '''
+              mkdir -m 700 -p "${HOME}/.ssh"
+              cat "${SSH_HOSTKEY_ARCHIVES_JENKINS_IO}" "${SSH_HOSTKEY_PKG_ORIGIN_JENKINS_IO}" >> "${HOME}/.ssh/known_hosts"
+              ssh -v mirrorsync@archives.jenkins.io whoami
+              ssh -v mirrorbrain@pkg.origin.jenkins.io whoami
+              '''
+            }
           }
         }
         stage('Test Linux Agent `release-linux`') {
