@@ -13,8 +13,6 @@ spec:
       image: jenkinsciinfra/packaging:8.2.8
       imagePullPolicy: "IfNotPresent"
       env:
-        - name: "HOME"
-          value: "/home/jenkins/agent/workspace"
         - name: "JENKINS_JAVA_BIN"
           value: "/opt/jdk-21/bin/java"
         - name: "JENKINS_JAVA_OPTS"
@@ -32,11 +30,17 @@ spec:
         runAsGroup: 1000
       volumeMounts:
         - name: data-storage-jenkins-io
-          mountPath: /srv/releases/jenkins
+          mountPath: /var/www/get.jenkins.io.staging
+          subPath: ./get.jenkins.io/mirrorbits-staging/
+        - name: data-storage-jenkins-io
+          mountPath: /var/www/get.jenkins.io.production
           subPath: ./get.jenkins.io/mirrorbits/
         - name: data-storage-jenkins-io
           mountPath: /var/www/pkg.jenkins.io.staging
           subPath: ./pkg.jenkins.io/staging/
+        - name: data-storage-jenkins-io
+          mountPath: /var/www/pkg.jenkins.io.production
+          subPath: ./pkg.jenkins.io/production/
   volumes:
     - name: data-storage-jenkins-io
       persistentVolumeClaim:
