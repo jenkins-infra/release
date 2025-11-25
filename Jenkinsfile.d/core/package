@@ -302,7 +302,7 @@ pipeline {
           'archives.jenkins.io',
         ]) {
           sh '''
-          mkdir -p "${HOME}/.ssh"
+              mkdir -m 700 -p "${HOME}/.ssh"
           cat "${SSH_HOSTKEY_ARCHIVES_JENKINS_IO}" "${SSH_HOSTKEY_PKG_ORIGIN_JENKINS_IO}" >> "${HOME}/.ssh/known_hosts"
           '''
           sh '''
