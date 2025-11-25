@@ -70,7 +70,7 @@ pipeline {
   }
 
 //  ENV JENKINS_VERSION
-//    stable: It represents the latest stable version that satifies version pattern X.Y.Z
+//    stable: It represents the latest stable version that satisfies version pattern X.Y.Z
 //    weekly: It represents the latest weekly version that satisfies version pattern X.Y
 //    <version>: where version represent any valid existing version like 2.176.2
 
@@ -119,10 +119,9 @@ pipeline {
 
     }
     stage('Get GPG key') {
-
       steps {
         checkout scm
-        dir (WORKING_DIRECTORY){
+        dir (WORKING_DIRECTORY) {
           git branch: PACKAGING_GIT_BRANCH, credentialsId: 'release-key', url: PACKAGING_GIT_REPOSITORY
         }
 
@@ -130,7 +129,7 @@ pipeline {
           ./utils/release.bash --getGPGKeyFromAzure
         '''
 
-        dir (WORKING_DIRECTORY){
+        dir (WORKING_DIRECTORY) {
           stash includes: GPG_FILE , name: 'GPG'
         }
 
@@ -139,7 +138,6 @@ pipeline {
     }
 
     stage('Get Code Signing Certificate') {
-
       steps {
         sh '''
           utils/release.bash --downloadAzureKeyvaultSecret
@@ -150,52 +148,48 @@ pipeline {
       }
     }
 
-    stage('Download WAR archive to package'){
+    stage('Download WAR archive to package') {
       steps{
         sh '''
           ./utils/release.bash --downloadJenkins
         '''
-        dir (WORKING_DIRECTORY){
+        dir (WORKING_DIRECTORY) {
           stash includes: WAR_FILENAME, name: "WAR"
           archiveArtifacts artifacts: "*.war"
         }
       }
     }
-    stage('Package'){
+    stage('Package') {
       failFast false
       parallel {
         stage('WAR') {
           stages {
-            stage('Publish'){
+            stage('Publish') {
               steps {
-                sshagent(['pkgserver']) {
-                  sh '''
-                    ./utils/release.bash --packaging war.publish
-                  '''
-                }
+                sh '''
+                  ./utils/release.bash --packaging war.publish
+                '''
               }
             }
           }
         }
         stage('Debian') {
           stages {
-            stage('Build'){
+            stage('Build') {
               steps {
                 sh '''
                   ./utils/release.bash --packaging deb
                 '''
-                dir (WORKING_DIRECTORY){
+                dir (WORKING_DIRECTORY) {
                   archiveArtifacts artifacts: "target/debian/*.deb"
                 }
               }
             }
-            stage('Publish'){
+            stage('Publish') {
               steps {
-                sshagent(['pkgserver']) {
-                  sh '''
-                    ./utils/release.bash --packaging deb.publish
-                  '''
-                }
+                sh '''
+                  ./utils/release.bash --packaging deb.publish
+                '''
               }
             }
           }
@@ -214,11 +208,9 @@ pipeline {
             }
             stage('Publish'){
               steps {
-                sshagent(['pkgserver']) {
-                  sh '''
-                    ./utils/release.bash --packaging rpm.publish
-                  '''
-                }
+                sh '''
+                  ./utils/release.bash --packaging rpm.publish
+                '''
               }
             }
           }
@@ -239,7 +231,7 @@ pipeline {
               steps {
                 container('dotnet') {
                   checkout scm
-                  dir (WORKING_DIRECTORY){
+                  dir (WORKING_DIRECTORY) {
                     git branch: PACKAGING_GIT_BRANCH, credentialsId: 'release-key', url: PACKAGING_GIT_REPOSITORY
 
                     unstash 'GPG'
@@ -260,21 +252,19 @@ pipeline {
                 }
               }
             }
-            stage('Publish'){
+            stage('Publish') {
               steps {
                 unarchive mapping: ['*.msi*': WORKING_DIRECTORY]
-                sshagent(['pkgserver']) {
-                  sh '''
-                    ./utils/release.bash --packaging msi.publish
-                  '''
-                }
+                sh '''
+                  ./utils/release.bash --packaging msi.publish
+                '''
               }
             }
           }
         }
       }
     }
-    stage('Promote'){
+    stage('Promote') {
       failFast true
       parallel {
         stage('Maven Repository') {
@@ -283,11 +273,9 @@ pipeline {
           }
 
           steps {
-            sshagent(['pkgserver']) {
-              sh '''
-                ./utils/release.bash --promoteStagingMavenArtifacts
-              '''
-            }
+            sh '''
+              ./utils/release.bash --promoteStagingMavenArtifacts
+            '''
           }
         }
         stage('Git Repository') {
@@ -295,26 +283,35 @@ pipeline {
             environment name: 'GIT_STAGING_REPOSITORY_PROMOTION_ENABLED', value: 'true'
           }
           steps {
-            sshagent(['pkgserver']) {
-              sh '''
-                ./utils/release.bash --promoteStagingGitRepository
-              '''
-            }
+            sh '''
+              ./utils/release.bash --promoteStagingGitRepository
+            '''
           }
         }
       }
     }
     // Force mirror synchronization
-    stage('Synchronize mirror'){
+    stage('Promote Packages and sync mirrors') {
+      environment {
+        SSH_HOSTKEY_ARCHIVES_JENKINS_IO   = credentials('ssh-hostkey-archives.jenkins.io')
+        SSH_HOSTKEY_PKG_ORIGIN_JENKINS_IO = credentials('ssh-hostkey-pkg.origin.jenkins.io')
+      }
       steps{
-        sshagent(['pkgserver']) {
+        sshagent(credentials: [
+          'pkgserver',
+          'archives.jenkins.io',
+        ]) {
           sh '''
-            ./utils/release.bash --syncMirror
+              mkdir -m 700 -p "${HOME}/.ssh"
+          cat "${SSH_HOSTKEY_ARCHIVES_JENKINS_IO}" "${SSH_HOSTKEY_PKG_ORIGIN_JENKINS_IO}" >> "${HOME}/.ssh/known_hosts"
+          '''
+          sh '''
+            ./utils/release.bash --promotePackages
           '''
         }
       }
     }
-    stage('Invalidate Fastly Cache'){
+    stage('Invalidate Fastly Cache') {
       environment {
         FASTLY_API_TOKEN = credentials('fastly-api-token')
         FASTLY_SERVICE_ID = credentials('fastly_pkgserver_service_id')
@@ -326,9 +323,9 @@ pipeline {
       }
     }
   }
-    post {
-      failure {
-        input '''Can I delete the pod? '''
-      }
+  post {
+    failure {
+      input '''Can I delete the pod? '''
     }
+  }
 }

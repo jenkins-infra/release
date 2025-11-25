@@ -307,7 +307,7 @@ function configurePackagingEnv() {
 	: "${BRAND:=$WORKSPACE/$WORKING_DIRECTORY/branding/common}"
 	: "${RELEASELINE:=}"
 	: "${ORGANIZATION:=jenkins.io}"
-	: "${BUILDENV:=$WORKSPACE/$WORKING_DIRECTORY/env/release.mk}"
+	: "${BUILDENV:=$WORKSPACE/env/package.mk}"
 	: "${CREDENTIAL:=$BRAND}" # For now, we just want this variable to be set to not empty
 	: "${GPG_PASSPHRASE_FILE:=$WORKSPACE/$WORKING_DIRECTORY/$GPG_KEYNAME.pass}"
 
@@ -326,7 +326,7 @@ function cleanPackagingEnv() {
 }
 
 function packaging() {
-	# Still function need an access to this Makefile
+	# This function needs access to this Makefile
 	# https://github.com/jenkinsci/packaging/blob/master/Makefile
 	# if more than parameter is needed then they have to be quoted
 	# example: `utils/release.bash --packaging "deb rpm suse"`
@@ -450,7 +450,7 @@ function showPackagingPlan() {
 		Those new packages will be generated based on a war file downloaded
 		from ${JENKINS_DOWNLOAD_URL}
 
-		Once built, packages will be pushed to ${PKGSERVER}
+		Once built, packages will be pushed to get.jenkins.io and pkg.jenkins.io
 	EOF
 
 	if $GIT_STAGING_REPOSITORY_PROMOTION_ENABLED -eq "true"; then
@@ -477,11 +477,17 @@ function showPackagingPlan() {
 	fi
 }
 
-function syncMirror() {
-	source_dir=/srv/releases/jenkins/
+function promotePackages() {
+	# Where all webservices have their htdocs mounted
+	# TODO: can we use env. var from pod template instead (to avoid duplicating the information)
+	local source_base_dir=/var/www
+	local get_jenkins_io_staging="${source_base_dir}/get.jenkins.io.staging"
+	local get_jenkins_io_production="${source_base_dir}/get.jenkins.io.production"
+	local pkg_jenkins_io_staging="${source_base_dir}/pkg.jenkins.io.staging"
+	local pkg_jenkins_io_production="${source_base_dir}/pkg.jenkins.io.production"
 
-	# Step 1/2: copy binaries from local directory to remote server
-	# TODO: copy to archives.jenkins.io instead of pkg. Requires the same on update center/crawler at the same time.
+	## Step 1/3 - Copy binaries and HTML from staging to (remote) archives.jenkins.io (mirror fallback)
+	pushd "${get_jenkins_io_staging}"
 	rsync --recursive \
 		--links `# Copy symlinks as symlinks: destination is a Linux filesystem` \
 		--perms `# Preserve permissions: destination is a Linux filesystem` \
@@ -489,17 +495,43 @@ function syncMirror() {
 		--compress `# CPU is cheap, bandwidth is not` \
 		--verbose \
 		--times `# Preserve timestamps` \
-		--exclude=/updates `# populated by https://github.com/jenkins-infra/crawler` \
 		--exclude=/plugins `# populated by https://github.com/jenkins-infra/update-center2` \
-		-e "ssh ${PKGSERVER_SSH_OPTS[*]}" \
-		"${source_dir}" \
-		"${PKGSERVER}":/srv/releases/jenkins/ `# destination`
+		. `# source` \
+		mirrorsync@archives.jenkins.io:/srv/releases `# destination # TODO: get hostname and path from env`
+	popd
 
-	# Step 2/2: trigger remote sync script (generate symlinks, copy to archives and promote staging webdir to production)
-	# TODO: Remove the copy to archive in remote script and generate symlinks here
-	ssh "${PKGSERVER_SSH_OPTS[@]}" "${PKGSERVER}" /srv/releases/sync.sh
-
+	## Step 2/3 - Copy binaries and HTML from staging.get.jenkins.io to get.jenkins.io
+	pushd "${get_jenkins_io_staging}"
+	rsync --archive \
+		--verbose \
+		--progress \
+		--exclude=/plugins `# populated by https://github.com/jenkins-infra/update-center2` \
+		. `# source` \
+		"${get_jenkins_io_production}" `# destination # TODO: path from env`
+	popd
 	## TODO (long term): trigger a mirrorbits refresh
+
+	## Step 3/3 - Copy package sites from staging.pkg.origin.jenkins.io to pkg.origin.jenkins.io
+	pushd "${pkg_jenkins_io_staging}"
+	rsync --archive \
+		--verbose \
+		--progress \
+		--exclude=/plugins `# populated by https://github.com/jenkins-infra/update-center2` \
+		. `# source` \
+		"${pkg_jenkins_io_production}" `# destination # TODO: path from env`
+	# TODO: remove once pkg.origin.jenkins.io has migrated to Azure
+	rsync --recursive \
+		--links `# Copy symlinks as symlinks: destination is a Linux filesystem` \
+		--perms `# Preserve permissions: destination is a Linux filesystem` \
+		--devices --specials `# Preserve special files: destination is a Linux filesystem` \
+		--compress `# CPU is cheap, bandwidth is not` \
+		--verbose \
+		--times `# Preserve timestamps` \
+		--chown="mirrorbrain:www-data" `# Ensure the right ownership to have read-only on the webserver` \
+		--exclude=/plugins `# populated by https://github.com/jenkins-infra/update-center2` \
+		. `# source` \
+		mirrorbrain@pkg.origin.jenkins.io:/var/www/pkg.jenkins.io `# destination`
+	popd
 }
 
 function main() {
@@ -538,7 +570,7 @@ function main() {
 			--promoteStagingGitRepository) echo "Promote Staging Git Repository" && promoteStagingGitRepository ;;
 			--stageRelease) echo "Stage Release" && stageRelease ;;
 			--packaging) echo 'Execute packaging makefile, quote required around Makefile target' && packaging "$2" ;;
-			--syncMirror) echo 'Trigger mirror synchronization' && syncMirror ;;
+			--promotePackages) echo 'Trigger mirror synchronization' && promotePackages ;;
 			-h) echo "help" ;;
 			-*) echo "help" ;;
 			esac
@@ -575,7 +607,6 @@ source "${ROOT_DIR}/profile.d/${RELEASE_PROFILE}"
 : "${JENKINS_VERSION:=latest}"
 : "${JENKINS_WAR:=$WORKSPACE/$WORKING_DIRECTORY/war/target/jenkins.war}"
 : "${JENKINS_ASC:=$WORKSPACE/$WORKING_DIRECTORY/war/target/jenkins.war.asc}"
-: "${PKGSERVER:=mirrorbrain@pkg.origin.jenkins.io}"
 : "${SIGN_ALIAS:=jenkins}"
 : "${SIGN_KEYSTORE_FILENAME:=jenkins.pfx}"
 : "${SIGN_KEYSTORE:=${WORKSPACE}/${SIGN_KEYSTORE_FILENAME}}"
@@ -586,7 +617,6 @@ source "${ROOT_DIR}/profile.d/${RELEASE_PROFILE}"
 : "${MAVEN_REPOSITORY_PRODUCTION_NAME:=releases}"
 : "${MAVEN_REPOSITORY_SNAPSHOT_NAME:=releases}"
 : "${MAVEN_PUBLIC_JENKINS_REPOSITORY_MIRROR_URL:=https://repo.jenkins-ci.org/public/}"
-: "${PKGSERVER_SSH_OPTS:=-p 22}"
 
 : "${JENKINS_DOWNLOAD_URL:=$MAVEN_REPOSITORY_URL/$MAVEN_REPOSITORY_NAME/org/jenkins-ci/main/jenkins-war/}"
 
