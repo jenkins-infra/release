@@ -14,6 +14,8 @@ OWNER=jenkinsci
 REPO=jenkins
 SEARCH_LIMIT=100
 
+export GH_PAGER=cat
+
 targetVersion=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout --batch-mode)
 if [[ "$targetVersion" != *"$version"* ]]; then
     echo "The previous version does not appear to be released yet: $targetVersion" >&2
