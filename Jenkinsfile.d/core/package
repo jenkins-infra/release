@@ -207,38 +207,38 @@ pipeline {
         stage('Package') {
           failFast false
           parallel {
-            stage('WAR') {
-              stages {
-                stage('Publish') {
-                  steps {
-                    sh '''
-                      ./utils/release.bash --packaging war.publish
-                    '''
-                  }
-                }
-              }
-            }
-            stage('Debian') {
-              stages {
-                stage('Build') {
-                  steps {
-                    sh '''
-                      ./utils/release.bash --packaging deb
-                    '''
-                    dir (WORKING_DIRECTORY) {
-                      archiveArtifacts artifacts: "target/debian/*.deb"
-                    }
-                  }
-                }
-                stage('Publish') {
-                  steps {
-                    sh '''
-                      ./utils/release.bash --packaging deb.publish
-                    '''
-                  }
-                }
-              }
-            }
+            // stage('WAR') {
+            //   stages {
+            //     stage('Publish') {
+            //       steps {
+            //         sh '''
+            //           ./utils/release.bash --packaging war.publish
+            //         '''
+            //       }
+            //     }
+            //   }
+            // }
+            // stage('Debian') {
+            //   stages {
+            //     stage('Build') {
+            //       steps {
+            //         sh '''
+            //           ./utils/release.bash --packaging deb
+            //         '''
+            //         dir (WORKING_DIRECTORY) {
+            //           archiveArtifacts artifacts: "target/debian/*.deb"
+            //         }
+            //       }
+            //     }
+            //     stage('Publish') {
+            //       steps {
+            //         sh '''
+            //           ./utils/release.bash --packaging deb.publish
+            //         '''
+            //       }
+            //     }
+            //   }
+            // }
             stage('RPM') {
               stages {
                 stage('Build'){
@@ -260,120 +260,120 @@ pipeline {
                 }
               }
             }
-            stage('Windows') {
-              when {
-                environment name: 'WINDOWS_PACKAGING_ENABLED', value: 'true'
-              }
-              stages {
-                stage('Build') {
-                  // Windows requirement: Every steps need to be executed inside default jnlp
-                  // as the step 'container' is known to not be working
-                  agent {
-                    kubernetes {
-                      yamlFile 'PodTemplates.d/package-windows.yaml'
-                    }
-                  }
-                  steps {
-                    container('dotnet') {
-                      checkout scm
-                      dir (WORKING_DIRECTORY) {
-                        git branch: PACKAGING_GIT_BRANCH, credentialsId: 'release-key', url: PACKAGING_GIT_REPOSITORY
+            // stage('Windows') {
+            //   when {
+            //     environment name: 'WINDOWS_PACKAGING_ENABLED', value: 'true'
+            //   }
+            //   stages {
+            //     stage('Build') {
+            //       // Windows requirement: Every steps need to be executed inside default jnlp
+            //       // as the step 'container' is known to not be working
+            //       agent {
+            //         kubernetes {
+            //           yamlFile 'PodTemplates.d/package-windows.yaml'
+            //         }
+            //       }
+            //       steps {
+            //         container('dotnet') {
+            //           checkout scm
+            //           dir (WORKING_DIRECTORY) {
+            //             git branch: PACKAGING_GIT_BRANCH, credentialsId: 'release-key', url: PACKAGING_GIT_REPOSITORY
 
-                        unstash 'GPG'
-                        unstash 'WAR'
-                        unstash 'KEYSTORE'
+            //             unstash 'GPG'
+            //             unstash 'WAR'
+            //             unstash 'KEYSTORE'
 
-                        powershell '''
-                          Get-ChildItem env:
-                          $env:WAR=(Resolve-Path .\\jenkins.war).Path
-                          & .\\make.ps1
-                        '''
-                        // Don't archive the full path
-                        dir('msi\\build\\bin\\Release\\en-US') {
-                          archiveArtifacts '*.msi*'
-                        }
+            //             powershell '''
+            //               Get-ChildItem env:
+            //               $env:WAR=(Resolve-Path .\\jenkins.war).Path
+            //               & .\\make.ps1
+            //             '''
+            //             // Don't archive the full path
+            //             dir('msi\\build\\bin\\Release\\en-US') {
+            //               archiveArtifacts '*.msi*'
+            //             }
 
-                      }
-                    }
-                  }
-                }
-                stage('Publish') {
-                  steps {
-                    unarchive mapping: ['*.msi*': WORKING_DIRECTORY]
-                    sh '''
-                      ./utils/release.bash --packaging msi.publish
-                    '''
-                  }
-                }
-              }
-            }
+            //           }
+            //         }
+            //       }
+            //     }
+            //     stage('Publish') {
+            //       steps {
+            //         unarchive mapping: ['*.msi*': WORKING_DIRECTORY]
+            //         sh '''
+            //           ./utils/release.bash --packaging msi.publish
+            //         '''
+            //       }
+            //     }
+            //   }
+            // }
           }
         }
-        stage('Promote') {
-          failFast true
-          parallel {
-            stage('Maven Repository') {
-              when {
-                environment name: 'MAVEN_STAGING_REPOSITORY_PROMOTION_ENABLED', value: 'true'
-              }
+        // stage('Promote') {
+        //   failFast true
+        //   parallel {
+        //     stage('Maven Repository') {
+        //       when {
+        //         environment name: 'MAVEN_STAGING_REPOSITORY_PROMOTION_ENABLED', value: 'true'
+        //       }
 
-              steps {
-                sh '''
-                  ./utils/release.bash --promoteStagingMavenArtifacts
-                '''
-              }
-            }
-            stage('Git Repository') {
-              when {
-                environment name: 'GIT_STAGING_REPOSITORY_PROMOTION_ENABLED', value: 'true'
-              }
-              steps {
-                sh '''
-                  ./utils/release.bash --promoteStagingGitRepository
-                '''
-              }
-            }
-          }
-        }
+        //       steps {
+        //         sh '''
+        //           ./utils/release.bash --promoteStagingMavenArtifacts
+        //         '''
+        //       }
+        //     }
+        //     stage('Git Repository') {
+        //       when {
+        //         environment name: 'GIT_STAGING_REPOSITORY_PROMOTION_ENABLED', value: 'true'
+        //       }
+        //       steps {
+        //         sh '''
+        //           ./utils/release.bash --promoteStagingGitRepository
+        //         '''
+        //       }
+        //     }
+        //   }
+        // }
       }
     }
-    stage('Promote Packages and sync mirrors') {
-      when {
-        environment name: 'ONLY_STAGING', value: 'false'
-      }
-      environment {
-        SSH_HOSTKEY_ARCHIVES_JENKINS_IO   = credentials('ssh-hostkey-archives.jenkins.io')
-        SSH_HOSTKEY_PKG_ORIGIN_JENKINS_IO = credentials('ssh-hostkey-pkg.origin.jenkins.io')
-      }
-      steps {
-        sshagent(credentials: [
-          'pkgserver',
-          'archives.jenkins.io',
-        ]) {
-          sh '''
-              mkdir -m 700 -p "${HOME}/.ssh"
-          cat "${SSH_HOSTKEY_ARCHIVES_JENKINS_IO}" "${SSH_HOSTKEY_PKG_ORIGIN_JENKINS_IO}" >> "${HOME}/.ssh/known_hosts"
-          '''
-          sh '''
-            ./utils/release.bash --promotePackages
-          '''
-        }
-      }
-    }
-    stage('Invalidate Fastly Cache') {
-      when {
-        environment name: 'ONLY_STAGING', value: 'false'
-      }
-      environment {
-        FASTLY_API_TOKEN = credentials('fastly-api-token')
-        FASTLY_SERVICE_ID = credentials('fastly_pkgserver_service_id')
-      }
-      steps {
-        sh '''
-          ./utils/release.bash --invalidateFastlyCache
-        '''
-      }
-    }
+    // stage('Promote Packages and sync mirrors') {
+    //   when {
+    //     environment name: 'ONLY_STAGING', value: 'false'
+    //   }
+    //   environment {
+    //     SSH_HOSTKEY_ARCHIVES_JENKINS_IO   = credentials('ssh-hostkey-archives.jenkins.io')
+    //     SSH_HOSTKEY_PKG_ORIGIN_JENKINS_IO = credentials('ssh-hostkey-pkg.origin.jenkins.io')
+    //   }
+    //   steps {
+    //     sshagent(credentials: [
+    //       'pkgserver',
+    //       'archives.jenkins.io',
+    //     ]) {
+    //       sh '''
+    //           mkdir -m 700 -p "${HOME}/.ssh"
+    //       cat "${SSH_HOSTKEY_ARCHIVES_JENKINS_IO}" "${SSH_HOSTKEY_PKG_ORIGIN_JENKINS_IO}" >> "${HOME}/.ssh/known_hosts"
+    //       '''
+    //       sh '''
+    //         ./utils/release.bash --promotePackages
+    //       '''
+    //     }
+    //   }
+    // }
+    // stage('Invalidate Fastly Cache') {
+    //   when {
+    //     environment name: 'ONLY_STAGING', value: 'false'
+    //   }
+    //   environment {
+    //     FASTLY_API_TOKEN = credentials('fastly-api-token')
+    //     FASTLY_SERVICE_ID = credentials('fastly_pkgserver_service_id')
+    //   }
+    //   steps {
+    //     sh '''
+    //       ./utils/release.bash --invalidateFastlyCache
+    //     '''
+    //   }
+    // }
   }
   post {
     failure {
