@@ -432,6 +432,7 @@ function verifyCertificateSignature() {
 }
 
 function showReleasePlan() {
+	set +x
 	cat <<-EOF
 		A new ${RELEASE_PROFILE} release will be generated for the "${RELEASELINE:-weekly}" release).
 
@@ -441,17 +442,57 @@ function showReleasePlan() {
 		Artifacts will be pushed to the maven repository named "${MAVEN_REPOSITORY_NAME}"
 		located on "${MAVEN_REPOSITORY_URL}" authenticated as "${MAVEN_REPOSITORY_USERNAME}"
 	EOF
+	set -x
 }
 
 function showPackagingPlan() {
-	cat <<-EOF
-		New Jenkins core packages will be generated for version $(jv get) for the "${RELEASELINE:-weekly}" release
+	set +x
 
-		Those new packages will be generated based on a war file downloaded
-		from ${JENKINS_DOWNLOAD_URL}
+	local staging_description production_description release_packages_description
+	release_packages_description="Jenkins core packages for version $(jv get) ("${RELEASELINE:-weekly}" release)"
+	staging_description="staging (at https://$(basename "${BASE_BIN_DIR}").staging.pkg.origin.jenkins.io and https://staging.get.jenkins.io/$(basename "${BASE_PKG_DIR}"))"
+	production_description="production (at https://get.jenkins.io and https://pkg.jenkins.io)."
 
-		Once built, packages will be pushed to get.jenkins.io and pkg.jenkins.io
-	EOF
+	if [ "${ONLY_PROMOTION:-false}" == "true" ]
+	then
+		if [ "${ONLY_STAGING:-false}" == "true" ]
+		then
+			echo "ERROR: you can't disable both staging (ONLY_PROMOTION=true) and promotion (ONLY_STAGING=true)."
+			exit 1
+		fi
+
+		if [ "${FORCE_STAGING_BOOTSTRAP:-false}" == "true" ]
+		then
+			echo "ERROR: you can't disable staging (ONLY_PROMOTION=true) while forcing for a staging bootstrap (FORCE_STAGING_BOOTSTRAP=true)."
+			exit 1
+		fi
+
+		cat <<-EOF
+			The ${release_packages_description}
+			staged in ${BASE_BIN_DIR} and ${BASE_PKG_DIR} will be promoted (e.g. published)
+			from ${staging_description}
+			to ${production_description}.
+		EOF
+	else
+		cat <<-EOF
+			New ${release_packages_description}
+
+			Those new packages will be generated based on a war file downloaded
+			from ${JENKINS_DOWNLOAD_URL}
+		EOF
+
+		if [ "${ONLY_STAGING:-false}" == "true" ]
+		then
+			cat <<-EOF
+				Once built, packages will be published to ${staging_description}.
+			EOF
+		else
+			cat <<-EOF
+				Once built, packages will be published to ${staging_description}
+				and then automatically promoted (e.g. published) to ${production_description}.
+			EOF
+		fi
+	fi
 
 	if $GIT_STAGING_REPOSITORY_PROMOTION_ENABLED -eq "true"; then
 		cat <<-EOF
@@ -475,16 +516,16 @@ function showPackagingPlan() {
 	else
 		echo "Maven repository promotion is disabled"
 	fi
+
+	set -x
 }
 
 function promotePackages() {
-	# Where all webservices have their htdocs mounted
-	# TODO: can we use env. var from pod template instead (to avoid duplicating the information)
-	local source_base_dir=/var/www
-	local get_jenkins_io_staging="${source_base_dir}/get.jenkins.io.staging"
-	local get_jenkins_io_production="${source_base_dir}/get.jenkins.io.production"
-	local pkg_jenkins_io_staging="${source_base_dir}/pkg.jenkins.io.staging"
-	local pkg_jenkins_io_production="${source_base_dir}/pkg.jenkins.io.production"
+	# Where all webservices have their htdocs mounted (provided by the agent environment)
+	local get_jenkins_io_staging="${BASE_BIN_DIR}"
+	local get_jenkins_io_production="${GET_JENKINS_IO_PRODUCTION}"
+	local pkg_jenkins_io_staging="${BASE_PKG_DIR}"
+	local pkg_jenkins_io_production="${PKG_JENKINS_IO_PRODUCTION}"
 
 	## Step 1/3 - Copy binaries and HTML from staging to (remote) archives.jenkins.io (mirror fallback)
 	pushd "${get_jenkins_io_staging}"
@@ -500,7 +541,7 @@ function promotePackages() {
 		mirrorsync@archives.jenkins.io:/srv/releases `# destination # TODO: get hostname and path from env`
 	popd
 
-	## Step 2/3 - Copy binaries and HTML from staging.get.jenkins.io to get.jenkins.io
+	## Step 2/3 - Copy binaries and HTML from staging to production
 	pushd "${get_jenkins_io_staging}"
 	rsync --archive \
 		--verbose \
@@ -511,7 +552,7 @@ function promotePackages() {
 	popd
 	## TODO (long term): trigger a mirrorbits refresh
 
-	## Step 3/3 - Copy package sites from staging.pkg.origin.jenkins.io to pkg.origin.jenkins.io
+	## Step 3/3 - Copy package sites from staging to production
 	pushd "${pkg_jenkins_io_staging}"
 	rsync --archive \
 		--verbose \
@@ -519,7 +560,7 @@ function promotePackages() {
 		--exclude=/plugins `# populated by https://github.com/jenkins-infra/update-center2` \
 		. `# source` \
 		"${pkg_jenkins_io_production}" `# destination # TODO: path from env`
-	# TODO: remove once pkg.origin.jenkins.io has migrated to Azure
+	# TODO: remove once fully migrated to Azure
 	rsync --recursive \
 		--links `# Copy symlinks as symlinks: destination is a Linux filesystem` \
 		--perms `# Preserve permissions: destination is a Linux filesystem` \

@@ -17,6 +17,14 @@ spec:
           value: "/opt/jdk-21/bin/java"
         - name: "JENKINS_JAVA_OPTS"
           value: "-XX:+PrintCommandLineFlags"
+        - name: "GET_JENKINS_IO_STAGING"
+          value: "/var/www/get.jenkins.io.staging"
+        - name: "PKG_JENKINS_IO_STAGING"
+          value: "/var/www/pkg.jenkins.io.staging"
+        - name: "GET_JENKINS_IO_PRODUCTION"
+          value: "/var/www/get.jenkins.io.production"
+        - name: "PKG_JENKINS_IO_PRODUCTION"
+          value: "/var/www/pkg.jenkins.io.production"
       resources:
         limits:
           memory: "1Gi"
