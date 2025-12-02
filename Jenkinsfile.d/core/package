@@ -115,7 +115,9 @@ pipeline {
     // Sanitize URL to avoid nested subdomains and other URL bad surprises: "feat/foo-stable:2.539" => "feat_foo-stable_2_539"
     BASE_PKG_DIR              = "${env.PKG_JENKINS_IO_STAGING}/${env.BRANCH_NAME.replaceAll('\\.', '_').replaceAll('\\/', '_').replaceAll('\\:', '_')}"
     FORCE_STAGING_BOOTSTRAP   = "${params.containsKey("FORCE_STAGING_BOOTSTRAP_PARAM") ? params.FORCE_STAGING_BOOTSTRAP_PARAM : false}"
-    ONLY_STAGING              = "${params.containsKey("ONLY_STAGING_PARAM") ? params.ONLY_STAGING_PARAM : false}"
+    // Commented temporarily only for 2.540 to validate promotion
+    // ONLY_STAGING              = "${params.containsKey("ONLY_STAGING_PARAM") ? params.ONLY_STAGING_PARAM : false}"
+    ONLY_STAGING              = "true"
     ONLY_PROMOTION            = "${params.containsKey("ONLY_PROMOTION_PARAM") ? params.ONLY_PROMOTION_PARAM : false}"
   }
 
