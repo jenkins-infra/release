@@ -530,6 +530,7 @@ function promotePackages() {
 	## Step 1/3 - Copy binaries and HTML from staging to (remote) archives.jenkins.io (mirror fallback)
 	pushd "${get_jenkins_io_staging}"
 	rsync --recursive \
+		--dry-run `# TODO: remove before merging PR https://github.com/jenkins-infra/release/pull/804` \
 		--links `# Copy symlinks as symlinks: destination is a Linux filesystem` \
 		--perms `# Preserve permissions: destination is a Linux filesystem` \
 		--devices --specials `# Preserve special files: destination is a Linux filesystem` \
@@ -544,6 +545,7 @@ function promotePackages() {
 	## Step 2/3 - Copy binaries and HTML from staging to production
 	pushd "${get_jenkins_io_staging}"
 	rsync --archive \
+		--dry-run `# TODO: remove before merging PR https://github.com/jenkins-infra/release/pull/804` \
 		--verbose \
 		--progress \
 		--exclude=/plugins `# populated by https://github.com/jenkins-infra/update-center2` \
@@ -555,6 +557,7 @@ function promotePackages() {
 	## Step 3/3 - Copy package sites from staging to production
 	pushd "${pkg_jenkins_io_staging}"
 	rsync --archive \
+		--dry-run `# TODO: remove before merging PR https://github.com/jenkins-infra/release/pull/804` \
 		--verbose \
 		--progress \
 		--exclude=/plugins `# populated by https://github.com/jenkins-infra/update-center2` \
@@ -562,6 +565,7 @@ function promotePackages() {
 		"${pkg_jenkins_io_production}" `# destination # TODO: path from env`
 	# TODO: remove once fully migrated to Azure
 	rsync --recursive \
+		--dry-run `# TODO: remove before merging PR https://github.com/jenkins-infra/release/pull/804` \
 		--links `# Copy symlinks as symlinks: destination is a Linux filesystem` \
 		--perms `# Preserve permissions: destination is a Linux filesystem` \
 		--devices --specials `# Preserve special files: destination is a Linux filesystem` \
