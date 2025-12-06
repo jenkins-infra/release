@@ -18,5 +18,5 @@ Process through [LTS Candidates](https://github.com/jenkinsci/jenkins/issues?q=i
 
 #### Identify issue commits
 
-For issues look at the PR that closed the issue or is linked to the issue.
-For pull requests look at the commit that was merged closing the pull request.
+For issues, look at the PR that closed the issue or is linked to the issue.
+For pull requests, look at the commit that was merged closing the pull request.
