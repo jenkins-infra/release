@@ -14,15 +14,9 @@ There is a couple of manual tasks that needs to follow described in the output.
 
 ### Backporting
 
-Process through [LTS Candidates](https://issues.jenkins.io/issues/?filter=12146) and update label `lts-candidate` to `${VERSION}-fixed` or `${VERSION}-rejected`. See `./lts-candidate-stats.sh <next_lts_version>` for status report.
+Process through [LTS Candidates](https://github.com/jenkinsci/jenkins/issues?q=is%3Aclosed%20label%3Alts-candidate) and update label `lts-candidate` to `${VERSION}-fixed` or `${VERSION}-rejected`. See `./lts-candidate-stats.sh <next_lts_version>` for status report.
 
 #### Identify issue commits
 
-`./list-issue-commits.sh <jira_id>` can be used to identify what (properly labeled) commits are
-
-- Common for master branch and current branch (no need to backport)
-- On master branch only (needs to be backported). The script reports the number of weekly releases the commit is part of in parentheses.
-
-Note it is never 100% bullet proof as there might be commits that are part of the fix yet are not labeled as such. Reviewing the JIRA and/or the Pull Request is often needed anyway. Longer branches are better cherry picked by merge commits.
-
-The commits are backported using `git cherry-pick -x <sha>` so the original commit is referenced.
+For issues look at the PR that closed the issue or is linked to the issue.
+For pull requests look at the commit that was merged closing the pull request.
