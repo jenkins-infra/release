@@ -365,6 +365,8 @@ All steps need to be done twice: Once for weekly, once for LTS.
 
 ==== Staging (before release day)
 
+===== Maven Artifacts
+
 To stage the Maven artifacts, trigger the generic Release link:https://release.ci.jenkins.io/job/core/job/release/[job] from the appropriate branch like `security-stable-2.303.2`.
 
 To do that, follow these steps:
@@ -377,16 +379,37 @@ To do that, follow these steps:
 ... `MAVEN_REPOSITORY_NAME` set to `unused` as we already define it in the release profile file, which overrides the job parameter
 ... `VALIDATION_ENABLED` set to true if the validation stage should run
 
-==== Publishing (on release day)
+===== Packages
 
-. To create and publish packages, trigger the generic Packaging job link:https://release.ci.jenkins.io/job/core/job/package/[job] from the appropriate branch like `security-stable-2.303.2` with correct parameters
+. To create and stage packages (except Docker images), trigger the generic Packaging job link:https://release.ci.jenkins.io/job/core/job/package/[job] from the appropriate branch like `security-stable-2.303.2` with correct parameters
 .. `RELEASE_PROFILE` set to `security`
+.. `JENKINS_VERSION` set to `unused` same reason as before
 .. `RELEASE_GIT_BRANCH`  set to `unused` same reason as before
 .. `MAVEN_REPOSITORY_NAME` set to `unused` same reason as before
-.. `MAVEN_REPOSITORY_PRODUCTION_NAME` set to `unused`
+.. `MAVEN_REPOSITORY_PRODUCTION_NAME` set to `unused` same reason as before
 .. `MAVEN_STAGING_REPOSITORY_PROMOTION_ENABLED` set to false (manually done by publishing-tool in a parallel process)
 .. `GIT_STAGING_REPOSITORY_PROMOTION_ENABLED` set to false (manually merged by security team)
-.. `VALIDATION_ENABLED` set to true
+.. `VALIDATION_ENABLED` set to true (we want a summary of what need to be done at the beginning)
+.. `WINDOWS_PACKAGING_ENABLED` set to true (we want to generate and stage Windows package along with other packages)
+.. `FORCE_STAGING_BOOTSTRAP_PARAM` set to false (only for edge cases)
+.. `ONLY_STAGING_PARAM` set to true (we only want to stage, not publish)
+.. `ONLY_PROMOTION_PARAM` set to false (we only want to stage, not publish)
+
+==== Publishing (on release day)
+
+. To publish packages from staging, trigger the generic Packaging job link:https://release.ci.jenkins.io/job/core/job/package/[job] from the appropriate branch like `security-stable-2.303.2` with correct parameters
+.. `RELEASE_PROFILE` set to `security`
+.. `JENKINS_VERSION` set to `unused` same reason as before
+.. `RELEASE_GIT_BRANCH` set to `unused` same reason as before
+.. `MAVEN_REPOSITORY_NAME` set to `unused` same reason as before
+.. `MAVEN_REPOSITORY_PRODUCTION_NAME` set to `unused` same reason as before
+.. `MAVEN_STAGING_REPOSITORY_PROMOTION_ENABLED` set to false (manually done by publishing-tool in a parallel process)
+.. `GIT_STAGING_REPOSITORY_PROMOTION_ENABLED` set to false (manually merged by security team)
+.. `VALIDATION_ENABLED` set to true (we want a summary of what need to be done at the beginning)
+.. `WINDOWS_PACKAGING_ENABLED` set to **false** (no package generation)
+.. `FORCE_STAGING_BOOTSTRAP_PARAM` set to false (only for edge cases)
+.. `ONLY_STAGING_PARAM` set to **false** (we don't want to stage anything)
+.. `ONLY_PROMOTION_PARAM` set to **true** (we only want to publish)
 
 == Certificate
 
