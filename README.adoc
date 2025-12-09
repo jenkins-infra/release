@@ -383,12 +383,14 @@ To do that, follow these steps:
 
 . To create and stage packages (except Docker images), trigger the generic Packaging job link:https://release.ci.jenkins.io/job/core/job/package/[job] from the appropriate branch like `security-stable-2.303.2` with correct parameters
 .. `RELEASE_PROFILE` set to `security`
+.. `JENKINS_VERSION` set to `unused` same reason as before
 .. `RELEASE_GIT_BRANCH`  set to `unused` same reason as before
 .. `MAVEN_REPOSITORY_NAME` set to `unused` same reason as before
 .. `MAVEN_REPOSITORY_PRODUCTION_NAME` set to `unused`
 .. `MAVEN_STAGING_REPOSITORY_PROMOTION_ENABLED` set to false (manually done by publishing-tool in a parallel process)
 .. `GIT_STAGING_REPOSITORY_PROMOTION_ENABLED` set to false (manually merged by security team)
-.. `VALIDATION_ENABLED` set to true
+.. `VALIDATION_ENABLED` set to true (we want a summary of what need to be done at the beginning)
+.. `WINDOWS_PACKAGING_ENABLE` set to true (we want to generate and stage Windows package along with other packages)
 .. `FORCE_STAGING_BOOTSTRAP_PARAM` set to false (only for edge cases)
 .. `ONLY_STAGING_PARAM` set to true (we only want to stage, not publish)
 .. `ONLY_PROMOTION_PARAM` set to false (we only want to stage, not publish)
@@ -397,12 +399,14 @@ To do that, follow these steps:
 
 . To publish packages from staging, trigger the generic Packaging job link:https://release.ci.jenkins.io/job/core/job/package/[job] from the appropriate branch like `security-stable-2.303.2` with correct parameters
 .. `RELEASE_PROFILE` set to `security`
-.. `RELEASE_GIT_BRANCH`  set to `unused` same reason as before
+.. `JENKINS_VERSION` set to `unused` same reason as before
+.. `RELEASE_GIT_BRANCH` set to `unused` same reason as before
 .. `MAVEN_REPOSITORY_NAME` set to `unused` same reason as before
 .. `MAVEN_REPOSITORY_PRODUCTION_NAME` set to `unused`
 .. `MAVEN_STAGING_REPOSITORY_PROMOTION_ENABLED` set to false (manually done by publishing-tool in a parallel process)
 .. `GIT_STAGING_REPOSITORY_PROMOTION_ENABLED` set to false (manually merged by security team)
-.. `VALIDATION_ENABLED` set to true
+.. `VALIDATION_ENABLED` set to true (we want a summary of what need to be done at the beginning)
+.. `WINDOWS_PACKAGING_ENABLE` set to false (no package generation)
 .. `FORCE_STAGING_BOOTSTRAP_PARAM` set to false (only for edge cases)
 .. `ONLY_STAGING_PARAM` set to false (we don't want to stage anything)
 .. `ONLY_PROMOTION_PARAM` set to false (we only want to publish)
