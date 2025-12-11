@@ -184,8 +184,8 @@ pipeline {
                 mkdir -p "${BASE_BIN_DIR}" "${BASE_PKG_DIR}"
 
                 # TODO: Initialize from production with symlinks?
-                # Initialize from production only for RPMs to get the history when rebuilding index (debian don't care)
-                rsync -avtz --chown=1000:1000 "${GET_JENKINS_IO_PRODUCTION}/rpm" "${BASE_BIN_DIR}/"
+                # Initialize from production only for Redhat and Opensuse to get the history when rebuilding index (debian don't care)
+                rsync -avtz --chown=1000:1000 "${GET_JENKINS_IO_PRODUCTION}/redhat-stable" "${GET_JENKINS_IO_PRODUCTION}/opensuse-stable" "${BASE_BIN_DIR}/"
 
                 # Initialize from production as we need an initial package state. We don't sync old package index which are kept in production.
                 rsync -avtz --chown=1000:1000 --exclude="*-legacy/*" "${PKG_JENKINS_IO_PRODUCTION}/" "${BASE_PKG_DIR}/"
