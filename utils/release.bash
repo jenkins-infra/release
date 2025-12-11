@@ -449,7 +449,7 @@ function showPackagingPlan() {
 	set +x
 
 	local staging_description production_description release_packages_description
-	release_packages_description="Jenkins core packages for version $(jv get) ("${RELEASELINE:-weekly}" release)"
+	release_packages_description="Jenkins core packages for version $(jv get) ('${RELEASELINE:-weekly}' release)"
 	staging_description="staging (at https://$(basename "${BASE_BIN_DIR}").staging.pkg.origin.jenkins.io and https://staging.get.jenkins.io/$(basename "${BASE_PKG_DIR}"))"
 	production_description="production (at https://get.jenkins.io and https://pkg.jenkins.io)."
 
@@ -577,6 +577,7 @@ function promotePackages() {
 
 function prepareStaging() {
 	local pkg_jenkins_io_production="${PKG_JENKINS_IO_PRODUCTION}"
+	local releaseline="${RELEASELINE}"
 
 	# Bootstrap (e.g. reset to production) all stagings for this branch if requested by the user or if missing a directory
 	if [ "${FORCE_STAGING_BOOTSTRAP}" = "true" ] || [ ! -d "${BASE_BIN_DIR}" ] || [ ! -d "${BASE_PKG_DIR}" ]
@@ -586,15 +587,16 @@ function prepareStaging() {
 		mkdir -p "${BASE_BIN_DIR}" "${BASE_PKG_DIR}"
 
 		# TODO: Initialize from production with symlinks?
-		# Initialize from production only for RPMs to get the history when rebuilding index (debian don't care)
+		# Initialize from production only for RPMs to get the history when rebuilding index (Debian don't care)
 		rsync -avtz --chown=1000:1000 \
-			"${GET_JENKINS_IO_PRODUCTION}/rpm" `# TODO: add support for both weekly and stable lines` \
+			"${GET_JENKINS_IO_PRODUCTION}/rpm${releaseline}" \
 			"${BASE_BIN_DIR}/"
 
-		# Initialize from production as we need an initial package state. We don't sync old package index which are kept in production.
+		# Initialize from production as we need an initial package state.
 		rsync -avtz --chown=1000:1000 \
-			--exclude="*-legacy/*" `# The legacy directories are designed for archiving purpose so we don't need them at all in staging` \
-			"${pkg_jenkins_io_production}/" "${BASE_PKG_DIR}/"
+			"${pkg_jenkins_io_production}/rpm${releaseline}" \
+			"${pkg_jenkins_io_production}/debian${releaseline}" \
+			"${BASE_PKG_DIR}/"
 	fi
 }
 
