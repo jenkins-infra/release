@@ -575,6 +575,29 @@ function promotePackages() {
 	popd
 }
 
+function prepareStaging() {
+	local pkg_jenkins_io_production="${PKG_JENKINS_IO_PRODUCTION}"
+
+	# Bootstrap (e.g. reset to production) all stagings for this branch if requested by the user or if missing a directory
+	if [ "${FORCE_STAGING_BOOTSTRAP}" = "true" ] || [ ! -d "${BASE_BIN_DIR}" ] || [ ! -d "${BASE_PKG_DIR}" ]
+	then
+		echo "Bootstrap (reset to production) of the staging environment for ${BASE_BIN_DIR} and ${BASE_PKG_DIR} directories..."
+		rm -rf "${BASE_BIN_DIR}" "${BASE_PKG_DIR}"
+		mkdir -p "${BASE_BIN_DIR}" "${BASE_PKG_DIR}"
+
+		# TODO: Initialize from production with symlinks?
+		# Initialize from production only for RPMs to get the history when rebuilding index (debian don't care)
+		rsync -avtz --chown=1000:1000 \
+			"${GET_JENKINS_IO_PRODUCTION}/rpm" `# TODO: add support for both weekly and stable lines` \
+			"${BASE_BIN_DIR}/"
+
+		# Initialize from production as we need an initial package state. We don't sync old package index which are kept in production.
+		rsync -avtz --chown=1000:1000 \
+			--exclude="*-legacy/*" `# The legacy directories are designed for archiving purpose so we don't need them at all in staging` \
+			"${pkg_jenkins_io_production}/" "${BASE_PKG_DIR}/"
+	fi
+}
+
 function main() {
 	if [[ $# -eq 0 ]]; then
 		configureGPG
@@ -612,6 +635,7 @@ function main() {
 			--stageRelease) echo "Stage Release" && stageRelease ;;
 			--packaging) echo 'Execute packaging makefile, quote required around Makefile target' && packaging "$2" ;;
 			--promotePackages) echo 'Trigger mirror synchronization' && promotePackages ;;
+			--prepareStaging) echo 'Prepare staging environment' && prepareStaging ;;
 			-h) echo "help" ;;
 			-*) echo "help" ;;
 			esac
