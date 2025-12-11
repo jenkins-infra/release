@@ -207,38 +207,38 @@ pipeline {
         stage('Package') {
           failFast false
           parallel {
-            // stage('WAR') {
-            //   stages {
-            //     stage('Publish') {
-            //       steps {
-            //         sh '''
-            //           ./utils/release.bash --packaging war.publish
-            //         '''
-            //       }
-            //     }
-            //   }
-            // }
-            // stage('Debian') {
-            //   stages {
-            //     stage('Build') {
-            //       steps {
-            //         sh '''
-            //           ./utils/release.bash --packaging deb
-            //         '''
-            //         dir (WORKING_DIRECTORY) {
-            //           archiveArtifacts artifacts: "target/debian/*.deb"
-            //         }
-            //       }
-            //     }
-            //     stage('Publish') {
-            //       steps {
-            //         sh '''
-            //           ./utils/release.bash --packaging deb.publish
-            //         '''
-            //       }
-            //     }
-            //   }
-            // }
+            stage('WAR') {
+              stages {
+                stage('Publish') {
+                  steps {
+                    sh '''
+                      ./utils/release.bash --packaging war.publish
+                    '''
+                  }
+                }
+              }
+            }
+            stage('Debian') {
+              stages {
+                stage('Build') {
+                  steps {
+                    sh '''
+                      ./utils/release.bash --packaging deb
+                    '''
+                    dir (WORKING_DIRECTORY) {
+                      archiveArtifacts artifacts: "target/debian/*.deb"
+                    }
+                  }
+                }
+                stage('Publish') {
+                  steps {
+                    sh '''
+                      ./utils/release.bash --packaging deb.publish
+                    '''
+                  }
+                }
+              }
+            }
             stage('Redhat') {
               stages {
                 stage('Build'){
@@ -283,53 +283,53 @@ pipeline {
                 }
               }
             }
-            // stage('Windows') {
-            //   when {
-            //     environment name: 'WINDOWS_PACKAGING_ENABLED', value: 'true'
-            //   }
-            //   stages {
-            //     stage('Build') {
-            //       // Windows requirement: Every steps need to be executed inside default jnlp
-            //       // as the step 'container' is known to not be working
-            //       agent {
-            //         kubernetes {
-            //           yamlFile 'PodTemplates.d/package-windows.yaml'
-            //         }
-            //       }
-            //       steps {
-            //         container('dotnet') {
-            //           checkout scm
-            //           dir (WORKING_DIRECTORY) {
-            //             git branch: PACKAGING_GIT_BRANCH, credentialsId: 'release-key', url: PACKAGING_GIT_REPOSITORY
+            stage('Windows') {
+              when {
+                environment name: 'WINDOWS_PACKAGING_ENABLED', value: 'true'
+              }
+              stages {
+                stage('Build') {
+                  // Windows requirement: Every steps need to be executed inside default jnlp
+                  // as the step 'container' is known to not be working
+                  agent {
+                    kubernetes {
+                      yamlFile 'PodTemplates.d/package-windows.yaml'
+                    }
+                  }
+                  steps {
+                    container('dotnet') {
+                      checkout scm
+                      dir (WORKING_DIRECTORY) {
+                        git branch: PACKAGING_GIT_BRANCH, credentialsId: 'release-key', url: PACKAGING_GIT_REPOSITORY
 
-            //             unstash 'GPG'
-            //             unstash 'WAR'
-            //             unstash 'KEYSTORE'
+                        unstash 'GPG'
+                        unstash 'WAR'
+                        unstash 'KEYSTORE'
 
-            //             powershell '''
-            //               Get-ChildItem env:
-            //               $env:WAR=(Resolve-Path .\\jenkins.war).Path
-            //               & .\\make.ps1
-            //             '''
-            //             // Don't archive the full path
-            //             dir('msi\\build\\bin\\Release\\en-US') {
-            //               archiveArtifacts '*.msi*'
-            //             }
+                        powershell '''
+                          Get-ChildItem env:
+                          $env:WAR=(Resolve-Path .\\jenkins.war).Path
+                          & .\\make.ps1
+                        '''
+                        // Don't archive the full path
+                        dir('msi\\build\\bin\\Release\\en-US') {
+                          archiveArtifacts '*.msi*'
+                        }
 
-            //           }
-            //         }
-            //       }
-            //     }
-            //     stage('Publish') {
-            //       steps {
-            //         unarchive mapping: ['*.msi*': WORKING_DIRECTORY]
-            //         sh '''
-            //           ./utils/release.bash --packaging msi.publish
-            //         '''
-            //       }
-            //     }
-            //   }
-            // }
+                      }
+                    }
+                  }
+                }
+                stage('Publish') {
+                  steps {
+                    unarchive mapping: ['*.msi*': WORKING_DIRECTORY]
+                    sh '''
+                      ./utils/release.bash --packaging msi.publish
+                    '''
+                  }
+                }
+              }
+            }
           }
         }
         stage('Promote') {
