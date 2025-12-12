@@ -45,12 +45,16 @@ spec:
       privileged: false
     tty: false
   nodeSelector:
-    kubernetes.azure.com/agentpool: w2019
+    kubernetes.azure.com/agentpool: w2022
     kubernetes.io/os: windows
   tolerations:
     - key: "os"
       operator: "Equal"
       value: "windows"
+      effect: "NoSchedule"
+    - key: "version"
+      operator: "Equal"
+      value: "windows2022"
       effect: "NoSchedule"
     - key: "jenkins"
       operator: "Equal"
