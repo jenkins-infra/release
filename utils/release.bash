@@ -521,14 +521,8 @@ function showPackagingPlan() {
 }
 
 function promotePackages() {
-	# Where all webservices have their htdocs mounted (provided by the agent environment)
-	local get_jenkins_io_staging="${BASE_BIN_DIR}"
-	local get_jenkins_io_production="${GET_JENKINS_IO_PRODUCTION}"
-	local pkg_jenkins_io_staging="${BASE_PKG_DIR}"
-	local pkg_jenkins_io_production="${PKG_JENKINS_IO_PRODUCTION}"
-
 	## Step 1/3 - Copy binaries and HTML from staging to (remote) archives.jenkins.io (mirror fallback)
-	pushd "${get_jenkins_io_staging}"
+	pushd "${BASE_BIN_DIR}"
 	rsync --recursive \
 		--links `# Copy symlinks as symlinks: destination is a Linux filesystem` \
 		--perms `# Preserve permissions: destination is a Linux filesystem` \
@@ -542,24 +536,24 @@ function promotePackages() {
 	popd
 
 	## Step 2/3 - Copy binaries and HTML from staging to production
-	pushd "${get_jenkins_io_staging}"
+	pushd "${BASE_BIN_DIR}"
 	rsync --archive \
 		--verbose \
 		--progress \
 		--exclude=/plugins `# populated by https://github.com/jenkins-infra/update-center2` \
 		. `# source` \
-		"${get_jenkins_io_production}" `# destination # TODO: path from env`
+		"${GET_JENKINS_IO_PRODUCTION}"
 	popd
 	## TODO (long term): trigger a mirrorbits refresh
 
 	## Step 3/3 - Copy package sites from staging to production
-	pushd "${pkg_jenkins_io_staging}"
+	pushd "${BASE_PKG_DIR}"
 	rsync --archive \
 		--verbose \
 		--progress \
 		--exclude=/plugins `# populated by https://github.com/jenkins-infra/update-center2` \
 		. `# source` \
-		"${pkg_jenkins_io_production}" `# destination # TODO: path from env`
+		"${PKG_JENKINS_IO_PRODUCTION}"
 	# TODO: remove once fully migrated to Azure
 	rsync --recursive \
 		--links `# Copy symlinks as symlinks: destination is a Linux filesystem` \
@@ -576,7 +570,6 @@ function promotePackages() {
 }
 
 function prepareStaging() {
-	local pkg_jenkins_io_production="${PKG_JENKINS_IO_PRODUCTION}"
 	local releaseline="${RELEASELINE}"
 
 	# Bootstrap (e.g. reset to production) all stagings for this branch if requested by the user or if missing a directory
@@ -594,8 +587,8 @@ function prepareStaging() {
 
 		# Initialize from production as we need an initial package state.
 		rsync -avtz --chown=1000:1000 \
-			"${pkg_jenkins_io_production}/rpm${releaseline}" \
-			"${pkg_jenkins_io_production}/debian${releaseline}" \
+			"${PKG_JENKINS_IO_PRODUCTION}/rpm${releaseline}" \
+			"${PKG_JENKINS_IO_PRODUCTION}/debian${releaseline}" \
 			"${BASE_PKG_DIR}/"
 	fi
 }
@@ -694,6 +687,12 @@ source "${ROOT_DIR}/profile.d/${RELEASE_PROFILE}"
 : "${RELEASE_GIT_PRODUCTION_REPOSITORY:=$RELEASE_GIT_REPOSITORY }"
 : "${RELEASE_GIT_PRODUCTION_BRANCH:=$RELEASE_GIT_BRANCH}"
 
+# Publication environment (path to production file system provided by the agent)
+: "${BASE_BIN_DIR}"
+: "${GET_JENKINS_IO_PRODUCTION}"
+: "${PKG_JENKINS_IO_PRODUCTION}"
+
+
 export JENKINS_VERSION
 export JENKINS_DOWNLOAD_URL
 export MAVEN_REPOSITORY_USERNAME
@@ -709,7 +708,10 @@ export GPG_KEYNAME
 
 export RELEASE_PROFILE
 export RELEASELINE
-export JENKINS_VERSION
+
+export BASE_BIN_DIR
+export GET_JENKINS_IO_PRODUCTION
+export PKG_JENKINS_IO_PRODUCTION
 
 if [[ ! -d $WORKING_DIRECTORY ]]; then
 	mkdir -p "${WORKING_DIRECTORY}"
