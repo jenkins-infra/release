@@ -11,7 +11,7 @@ metadata:
 spec:
   serviceAccountName: release-ci-jenkins-io-agents
   containers:
-  - image: jenkins/inbound-agent:3341.v0766d82b_dec0-4-jdk21-nanoserver-1809
+  - image: jenkins/inbound-agent:3341.v0766d82b_dec0-4-jdk21-nanoserver-ltsc2022
     imagePullPolicy: "IfNotPresent"
     name: "jnlp"
     env:
@@ -31,7 +31,7 @@ spec:
       - Start-Sleep -s 2147483 # We must be sure that the process used by the container doesn't stop before the Jenkins job and second is not greater than 2147483
     command:
       - "powershell.exe"
-    image: "mcr.microsoft.com/dotnet/framework/sdk:3.5"
+    image: "mcr.microsoft.com/dotnet/framework/sdk:3.5-windowsservercore-ltsc2022"
     imagePullPolicy: "IfNotPresent"
     name: "dotnet"
     resources:
@@ -45,12 +45,16 @@ spec:
       privileged: false
     tty: false
   nodeSelector:
-    kubernetes.azure.com/agentpool: w2019
+    kubernetes.azure.com/agentpool: w2022
     kubernetes.io/os: windows
   tolerations:
     - key: "os"
       operator: "Equal"
       value: "windows"
+      effect: "NoSchedule"
+    - key: "version"
+      operator: "Equal"
+      value: "windows2022"
       effect: "NoSchedule"
     - key: "jenkins"
       operator: "Equal"
