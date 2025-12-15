@@ -91,6 +91,10 @@ pipeline {
             }
           }
           steps {
+            // Ensure we can get the secondary git repository used for packaging
+            dir ('./release'){
+              git branch: 'master', credentialsId: 'release-key', url: 'git@github.com:jenkinsci/packaging.git'
+            }
             pwsh 'java -version'
             container('dotnet') {
                 powershell 'msbuild -version'
