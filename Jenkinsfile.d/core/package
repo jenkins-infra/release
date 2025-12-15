@@ -348,7 +348,7 @@ pipeline {
         }
       }
     }
-    stage('Invalidate Fastly Cache') {
+    stage('Invalidate Fastly Cache for pkg.jenkins.io') {
       when {
         environment name: 'ONLY_STAGING', value: 'false'
       }
