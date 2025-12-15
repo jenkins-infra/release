@@ -291,9 +291,10 @@ function guessGitBranchInformation() {
 
 function invalidateFastlyCache() {
 	: "${FASTLY_API_TOKEN:?Require FASTLY_API_TOKEN env variable}"
+	# Expecting pkg.jenkins.io site ID
 	: "${FASTLY_SERVICE_ID:?Require FASTLY_SERVICE_ID env variable}"
 
-	curl \
+	curl --fail --location \
 		-X POST \
 		-H "Fastly-Key: ${FASTLY_API_TOKEN}" \
 		-H "Accept: application/json" \
