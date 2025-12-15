@@ -97,7 +97,7 @@ pipeline {
     AZURE_VAULT_TENANT_ID     = credentials('azure-vault-tenant-id')
     GPG_FILE                  = 'jenkins-release.gpg'
     GPG_PASSPHRASE            = credentials('release-gpg-passphrase-2023')
-    // Using HTTPS with no credentials - https://github.com/jenkins-infra/helpdesk/issues/4909 - need a GH app if rate limited of need to write things to git
+    // Using HTTPS with no credentials - https://github.com/jenkins-infra/helpdesk/issues/4909 - need a GH app if rate limited or need to write things to git
     PACKAGING_GIT_REPOSITORY  = 'https://github.com/jenkinsci/packaging.git'
     PACKAGING_GIT_BRANCH      = 'master'
     SIGN_KEYSTORE_FILENAME    = 'jenkins.pfx'
