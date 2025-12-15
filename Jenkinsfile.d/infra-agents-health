@@ -15,7 +15,7 @@ pipeline {
     AZURE_VAULT_CLIENT_ID     = credentials('azure-vault-client-id')
     AZURE_VAULT_CLIENT_SECRET = credentials('azure-vault-client-secret')
     AZURE_VAULT_TENANT_ID     = credentials('azure-vault-tenant-id')
-    // Using HTTPS with no credentials - https://github.com/jenkins-infra/helpdesk/issues/4909 - need a GH app if rate limited of need to write things to git
+    // Using HTTPS with no credentials - https://github.com/jenkins-infra/helpdesk/issues/4909 - need a GH app if rate limited or need to write things to git
     PACKAGING_GIT_REPOSITORY  = 'https://github.com/jenkinsci/packaging.git'
     PACKAGING_GIT_BRANCH      = 'master'
     WORKING_DIRECTORY         = "release"
