@@ -570,7 +570,10 @@ function promotePackages() {
 }
 
 function prepareStaging() {
-	local releaseline="${RELEASELINE}"
+	set +u
+	local rpmreleaseline="rpm${RELEASELINE}"
+	local debianreleaseline="rpm${RELEASELINE}"
+	set -u
 
 	# Bootstrap (e.g. reset to production) all stagings for this branch if requested by the user or if missing a directory
 	if [ "${FORCE_STAGING_BOOTSTRAP}" = "true" ] || [ ! -d "${BASE_BIN_DIR}" ] || [ ! -d "${BASE_PKG_DIR}" ]
@@ -582,13 +585,13 @@ function prepareStaging() {
 		# TODO: Initialize from production with symlinks?
 		# Initialize from production only for RPMs to get the history when rebuilding index (Debian don't care)
 		rsync -avtz --chown=1000:1000 \
-			"${GET_JENKINS_IO_PRODUCTION}/rpm${releaseline}" \
+			"${GET_JENKINS_IO_PRODUCTION}/${rpmreleaseline}" \
 			"${BASE_BIN_DIR}/"
 
 		# Initialize from production as we need an initial package state.
 		rsync -avtz --chown=1000:1000 \
-			"${PKG_JENKINS_IO_PRODUCTION}/rpm${releaseline}" \
-			"${PKG_JENKINS_IO_PRODUCTION}/debian${releaseline}" \
+			"${PKG_JENKINS_IO_PRODUCTION}/${rpmreleaseline}" \
+			"${PKG_JENKINS_IO_PRODUCTION}/${debianreleaseline}" \
 			"${BASE_PKG_DIR}/"
 	fi
 }
