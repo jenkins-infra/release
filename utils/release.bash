@@ -447,8 +447,9 @@ function showReleasePlan() {
 }
 
 function showPackagingPlan() {
-	set +x
+	checkPackagingEnvironment
 
+	set +x # To avoid polluting output
 	local staging_description production_description release_packages_description
 	release_packages_description="Jenkins core packages for version $(jv get) ('${RELEASELINE:-weekly}' release)"
 	staging_description="staging (at https://$(basename "${BASE_BIN_DIR}").staging.pkg.origin.jenkins.io and https://staging.get.jenkins.io/$(basename "${BASE_PKG_DIR}"))"
@@ -518,10 +519,12 @@ function showPackagingPlan() {
 		echo "Maven repository promotion is disabled"
 	fi
 
-	set -x
+	set -x # Back to normal
 }
 
 function promotePackages() {
+	checkPackagingEnvironment
+
 	## Step 1/3 - Copy binaries and HTML from staging to (remote) archives.jenkins.io (mirror fallback)
 	pushd "${BASE_BIN_DIR}"
 	rsync --recursive \
@@ -571,6 +574,8 @@ function promotePackages() {
 }
 
 function prepareStaging() {
+	checkPackagingEnvironment
+
 	set +u
 	local rpmreleaseline="rpm${RELEASELINE}"
 	local debianreleaseline="rpm${RELEASELINE}"
@@ -595,6 +600,15 @@ function prepareStaging() {
 			"${PKG_JENKINS_IO_PRODUCTION}/${debianreleaseline}" \
 			"${BASE_PKG_DIR}/"
 	fi
+}
+
+function checkPackagingEnvironment() {
+	# Packaging publication environment (path to production file system provided by the agent)
+	: "${BASE_BIN_DIR}"
+	: "${GET_JENKINS_IO_PRODUCTION}"
+	: "${PKG_JENKINS_IO_PRODUCTION}"
+
+	export BASE_BIN_DIR GET_JENKINS_IO_PRODUCTION PKG_JENKINS_IO_PRODUCTION
 }
 
 function main() {
@@ -691,19 +705,12 @@ source "${ROOT_DIR}/profile.d/${RELEASE_PROFILE}"
 : "${RELEASE_GIT_PRODUCTION_REPOSITORY:=$RELEASE_GIT_REPOSITORY }"
 : "${RELEASE_GIT_PRODUCTION_BRANCH:=$RELEASE_GIT_BRANCH}"
 
-# Publication environment (path to production file system provided by the agent)
-: "${BASE_BIN_DIR}"
-: "${GET_JENKINS_IO_PRODUCTION}"
-: "${PKG_JENKINS_IO_PRODUCTION}"
-
-
 export JENKINS_VERSION
 export JENKINS_DOWNLOAD_URL
 export MAVEN_REPOSITORY_USERNAME
 export MAVEN_REPOSITORY_PASSWORD
 export WAR
 export BRAND
-export RELEASELINE
 export ORGANIZATION
 export BUILDENV
 export CREDENTIAL
@@ -712,10 +719,6 @@ export GPG_KEYNAME
 
 export RELEASE_PROFILE
 export RELEASELINE
-
-export BASE_BIN_DIR
-export GET_JENKINS_IO_PRODUCTION
-export PKG_JENKINS_IO_PRODUCTION
 
 if [[ ! -d $WORKING_DIRECTORY ]]; then
 	mkdir -p "${WORKING_DIRECTORY}"
