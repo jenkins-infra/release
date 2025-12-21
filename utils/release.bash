@@ -463,12 +463,6 @@ function showPackagingPlan() {
 			exit 1
 		fi
 
-		if [ "${FORCE_STAGING_BOOTSTRAP:-false}" == "true" ]
-		then
-			echo "ERROR: you can't disable staging (ONLY_PROMOTION=true) while forcing for a staging bootstrap (FORCE_STAGING_BOOTSTRAP=true)."
-			exit 1
-		fi
-
 		cat <<-EOF
 			The ${release_packages_description}
 			staged in ${BASE_BIN_DIR} and ${BASE_PKG_DIR} will be promoted (e.g. published)
@@ -567,28 +561,16 @@ function prepareStaging() {
 
 	set +u
 	local rpmreleaseline="rpm${RELEASELINE}"
-	local debianreleaseline="rpm${RELEASELINE}"
 	set -u
 
-	# Bootstrap (e.g. reset to production) all stagings for this branch if requested by the user or if missing a directory
-	if [ "${FORCE_STAGING_BOOTSTRAP}" = "true" ] || [ ! -d "${BASE_BIN_DIR}" ] || [ ! -d "${BASE_PKG_DIR}" ]
-	then
-		echo "Bootstrap (reset to production) of the staging environment for ${BASE_BIN_DIR} and ${BASE_PKG_DIR} directories..."
-		rm -rf "${BASE_BIN_DIR}" "${BASE_PKG_DIR}"
-		mkdir -p "${BASE_BIN_DIR}" "${BASE_PKG_DIR}"
+	rm -rf "${BASE_BIN_DIR}" "${BASE_PKG_DIR}"
+	mkdir -p "${BASE_BIN_DIR}" "${BASE_PKG_DIR}"
 
-		# TODO: Initialize from production with symlinks?
-		# Initialize from production only for RPMs to get the history when rebuilding index (Debian don't care)
-		rsync -avtz --chown=1000:1000 \
-			"${GET_JENKINS_IO_PRODUCTION}/${rpmreleaseline}" \
-			"${BASE_BIN_DIR}/"
-
-		# Initialize from production as we need an initial package state.
-		rsync -avtz --chown=1000:1000 \
-			"${PKG_JENKINS_IO_PRODUCTION}/${rpmreleaseline}" \
-			"${PKG_JENKINS_IO_PRODUCTION}/${debianreleaseline}" \
-			"${BASE_PKG_DIR}/"
-	fi
+	# TODO: Initialize from production with symlinks?
+	# Initialize from production only for RPMs to get the history when rebuilding index (Debian merges production index with the new one instead)
+	rsync -avtz --chown=1000:1000 \
+		"${GET_JENKINS_IO_PRODUCTION}/${rpmreleaseline}" \
+		"${BASE_BIN_DIR}/"
 }
 
 function checkPackagingEnvironment() {

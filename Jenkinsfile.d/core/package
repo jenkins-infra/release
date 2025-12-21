@@ -64,11 +64,6 @@ pipeline {
     )
     booleanParam(
       defaultValue: false,
-      description: 'Force bootstrap (cleanup + initialization from production) of the packages staging environment if data from previous staged build is present.',
-      name: 'FORCE_STAGING_BOOTSTRAP_PARAM'
-    )
-    booleanParam(
-      defaultValue: false,
       description: 'Select this checkbox if you want to disable promotion to production (e.g. only publish to staging).',
       name: 'ONLY_STAGING_PARAM'
     )
@@ -115,7 +110,6 @@ pipeline {
     BASE_BIN_DIR              = "${env.GET_JENKINS_IO_STAGING}/${env.BRANCH_NAME.replaceAll('\\.', '_').replaceAll('\\/', '_').replaceAll('\\:', '_')}"
     // Sanitize URL to avoid nested subdomains and other URL bad surprises: "feat/foo-stable:2.539" => "feat_foo-stable_2_539"
     BASE_PKG_DIR              = "${env.PKG_JENKINS_IO_STAGING}/${env.BRANCH_NAME.replaceAll('\\.', '_').replaceAll('\\/', '_').replaceAll('\\:', '_')}"
-    FORCE_STAGING_BOOTSTRAP   = "${params.containsKey("FORCE_STAGING_BOOTSTRAP_PARAM") ? params.FORCE_STAGING_BOOTSTRAP_PARAM : false}"
     ONLY_STAGING              = "${params.containsKey("ONLY_STAGING_PARAM") ? params.ONLY_STAGING_PARAM : false}"
     ONLY_PROMOTION            = "${params.containsKey("ONLY_PROMOTION_PARAM") ? params.ONLY_PROMOTION_PARAM : false}"
   }

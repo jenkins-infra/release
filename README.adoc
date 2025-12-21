@@ -391,7 +391,6 @@ To do that, follow these steps:
 .. `GIT_STAGING_REPOSITORY_PROMOTION_ENABLED` set to false (manually merged by security team)
 .. `VALIDATION_ENABLED` set to true (we want a summary of what need to be done at the beginning)
 .. `WINDOWS_PACKAGING_ENABLED` set to true (we want to generate and stage Windows package along with other packages)
-.. `FORCE_STAGING_BOOTSTRAP_PARAM` set to false (only for edge cases)
 .. `ONLY_STAGING_PARAM` set to true (we only want to stage, not publish)
 .. `ONLY_PROMOTION_PARAM` set to false (we only want to stage, not publish)
 
@@ -407,7 +406,6 @@ To do that, follow these steps:
 .. `GIT_STAGING_REPOSITORY_PROMOTION_ENABLED` set to false (manually merged by security team)
 .. `VALIDATION_ENABLED` set to true (we want a summary of what need to be done at the beginning)
 .. `WINDOWS_PACKAGING_ENABLED` set to **false** (no package generation)
-.. `FORCE_STAGING_BOOTSTRAP_PARAM` set to false (only for edge cases)
 .. `ONLY_STAGING_PARAM` set to **false** (we don't want to stage anything)
 .. `ONLY_PROMOTION_PARAM` set to **true** (we only want to publish)
 
