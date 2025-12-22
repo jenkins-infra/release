@@ -558,18 +558,7 @@ function promotePackages() {
 		--exclude=/plugins `# populated by https://github.com/jenkins-infra/update-center2` \
 		. `# source` \
 		"${PKG_JENKINS_IO_PRODUCTION}"
-	# TODO: remove once fully migrated to Azure
-	rsync --recursive \
-		--links `# Copy symlinks as symlinks: destination is a Linux filesystem` \
-		--perms `# Preserve permissions: destination is a Linux filesystem` \
-		--devices --specials `# Preserve special files: destination is a Linux filesystem` \
-		--compress `# CPU is cheap, bandwidth is not` \
-		--verbose \
-		--times `# Preserve timestamps` \
-		--chown="mirrorbrain:www-data" `# Ensure the right ownership to have read-only on the webserver` \
-		--exclude=/plugins `# populated by https://github.com/jenkins-infra/update-center2` \
-		. `# source` \
-		mirrorbrain@pkg.origin.jenkins.io:/var/www/pkg.jenkins.io `# destination`
+
 	popd
 }
 
