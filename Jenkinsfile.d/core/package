@@ -331,7 +331,6 @@ pipeline {
       }
       environment {
         SSH_HOSTKEY_ARCHIVES_JENKINS_IO   = credentials('ssh-hostkey-archives.jenkins.io')
-        SSH_HOSTKEY_PKG_ORIGIN_JENKINS_IO = credentials('ssh-hostkey-pkg.origin.jenkins.io')
       }
       steps {
         sshagent(credentials: [

@@ -32,7 +32,6 @@ pipeline {
           }
           environment {
             SSH_HOSTKEY_ARCHIVES_JENKINS_IO = credentials('ssh-hostkey-archives.jenkins.io')
-            SSH_HOSTKEY_PKG_ORIGIN_JENKINS_IO = credentials('ssh-hostkey-pkg.origin.jenkins.io')
           }
           steps {
             checkout scm
@@ -63,9 +62,8 @@ pipeline {
             ]) {
               sh '''
               mkdir -m 700 -p "${HOME}/.ssh"
-              cat "${SSH_HOSTKEY_ARCHIVES_JENKINS_IO}" "${SSH_HOSTKEY_PKG_ORIGIN_JENKINS_IO}" >> "${HOME}/.ssh/known_hosts"
+              cat "${SSH_HOSTKEY_ARCHIVES_JENKINS_IO}" >> "${HOME}/.ssh/known_hosts"
               ssh -v mirrorsync@archives.jenkins.io whoami
-              ssh -v mirrorbrain@pkg.origin.jenkins.io whoami
               '''
             }
           }
