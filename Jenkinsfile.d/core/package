@@ -328,12 +328,11 @@ pipeline {
       }
       steps {
         sshagent(credentials: [
-          'pkgserver',
           'archives.jenkins.io',
         ]) {
           sh '''
               mkdir -m 700 -p "${HOME}/.ssh"
-          cat "${SSH_HOSTKEY_ARCHIVES_JENKINS_IO}" "${SSH_HOSTKEY_PKG_ORIGIN_JENKINS_IO}" >> "${HOME}/.ssh/known_hosts"
+          cat "${SSH_HOSTKEY_ARCHIVES_JENKINS_IO}" >> "${HOME}/.ssh/known_hosts"
           '''
           sh '''
             ./utils/release.bash --promotePackages
