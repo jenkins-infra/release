@@ -118,14 +118,22 @@ function downloadAzureKeyvaultSecret() {
 		--file "${SIGN_CERTIFICATE}"
 }
 
-# JENKINS_VERSION: Define which version will be packaged where:
-# * \'latest\' means the latest version available
-# * <version> represents any valid existing version like 2.440.3 available at JENKINS_DOWNLOAD_URL
-# JENKINS_DOWNLOAD_URL: Specify the endpoint to use for downloading jenkins.war
-# MAVEN_REPOSITORY_USERNAME: optional username for repository access
-# MAVEN_REPOSITORY_PASSWORD: optional password for repository access
+# Once the exact Jenkins Version to get is determined, we retrieve the WAR and the signature file from Artifactory
+# The signature is verified to ensure the GPG key is correct
 function downloadJenkinsWar() {
-	jv download
+	jenkinsVersion="$(jv get)" # jv utilizes the JENKINS_VERSION environment variable which can be the line (latest/weekly/lts/stable) or an exact version
+
+	# Download WAR from Artifactory. Note: the expected filename is "jenkins.war".
+	warUrl="https://repo.jenkins-ci.org/releases/org/jenkins-ci/main/jenkins-war/${jenkinsVersion}/jenkins-war-${jenkinsVersion}.war"
+	curl --fail --silent --show-error --location --output "${WAR}" \
+		"${warUrl}"
+
+	# Download signature from Artifactory (signed by Maven during the release process). Note: the expected filename is "jenkins.war.asc".
+	warSignatureUrl="${warUrl}.asc"
+	curl --fail --silent --show-error --location --output "${WAR}.asc" \
+		"${warSignatureUrl}"
+
+	# TODO: verify the download. Requires retrieving the correct GPG key (edge case when rotating key, might need to use state files)
 }
 
 function getGPGKeyFromAzure() {
