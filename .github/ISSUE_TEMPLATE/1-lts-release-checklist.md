@@ -27,12 +27,25 @@ This role should rotate between LTS releases
 
 - [ ] Create or update release branch in [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins), e.g. `stable-2.387`, use the [init-lts-line](https://github.com/jenkins-infra/release/blob/master/tools/init-lts-line) script or carry out the equivalent steps therein.
 
+- [ ] Create the release branch from the weekly used as baseline (see details below) in [jenkinsci/packaging](https://github.com/jenkinsci/packaging), e.g. `stable-2.387`. Strike out for new point release.
+  - Identify the release date of the weekly used as baseline - https://www.jenkins.io/changelog/ is an easy source of truth (Eg. `2.387` -> https://www.jenkins.io/changelog-old/#v2.387 -> "January 17, 2023").
+  - [ ] From the weekly release date, identify which commit of [jenkinsci/packaging](https://github.com/jenkinsci/packaging) was used for this release. Usually the first commit before the weekly release date is the right one (e.g. fro the `2.387`: https://github.com/jenkinsci/packaging/commit/4eebb530013fe888243d889cc6aeb1862e061a62 from January 15, 2023)
+  - [ ] Create the new `stable-x.xxx` branch from this commit with:
+
+    ```bash
+    # Assuming "origin" points to https://github.com/jenkinsci/packaging
+    git fetch --prune origin
+    git checkout -b stable-x.xxx <commit ID>
+    git push origin stable-x.xxx
+    ```
+
 - [ ] Create or update release branch in [jenkins-infra/release](https://github.com/jenkins-infra/release), e.g. `stable-2.387`. Strike out for initial release.
   - [ ] Modify the `RELEASE_GIT_BRANCH` and `JENKINS_VERSION` values in the environment file (`profile.d/stable`) to match the release.
   - [ ] Modify the `PACKAGING_GIT_BRANCH` value in the packaging script (`Jenkinsfile.d/core/package`) to match the release.
   - For more info, refer to [stable](https://github.com/jenkins-infra/release#stable).
 
-- [ ] Create or update release branch in [jenkinsci/packaging](https://github.com/jenkinsci/packaging), e.g. `stable-2.387`. Strike out for new point release.
+- [ ] Check with the Jenkins Infrastructure team for backports on both repositories [jenkinsci/packaging](https://github.com/jenkinsci/packaging) and [jenkins-infra/release](https://github.com/jenkins-infra/release)
+  - A message in the Matrix channel `#jenkins-infra` mentioning this issue and this item is enough: they will own the backports
 
 - [ ] Create a pull request to update [bom](https://github.com/jenkinsci/bom) to the weekly version that will be the base of the release line (and strike this out for new point release).
       Assure that the [bom-weekly version number](https://github.com/jenkinsci/bom/blob/master/sample-plugin/pom.xml#L17) is already testing the base of the release line or a version newer than the base of the release line.
