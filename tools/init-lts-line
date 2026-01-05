@@ -51,8 +51,8 @@ trap "rm -rf '$release_repo'" EXIT
 git clone git@github.com:jenkins-infra/release.git "$release_repo"
 pushd "$release_repo"
 # Use first child of release commit as branch point, using the datetime as there are no tags or formatted commits for jenkins-infra/release
-baseline_infra_commit="$(git log -n 1 --until="${baseline_release_date}" --pretty=%H)"
-git checkout -b "$branch_name" "${baseline_infra_commit}"
+baseline_infrarelease_commit="$(git log -n 1 --until="${baseline_release_date}" --pretty=%H)"
+git checkout -b "$branch_name" "${baseline_infrarelease_commit}"
 
 sed -i'' -e "s/PACKAGING_GIT_BRANCH      = 'master'/PACKAGING_GIT_BRANCH      = '${branch_name}'/g" Jenkinsfile.d/core/package
 
