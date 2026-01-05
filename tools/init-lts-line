@@ -32,7 +32,7 @@ trap "rm -rf '$packaging'" EXIT
 git clone git@github.com:jenkinsci/packaging.git "$packaging"
 pushd "$packaging"
 # Use first child of release commit as branch point, using the datetime as there are no tags or formatted commits for packaging
-baseline_packaging_commit="$(git log --until="${baseline_release_date}" --pretty=%H | head -1)"
+baseline_packaging_commit="$(git log -n 1 --until="${baseline_release_date}" --pretty=%H)"
 git checkout -b "$branch_name" "${baseline_packaging_commit}"
 git push -u origin "$branch_name"
 popd
@@ -51,7 +51,7 @@ trap "rm -rf '$release_repo'" EXIT
 git clone git@github.com:jenkins-infra/release.git "$release_repo"
 pushd "$release_repo"
 # Use first child of release commit as branch point, using the datetime as there are no tags or formatted commits for jenkins-infra/release
-baseline_infra_commit="$(git log --until="${baseline_release_date}" --pretty=%H | head -1)"
+baseline_infra_commit="$(git log -n 1 --until="${baseline_release_date}" --pretty=%H)"
 git checkout -b "$branch_name" "${baseline_infra_commit}"
 
 sed -i'' -e "s/PACKAGING_GIT_BRANCH      = 'master'/PACKAGING_GIT_BRANCH      = '${branch_name}'/g" Jenkinsfile.d/core/package
