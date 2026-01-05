@@ -44,7 +44,7 @@ This role should rotate between LTS releases
   - [ ] Modify the `PACKAGING_GIT_BRANCH` value in the packaging script (`Jenkinsfile.d/core/package`) to match the release.
   - For more info, refer to [stable](https://github.com/jenkins-infra/release#stable).
 
-- [ ] Check with the Jenkins Infrastructure team for backports on both repositories [jenkinsci/packaging](https://github.com/jenkinsci/packaging) and [jenkins-infra/release](https://github.com/jenkins-infra/release)
+- [ ] Check with the Jenkins Infrastructure team for backports on both repositories [jenkinsci/packaging](https://github.com/jenkinsci/packaging) and [jenkins-infra/release](https://github.com/jenkins-infra/release) as per https://github.com/jenkins-infra/release/blob/master/docs/releases.md#open-a-backporting-pr.
   - A message in the Matrix channel `#jenkins-infra` mentioning this issue and this item is enough: they will own the backports
 
 - [ ] Create a pull request to update [bom](https://github.com/jenkinsci/bom) to the weekly version that will be the base of the release line (and strike this out for new point release).
