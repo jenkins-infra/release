@@ -12,7 +12,7 @@ baseline=$1
 # Make tagged commit part of the release branch
 branch_name="stable-${baseline}"
 # Use first child of release commit as branch point (`[maven-release-plugin] prepare for next development iteration`)
-baseline_commit="$(git log --reverse --ancestry-path --pretty=%H jenkins-${baseline}..master | head -1)"
+baseline_commit="$(git log --reverse --ancestry-path --pretty=%H jenkins-${baseline}..master | sed -n '1p')"
 baseline_release_date="$(git show -s --format=%ct "${baseline_commit}")"
 git checkout -b $branch_name "${baseline_commit}"
 
