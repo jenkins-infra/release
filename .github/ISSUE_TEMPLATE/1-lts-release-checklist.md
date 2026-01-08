@@ -25,14 +25,13 @@ This role should rotate between LTS releases
     If the last release of the preceding LTS line is a security release, consider making the matching weekly release the [new LTS baseline](https://groups.google.com/g/jenkinsci-dev/c/ca7Lp0x6Kqs/m/QwHj66hZAgAJ).
     For example, 2.462.3 LTS and 2.479 were security releases and it is simpler to use 2.479 as baseline than 2.477.
 
-- [ ] Create or update release branch in [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins), e.g. `stable-2.387`, use the [init-lts-line](https://github.com/jenkins-infra/release/blob/master/tools/init-lts-line) script or carry out the equivalent steps therein.
+- [ ] Create or update the release branches in all the repositories below, e.g. `stable-2.387` with the [init-lts-line](https://github.com/jenkins-infra/release/blob/master/tools/init-lts-line) script or carry out the equivalent steps therein. For more info, refer to [stable](https://github.com/jenkins-infra/release#stable).
+  - [ ] [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins)
+  - [ ] [jenkinsci/packaging](https://github.com/jenkinsci/packaging)
+  - [ ] [jenkins-infra/release](https://github.com/jenkins-infra/release)
 
-- [ ] Create or update release branch in [jenkins-infra/release](https://github.com/jenkins-infra/release), e.g. `stable-2.387`. Strike out for initial release.
-  - [ ] Modify the `RELEASE_GIT_BRANCH` and `JENKINS_VERSION` values in the environment file (`profile.d/stable`) to match the release.
-  - [ ] Modify the `PACKAGING_GIT_BRANCH` value in the packaging script (`Jenkinsfile.d/core/package`) to match the release.
-  - For more info, refer to [stable](https://github.com/jenkins-infra/release#stable).
-
-- [ ] Create or update release branch in [jenkinsci/packaging](https://github.com/jenkinsci/packaging), e.g. `stable-2.387`. Strike out for new point release.
+- [ ] Check with the Jenkins Infrastructure team for backports on both repositories [jenkinsci/packaging](https://github.com/jenkinsci/packaging) and [jenkins-infra/release](https://github.com/jenkins-infra/release) as per https://github.com/jenkins-infra/release/blob/master/docs/releases.md#open-a-backporting-pr.
+  - A message in the Matrix channel `#jenkins-infra` mentioning this issue and this item is enough: they will own the backports
 
 - [ ] Create a pull request to update [bom](https://github.com/jenkinsci/bom) to the weekly version that will be the base of the release line (and strike this out for new point release).
       Assure that the [bom-weekly version number](https://github.com/jenkinsci/bom/blob/master/sample-plugin/pom.xml#L17) is already testing the base of the release line or a version newer than the base of the release line.

@@ -64,11 +64,6 @@ pipeline {
     )
     booleanParam(
       defaultValue: false,
-      description: 'Force bootstrap (cleanup + initialization from production) of the packages staging environment if data from previous staged build is present.',
-      name: 'FORCE_STAGING_BOOTSTRAP_PARAM'
-    )
-    booleanParam(
-      defaultValue: false,
       description: 'Select this checkbox if you want to disable promotion to production (e.g. only publish to staging).',
       name: 'ONLY_STAGING_PARAM'
     )
@@ -96,8 +91,9 @@ pipeline {
     AZURE_VAULT_CLIENT_SECRET = credentials('azure-vault-client-secret')
     AZURE_VAULT_TENANT_ID     = credentials('azure-vault-tenant-id')
     GPG_FILE                  = 'jenkins-release.gpg'
-    GPG_PASSPHRASE            = credentials('release-gpg-passphrase-2023')
-    PACKAGING_GIT_REPOSITORY  = 'git@github.com:jenkinsci/packaging.git'
+    GPG_PASSPHRASE            = credentials('release-gpg-passphrase-2026')
+    // Using HTTPS with no credentials - https://github.com/jenkins-infra/helpdesk/issues/4909 - need a GH app if rate limited or need to write things to git
+    PACKAGING_GIT_REPOSITORY  = 'https://github.com/jenkinsci/packaging.git'
     PACKAGING_GIT_BRANCH      = 'stable-2.541'
     SIGN_KEYSTORE_FILENAME    = 'jenkins.pfx'
     SIGN_STOREPASS            = credentials('signing-cert-pass-2023')
@@ -114,7 +110,6 @@ pipeline {
     BASE_BIN_DIR              = "${env.GET_JENKINS_IO_STAGING}/${env.BRANCH_NAME.replaceAll('\\.', '_').replaceAll('\\/', '_').replaceAll('\\:', '_')}"
     // Sanitize URL to avoid nested subdomains and other URL bad surprises: "feat/foo-stable:2.539" => "feat_foo-stable_2_539"
     BASE_PKG_DIR              = "${env.PKG_JENKINS_IO_STAGING}/${env.BRANCH_NAME.replaceAll('\\.', '_').replaceAll('\\/', '_').replaceAll('\\:', '_')}"
-    FORCE_STAGING_BOOTSTRAP   = "${params.containsKey("FORCE_STAGING_BOOTSTRAP_PARAM") ? params.FORCE_STAGING_BOOTSTRAP_PARAM : false}"
     ONLY_STAGING              = "${params.containsKey("ONLY_STAGING_PARAM") ? params.ONLY_STAGING_PARAM : false}"
     ONLY_PROMOTION            = "${params.containsKey("ONLY_PROMOTION_PARAM") ? params.ONLY_PROMOTION_PARAM : false}"
   }
@@ -149,7 +144,7 @@ pipeline {
           steps {
             checkout scm
             dir (WORKING_DIRECTORY) {
-              git branch: PACKAGING_GIT_BRANCH, credentialsId: 'release-key', url: PACKAGING_GIT_REPOSITORY
+              git branch: PACKAGING_GIT_BRANCH, url: PACKAGING_GIT_REPOSITORY
             }
 
             sh '''
@@ -176,20 +171,7 @@ pipeline {
         stage('Prepare package staging environment') {
           steps {
             sh '''
-              # Bootstrap (e.g. reset to production) all stagings for this branch if requested by the user or if missing a directory
-              if [ "${FORCE_STAGING_BOOTSTRAP}" = "true" ] || [ ! -d "${BASE_BIN_DIR}" ] || [ ! -d "${BASE_PKG_DIR}" ]
-              then
-                echo "Bootstrap (reset to production) of the staging environment for ${BASE_BIN_DIR} and ${BASE_PKG_DIR} directories..."
-                rm -rf "${BASE_BIN_DIR}" "${BASE_PKG_DIR}"
-                mkdir -p "${BASE_BIN_DIR}" "${BASE_PKG_DIR}"
-
-                # TODO: Initialize from production with symlinks?
-                # Initialize from production only for RPMs to get the history when rebuilding index (debian don't care)
-                rsync -avtz --chown=1000:1000 "${GET_JENKINS_IO_PRODUCTION}/rpm" "${BASE_BIN_DIR}/"
-
-                # Initialize from production as we need an initial package state. We don't sync old package index which are kept in production.
-                rsync -avtz --chown=1000:1000 --exclude="*-legacy/*" "${PKG_JENKINS_IO_PRODUCTION}/" "${BASE_PKG_DIR}/"
-              fi
+              ./utils/release.bash --prepareStaging
             '''
           }
         }
@@ -277,7 +259,7 @@ pipeline {
                     container('dotnet') {
                       checkout scm
                       dir (WORKING_DIRECTORY) {
-                        git branch: PACKAGING_GIT_BRANCH, credentialsId: 'release-key', url: PACKAGING_GIT_REPOSITORY
+                        git branch: PACKAGING_GIT_BRANCH, url: PACKAGING_GIT_REPOSITORY
 
                         unstash 'GPG'
                         unstash 'WAR'
@@ -343,16 +325,14 @@ pipeline {
       }
       environment {
         SSH_HOSTKEY_ARCHIVES_JENKINS_IO   = credentials('ssh-hostkey-archives.jenkins.io')
-        SSH_HOSTKEY_PKG_ORIGIN_JENKINS_IO = credentials('ssh-hostkey-pkg.origin.jenkins.io')
       }
       steps {
         sshagent(credentials: [
-          'pkgserver',
           'archives.jenkins.io',
         ]) {
           sh '''
               mkdir -m 700 -p "${HOME}/.ssh"
-          cat "${SSH_HOSTKEY_ARCHIVES_JENKINS_IO}" "${SSH_HOSTKEY_PKG_ORIGIN_JENKINS_IO}" >> "${HOME}/.ssh/known_hosts"
+          cat "${SSH_HOSTKEY_ARCHIVES_JENKINS_IO}" >> "${HOME}/.ssh/known_hosts"
           '''
           sh '''
             ./utils/release.bash --promotePackages
@@ -360,7 +340,7 @@ pipeline {
         }
       }
     }
-    stage('Invalidate Fastly Cache') {
+    stage('Invalidate Fastly Cache for pkg.jenkins.io') {
       when {
         environment name: 'ONLY_STAGING', value: 'false'
       }

@@ -118,14 +118,22 @@ function downloadAzureKeyvaultSecret() {
 		--file "${SIGN_CERTIFICATE}"
 }
 
-# JENKINS_VERSION: Define which version will be packaged where:
-# * \'latest\' means the latest version available
-# * <version> represents any valid existing version like 2.440.3 available at JENKINS_DOWNLOAD_URL
-# JENKINS_DOWNLOAD_URL: Specify the endpoint to use for downloading jenkins.war
-# MAVEN_REPOSITORY_USERNAME: optional username for repository access
-# MAVEN_REPOSITORY_PASSWORD: optional password for repository access
+# Once the exact Jenkins Version to get is determined, we retrieve the WAR and the signature file from Artifactory
+# The signature is verified to ensure the GPG key is correct
 function downloadJenkinsWar() {
-	jv download
+	jenkinsVersion="$(jv get)" # jv utilizes the JENKINS_VERSION environment variable which can be the line (latest/weekly/lts/stable) or an exact version
+
+	# Download WAR from Artifactory. Note: the expected filename is "jenkins.war".
+	warUrl="https://repo.jenkins-ci.org/releases/org/jenkins-ci/main/jenkins-war/${jenkinsVersion}/jenkins-war-${jenkinsVersion}.war"
+	curl --fail --silent --show-error --location --output "${WAR}" \
+		"${warUrl}"
+
+	# Download signature from Artifactory (signed by Maven during the release process). Note: the expected filename is "jenkins.war.asc".
+	warSignatureUrl="${warUrl}.asc"
+	curl --fail --silent --show-error --location --output "${WAR}.asc" \
+		"${warSignatureUrl}"
+
+	# TODO: verify the download. Requires retrieving the correct GPG key (edge case when rotating key, might need to use state files)
 }
 
 function getGPGKeyFromAzure() {
@@ -291,9 +299,10 @@ function guessGitBranchInformation() {
 
 function invalidateFastlyCache() {
 	: "${FASTLY_API_TOKEN:?Require FASTLY_API_TOKEN env variable}"
+	# Expecting pkg.jenkins.io site ID
 	: "${FASTLY_SERVICE_ID:?Require FASTLY_SERVICE_ID env variable}"
 
-	curl \
+	curl --fail --location \
 		-X POST \
 		-H "Fastly-Key: ${FASTLY_API_TOKEN}" \
 		-H "Accept: application/json" \
@@ -446,10 +455,11 @@ function showReleasePlan() {
 }
 
 function showPackagingPlan() {
-	set +x
+	checkPackagingEnvironment
 
+	set +x # To avoid polluting output
 	local staging_description production_description release_packages_description
-	release_packages_description="Jenkins core packages for version $(jv get) ("${RELEASELINE:-weekly}" release)"
+	release_packages_description="Jenkins core packages for version $(jv get) ('${RELEASELINE:-weekly}' release)"
 	staging_description="staging (at https://$(basename "${BASE_BIN_DIR}").staging.pkg.origin.jenkins.io and https://staging.get.jenkins.io/$(basename "${BASE_PKG_DIR}"))"
 	production_description="production (at https://get.jenkins.io and https://pkg.jenkins.io)."
 
@@ -458,12 +468,6 @@ function showPackagingPlan() {
 		if [ "${ONLY_STAGING:-false}" == "true" ]
 		then
 			echo "ERROR: you can't disable both staging (ONLY_PROMOTION=true) and promotion (ONLY_STAGING=true)."
-			exit 1
-		fi
-
-		if [ "${FORCE_STAGING_BOOTSTRAP:-false}" == "true" ]
-		then
-			echo "ERROR: you can't disable staging (ONLY_PROMOTION=true) while forcing for a staging bootstrap (FORCE_STAGING_BOOTSTRAP=true)."
 			exit 1
 		fi
 
@@ -517,18 +521,14 @@ function showPackagingPlan() {
 		echo "Maven repository promotion is disabled"
 	fi
 
-	set -x
+	set -x # Back to normal
 }
 
 function promotePackages() {
-	# Where all webservices have their htdocs mounted (provided by the agent environment)
-	local get_jenkins_io_staging="${BASE_BIN_DIR}"
-	local get_jenkins_io_production="${GET_JENKINS_IO_PRODUCTION}"
-	local pkg_jenkins_io_staging="${BASE_PKG_DIR}"
-	local pkg_jenkins_io_production="${PKG_JENKINS_IO_PRODUCTION}"
+	checkPackagingEnvironment
 
 	## Step 1/3 - Copy binaries and HTML from staging to (remote) archives.jenkins.io (mirror fallback)
-	pushd "${get_jenkins_io_staging}"
+	pushd "${BASE_BIN_DIR}"
 	rsync --recursive \
 		--links `# Copy symlinks as symlinks: destination is a Linux filesystem` \
 		--perms `# Preserve permissions: destination is a Linux filesystem` \
@@ -542,37 +542,52 @@ function promotePackages() {
 	popd
 
 	## Step 2/3 - Copy binaries and HTML from staging to production
-	pushd "${get_jenkins_io_staging}"
+	pushd "${BASE_BIN_DIR}"
 	rsync --archive \
 		--verbose \
 		--progress \
 		--exclude=/plugins `# populated by https://github.com/jenkins-infra/update-center2` \
 		. `# source` \
-		"${get_jenkins_io_production}" `# destination # TODO: path from env`
+		"${GET_JENKINS_IO_PRODUCTION}"
 	popd
 	## TODO (long term): trigger a mirrorbits refresh
 
 	## Step 3/3 - Copy package sites from staging to production
-	pushd "${pkg_jenkins_io_staging}"
+	pushd "${BASE_PKG_DIR}"
 	rsync --archive \
 		--verbose \
 		--progress \
 		--exclude=/plugins `# populated by https://github.com/jenkins-infra/update-center2` \
 		. `# source` \
-		"${pkg_jenkins_io_production}" `# destination # TODO: path from env`
-	# TODO: remove once fully migrated to Azure
-	rsync --recursive \
-		--links `# Copy symlinks as symlinks: destination is a Linux filesystem` \
-		--perms `# Preserve permissions: destination is a Linux filesystem` \
-		--devices --specials `# Preserve special files: destination is a Linux filesystem` \
-		--compress `# CPU is cheap, bandwidth is not` \
-		--verbose \
-		--times `# Preserve timestamps` \
-		--chown="mirrorbrain:www-data" `# Ensure the right ownership to have read-only on the webserver` \
-		--exclude=/plugins `# populated by https://github.com/jenkins-infra/update-center2` \
-		. `# source` \
-		mirrorbrain@pkg.origin.jenkins.io:/var/www/pkg.jenkins.io `# destination`
+		"${PKG_JENKINS_IO_PRODUCTION}"
+
 	popd
+}
+
+function prepareStaging() {
+	checkPackagingEnvironment
+
+	set +u
+	local rpmreleaseline="rpm${RELEASELINE}"
+	set -u
+
+	rm -rf "${BASE_BIN_DIR}" "${BASE_PKG_DIR}"
+	mkdir -p "${BASE_BIN_DIR}" "${BASE_PKG_DIR}"
+
+	# TODO: Initialize from production with symlinks?
+	# Initialize from production only for RPMs to get the history when rebuilding index (Debian merges production index with the new one instead)
+	rsync -avtz --chown=1000:1000 \
+		"${GET_JENKINS_IO_PRODUCTION}/${rpmreleaseline}" \
+		"${BASE_BIN_DIR}/"
+}
+
+function checkPackagingEnvironment() {
+	# Packaging publication environment (path to production file system provided by the agent)
+	: "${BASE_BIN_DIR}"
+	: "${GET_JENKINS_IO_PRODUCTION}"
+	: "${PKG_JENKINS_IO_PRODUCTION}"
+
+	export BASE_BIN_DIR GET_JENKINS_IO_PRODUCTION PKG_JENKINS_IO_PRODUCTION
 }
 
 function main() {
@@ -612,6 +627,7 @@ function main() {
 			--stageRelease) echo "Stage Release" && stageRelease ;;
 			--packaging) echo 'Execute packaging makefile, quote required around Makefile target' && packaging "$2" ;;
 			--promotePackages) echo 'Trigger mirror synchronization' && promotePackages ;;
+			--prepareStaging) echo 'Prepare staging environment' && prepareStaging ;;
 			-h) echo "help" ;;
 			-*) echo "help" ;;
 			esac
@@ -674,7 +690,6 @@ export MAVEN_REPOSITORY_USERNAME
 export MAVEN_REPOSITORY_PASSWORD
 export WAR
 export BRAND
-export RELEASELINE
 export ORGANIZATION
 export BUILDENV
 export CREDENTIAL
@@ -683,7 +698,6 @@ export GPG_KEYNAME
 
 export RELEASE_PROFILE
 export RELEASELINE
-export JENKINS_VERSION
 
 if [[ ! -d $WORKING_DIRECTORY ]]; then
 	mkdir -p "${WORKING_DIRECTORY}"

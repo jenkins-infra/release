@@ -12,7 +12,9 @@ baseline=$1
 # Make tagged commit part of the release branch
 branch_name="stable-${baseline}"
 # Use first child of release commit as branch point (`[maven-release-plugin] prepare for next development iteration`)
-git checkout -b $branch_name $(git log --reverse --ancestry-path --pretty=%H jenkins-${baseline}..master | head -1)
+baseline_commit="$(git log --reverse --ancestry-path --pretty=%H jenkins-${baseline}..master | sed -n '1p')"
+baseline_release_date="$(git show -s --format=%ct "${baseline_commit}")"
+git checkout -b $branch_name "${baseline_commit}"
 
 # Update versions
 mvn -q versions:set-property -Dproperty=revision -DnewVersion=${baseline}.1
@@ -29,7 +31,9 @@ packaging="$(mktemp -d /tmp/jenkins-lts-rc-packaging-XXXXXXXX)"
 trap "rm -rf '$packaging'" EXIT
 git clone git@github.com:jenkinsci/packaging.git "$packaging"
 pushd "$packaging"
-git checkout -b "$branch_name" master
+# Use first child of release commit as branch point, using the datetime as there are no tags or formatted commits for packaging
+baseline_packaging_commit="$(git log -n 1 --until="${baseline_release_date}" --pretty=%H)"
+git checkout -b "$branch_name" "${baseline_packaging_commit}"
 git push -u origin "$branch_name"
 popd
 
@@ -46,15 +50,17 @@ release_repo="$(mktemp -d /tmp/jenkins-lts-rc-release-XXXXXXXX)"
 trap "rm -rf '$release_repo'" EXIT
 git clone git@github.com:jenkins-infra/release.git "$release_repo"
 pushd "$release_repo"
-git checkout -b "stable-${baseline}"
+# Use first child of release commit as branch point, using the datetime as there are no tags or formatted commits for jenkins-infra/release
+baseline_infrarelease_commit="$(git log -n 1 --until="${baseline_release_date}" --pretty=%H)"
+git checkout -b "$branch_name" "${baseline_infrarelease_commit}"
 
-sed -i'' -e "s/PACKAGING_GIT_BRANCH      = 'master'/PACKAGING_GIT_BRANCH      = 'stable-${baseline}'/g" Jenkinsfile.d/core/package
+sed -i'' -e "s/PACKAGING_GIT_BRANCH      = 'master'/PACKAGING_GIT_BRANCH      = '${branch_name}'/g" Jenkinsfile.d/core/package
 
-sed -i'' -e "s/RELEASE_GIT_BRANCH=master/RELEASE_GIT_BRANCH=stable-${baseline}/g" profile.d/stable
+sed -i'' -e "s/RELEASE_GIT_BRANCH=master/RELEASE_GIT_BRANCH=${branch_name}/g" profile.d/stable
 echo "JENKINS_VERSION=${baseline}.1" >> profile.d/stable
 
 git add Jenkinsfile.d/core/package profile.d/stable
 git commit -m "Initiate ${baseline}.1"
-git push origin "stable-${baseline}"
+git push origin "${branch_name}"
 rm -f Jenkinsfile.d/core/package.bak
 popd

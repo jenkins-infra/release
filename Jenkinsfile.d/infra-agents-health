@@ -15,6 +15,10 @@ pipeline {
     AZURE_VAULT_CLIENT_ID     = credentials('azure-vault-client-id')
     AZURE_VAULT_CLIENT_SECRET = credentials('azure-vault-client-secret')
     AZURE_VAULT_TENANT_ID     = credentials('azure-vault-tenant-id')
+    // Using HTTPS with no credentials - https://github.com/jenkins-infra/helpdesk/issues/4909 - need a GH app if rate limited or need to write things to git
+    PACKAGING_GIT_REPOSITORY  = 'https://github.com/jenkinsci/packaging.git'
+    PACKAGING_GIT_BRANCH      = 'master'
+    WORKING_DIRECTORY         = "release"
   }
 
   stages {
@@ -28,13 +32,15 @@ pipeline {
           }
           environment {
             SSH_HOSTKEY_ARCHIVES_JENKINS_IO = credentials('ssh-hostkey-archives.jenkins.io')
-            SSH_HOSTKEY_PKG_ORIGIN_JENKINS_IO = credentials('ssh-hostkey-pkg.origin.jenkins.io')
           }
           steps {
+            checkout scm
+
             // Ensure we can get the secondary git repository used for packaging
-            dir ('./release'){
-              git branch: 'master', credentialsId: 'release-key', url: 'git@github.com:jenkinsci/packaging.git'
+            dir (WORKING_DIRECTORY) {
+              git branch: PACKAGING_GIT_BRANCH, url: PACKAGING_GIT_REPOSITORY
             }
+
             // Ensure we can retrieve the Code Signing Certificate'
             sh '''
             utils/release.bash --downloadAzureKeyvaultSecret
@@ -56,9 +62,8 @@ pipeline {
             ]) {
               sh '''
               mkdir -m 700 -p "${HOME}/.ssh"
-              cat "${SSH_HOSTKEY_ARCHIVES_JENKINS_IO}" "${SSH_HOSTKEY_PKG_ORIGIN_JENKINS_IO}" >> "${HOME}/.ssh/known_hosts"
+              cat "${SSH_HOSTKEY_ARCHIVES_JENKINS_IO}" >> "${HOME}/.ssh/known_hosts"
               ssh -v mirrorsync@archives.jenkins.io whoami
-              ssh -v mirrorbrain@pkg.origin.jenkins.io whoami
               '''
             }
           }
@@ -94,6 +99,14 @@ pipeline {
             pwsh 'java -version'
             container('dotnet') {
                 powershell 'msbuild -version'
+            }
+
+            container('dotnet') {
+              checkout scm
+              // Ensure we can get the secondary git repository used for packaging
+              dir (WORKING_DIRECTORY) {
+                git branch: PACKAGING_GIT_BRANCH, url: PACKAGING_GIT_REPOSITORY
+              }
             }
           }
         }
