@@ -57,7 +57,6 @@ pipeline {
 
             // Ensure we can SSH-connect to required remote servers
             sshagent(credentials: [
-              'pkgserver',
               'archives.jenkins.io'
             ]) {
               sh '''
