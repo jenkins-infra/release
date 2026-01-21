@@ -81,10 +81,15 @@ The [documentation](https://github.com/jenkins-infra/release/blob/master/docs/re
 - [ ] Publish changelog (one day prior to the release in case of a security update).
 
 - [ ] Announce the start of the LTS release process in the [#jenkins-release:matrix.org](https://matrix.to/#/#jenkins-release:matrix.org) channel.
-- [ ] Launch job on [release.ci.jenkins.io](https://release.ci.jenkins.io/job/core/job/stable/job/release/) if no security release for Jenkins is planned.
-  - [ ] Manually review and approve the child release job after carefully checking the "Plan" stage (you can compare with previous stable line).
-  - [ ] If this is the first release of a new LTS line, the packaging job will fail on its first run.  Either run the packaging job once and cancel it before the primary release job is run or accept that the packaging job on the first release of a new LTS line will need to be run a second time after it fails the initial run.
-  - [ ] ~3 to 4 hours after the beginning of release job, manually review and approve the child packaging job.
+
+- [ ] If this is the **first** release of a new LTS line (otherwise you can ignore this bullet), we have two pipelines which will fail on their first run on the `stable-xxx` branches. You have to run them both, only once for their first build (so they can aprse their parameters) and cancel them after a few seconds (the button "Build" of the branch page should then change to "Build with Parameters" after reloading the page):
+  - [ ] "Child" pipeline [https://release.ci.jenkins.io/job/core/job/release/](https://release.ci.jenkins.io/job/core/job/release/) on its `stable-xxx` branche.
+  - [ ] "Child" pipeline [https://release.ci.jenkins.io/job/core/job/package/](https://release.ci.jenkins.io/job/core/job/package/) on its `stable-xxx` branche.
+
+- [ ] Launch the "Parent" job ("Stable" -> "Release") on [release.ci.jenkins.io/job/core/job/stable/job/release/](https://release.ci.jenkins.io/job/core/job/stable/job/release/) if no security release for Jenkins is planned.
+  - [ ] The first "child" pipeline ("Core" -> "Core Release") triggered by the "parent" expects a human review and approval. Please check its "Plan" stage carefaully (you can compare with previous stable line build) and use the Appvoral to start the release build.
+  - [ ] The second "child" pipeline (("Core" -> "Core Package") will also require a human approval once the "Core Release" is finished, as it's started automatically by the "Parent" pipeline.
+  - Note: if the "Parent" pipeline has not been used or failed, please ask for help in the `jenkinsci/release` channel
 - [ ] Wait for successful job completion (release: ~3 to 4 hours, packaging ~30 minutes).
 
 - [ ] Check [LTS changelog](https://www.jenkins.io/changelog-stable/) is visible on the downloads site.
