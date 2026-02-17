@@ -124,7 +124,7 @@ function downloadJenkinsWar() {
 	jenkinsVersion="$(jv get)" # jv utilizes the JENKINS_VERSION environment variable which can be the line (latest/weekly/lts/stable) or an exact version
 
 	# Download WAR from Artifactory. Note: the expected filename is "jenkins.war".
-	warUrl="https://repo.jenkins-ci.org/releases/org/jenkins-ci/main/jenkins-war/${jenkinsVersion}/jenkins-war-${jenkinsVersion}.war"
+	warUrl="https://repo.jenkins-ci.org/${MAVEN_REPOSITORY_NAME}/org/jenkins-ci/main/jenkins-war/${jenkinsVersion}/jenkins-war-${jenkinsVersion}.war"
 	curl --fail --silent --show-error --location --output "${WAR}" \
 		"${warUrl}"
 
@@ -416,6 +416,14 @@ function stageRelease() {
 		-s settings-release.xml \
 		-ntp \
 		release:stage
+
+	# Update maven-metadata only if it's a public release
+	if [[ "${MAVEN_REPOSITORY_NAME}" == "releases" ]]; then
+		# Ensure Artifactory updates the `latest` field in the `jenkins-war` 's `maven-metadata.xml` (sometime it is not updated).
+		# Note 1: only useful for weekly releases (no op for LTS)
+		# Note 2: Could the "bug" being caused by only using Maven `release:stage` instead of `release:perform`?
+		curl -X POST -H 'Content-Length: 0' --fail --user "${MAVEN_REPOSITORY_USERNAME}:${MAVEN_REPOSITORY_PASSWORD}" "https://repo.jenkins-ci.org/api/maven/calculateMetadata/${MAVEN_REPOSITORY_NAME}/org/jenkins-ci/main/jenkins-war/"
+	fi
 }
 
 function performRelease() {
