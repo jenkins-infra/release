@@ -125,7 +125,7 @@ function downloadJenkinsWar() {
 
 	# Download WAR from Artifactory. Note: the expected filename is "jenkins.war".
 	warUrl="https://repo.jenkins-ci.org/${MAVEN_REPOSITORY_NAME}/org/jenkins-ci/main/jenkins-war/${jenkinsVersion}/jenkins-war-${jenkinsVersion}.war"
-	curl --fail --silent --show-error --location --output "${WAR}" \
+	curl --fail --silent --show-error --location --user "${MAVEN_REPOSITORY_USERNAME}:${MAVEN_REPOSITORY_PASSWORD}" --output "${WAR}" \
 		"${warUrl}"
 
 	# Download signature from Artifactory (signed by Maven during the release process). Note: the expected filename is "jenkins.war.asc".
