@@ -130,7 +130,7 @@ function downloadJenkinsWar() {
 
 	# Download signature from Artifactory (signed by Maven during the release process). Note: the expected filename is "jenkins.war.asc".
 	warSignatureUrl="${warUrl}.asc"
-	curl --fail --silent --show-error --location --output "${WAR}.asc" \
+	curl --fail --silent --show-error --location --user "${MAVEN_REPOSITORY_USERNAME}:${MAVEN_REPOSITORY_PASSWORD}" --output "${WAR}.asc" \
 		"${warSignatureUrl}"
 
 	# TODO: verify the download. Requires retrieving the correct GPG key (edge case when rotating key, might need to use state files)
