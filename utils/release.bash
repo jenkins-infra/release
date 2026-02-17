@@ -124,7 +124,7 @@ function downloadJenkinsWar() {
 	jenkinsVersion="$(jv get)" # jv utilizes the JENKINS_VERSION environment variable which can be the line (latest/weekly/lts/stable) or an exact version
 
 	# Download WAR from Artifactory. Note: the expected filename is "jenkins.war".
-	warUrl="https://repo.jenkins-ci.org/releases/org/jenkins-ci/main/jenkins-war/${jenkinsVersion}/jenkins-war-${jenkinsVersion}.war"
+	warUrl="https://repo.jenkins-ci.org/${MAVEN_REPOSITORY_NAME}/org/jenkins-ci/main/jenkins-war/${jenkinsVersion}/jenkins-war-${jenkinsVersion}.war"
 	curl --fail --silent --show-error --location --output "${WAR}" \
 		"${warUrl}"
 
