@@ -18,7 +18,7 @@ spec:
         - name: "MAVEN_OPTS"
           value: "-Xmx8g -Xms8g"
         - name: "JENKINS_JAVA_BIN"
-          value: "/opt/jdk-21/bin/java"
+          value: "/opt/jdk-25/bin/java"
         - name: "JENKINS_JAVA_OPTS"
           value: "-XX:+PrintCommandLineFlags"
       resources:
