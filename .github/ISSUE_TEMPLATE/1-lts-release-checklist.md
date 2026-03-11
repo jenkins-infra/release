@@ -112,7 +112,7 @@ The [documentation](https://github.com/jenkins-infra/release/blob/master/docs/re
 - [ ] Create a tag matching the LTS release you create in the [docker](https://github.com/jenkinsci/docker/) repository and publish a GitHub release.
 
 - [ ] If https://trusted.ci.jenkins.io/job/Containers/job/Controller job is disabled:
-  - [ ] Reënable it
+  - [ ] Enable it
   - [ ] Trigger a scan repository and watch for triggered jobs (cancel those of old tags if any)
   - [ ] Wait for the build completion
   - [ ] Disable the job again
