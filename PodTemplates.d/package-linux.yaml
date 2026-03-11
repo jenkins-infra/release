@@ -10,7 +10,7 @@ spec:
   serviceAccountName: release-ci-jenkins-io-agents
   containers:
     - name: jnlp
-      image: jenkinsciinfra/packaging:9.0.1
+      image: jenkinsciinfra/packaging:9.1.1
       imagePullPolicy: "IfNotPresent"
       env:
         - name: "JENKINS_JAVA_BIN"
