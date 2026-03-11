@@ -28,10 +28,11 @@ This role should rotate between LTS releases
 - [ ] Create or update the release branches in all the repositories below, e.g. `stable-2.387` with the [init-lts-line](https://github.com/jenkins-infra/release/blob/master/tools/init-lts-line) script or carry out the equivalent steps therein. For more info, refer to [stable](https://github.com/jenkins-infra/release#stable).
   - [ ] [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins)
   - [ ] [jenkinsci/packaging](https://github.com/jenkinsci/packaging)
+  - [ ] [jenkinsci/docker](https://github.com/jenkinsci/docker)
   - [ ] [jenkins-infra/release](https://github.com/jenkins-infra/release)
 
-- [ ] Check with the Jenkins Infrastructure team for backports on both repositories [jenkinsci/packaging](https://github.com/jenkinsci/packaging) and [jenkins-infra/release](https://github.com/jenkins-infra/release) as per https://github.com/jenkins-infra/release/blob/master/docs/releases.md#open-a-backporting-pr.
-  - A message in the Matrix channel `#jenkins-infra` mentioning this issue and this item is enough: they will own the backports
+- [ ] Check with the Jenkins Infrastructure team for backports on repositories [jenkinsci/packaging](https://github.com/jenkinsci/packaging), [jenkinsci/docker](https://github.com/jenkinsci/docker) and [jenkins-infra/release](https://github.com/jenkins-infra/release) as per https://github.com/jenkins-infra/release/blob/master/docs/releases.md#open-a-backporting-pr.
+  - A message one or two weeks before in the Matrix channel `#jenkins-infra` mentioning this issue and this item is enough: they will own the backports
 
 - [ ] Create a pull request to update [bom](https://github.com/jenkinsci/bom) to the weekly version that will be the base of the release line (and strike this out for new point release).
       Assure that the [bom-weekly version number](https://github.com/jenkinsci/bom/blob/master/sample-plugin/pom.xml#L17) is already testing the base of the release line or a version newer than the base of the release line.
@@ -49,8 +50,10 @@ Remember to exchange the LTS version, release date and Jira URLs.
 
 - [ ] Open backporting PR with `into-lts` label and summary of changes in description from [lts-candidate-stats script](https://github.com/jenkins-infra/release/blob/master/tools/lts-candidate-stats.sh) and:
   - [ ] the selected [Jira lts-candidates](https://issues.jenkins-ci.org/issues/?filter=12146).
-  - [ ] possible LTS candidates in the [release](https://github.com/jenkins-infra/release/issues?q=is%3Aclosed+label%3Alts-candidate+) repository.
-  - [ ] possible LTS candidates in the [packaging](https://github.com/jenkinsci/packaging/issues?q=is%3Aclosed+label%3Alts-candidate) repository.
+  - By the Jenkins Infrastructure team:
+    - [ ] possible LTS candidates in the [release](https://github.com/jenkins-infra/release/issues?q=is%3Aclosed+label%3Alts-candidate+) repository.
+    - [ ] possible LTS candidates in the [packaging](https://github.com/jenkinsci/packaging/issues?q=is%3Aclosed+label%3Alts-candidate) repository.
+    - [ ] possible LTS candidates in the [docker controller](https://github.com/jenkinsci/docker/issues?q=is%3Aclosed+label%3Alts-candidate) repository.
 
 - [ ] Open a pull request towards the [acceptance test harness](https://github.com/jenkinsci/acceptance-test-harness) and [plugin compatibility test](https://github.com/jenkinsci/bom) to confirm the incremental produced by the backporting PR doesn't contain regressions.
 The [documentation](https://github.com/jenkins-infra/release/blob/master/docs/releases.md#review-tests) explains which profiles you have to modify in your PR.
@@ -77,6 +80,9 @@ The [documentation](https://github.com/jenkins-infra/release/blob/master/docs/re
   - [ ] Inform the Jenkins security team about the need to update CVE metadata to exclude the new LTS line from affected version ranges.
 
 ## LTS release
+
+- [ ] Check with the Jenkins Infrastructure team that backports on repositories [jenkinsci/packaging](https://github.com/jenkinsci/packaging), [jenkinsci/docker](https://github.com/jenkinsci/docker) and [jenkins-infra/release](https://github.com/jenkins-infra/release) are completed and merged.
+  - A message two days prior to the release in the Matrix channel `#jenkins-infra` mentioning this issue and this item is enough
 
 - [ ] Publish changelog (one day prior to the release in case of a security update).
 
