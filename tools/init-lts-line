@@ -37,6 +37,18 @@ git checkout -b "$branch_name" "${baseline_packaging_commit}"
 git push -u origin "$branch_name"
 popd
 
+# Create dedicated docker controller branch
+docker="$(mktemp -d /tmp/jenkins-lts-rc-docker-XXXXXXXX)"
+# shellcheck disable=SC2064
+trap "rm -rf '${docker}'" EXIT
+git clone git@github.com:jenkinsci/docker.git "${docker}"
+pushd "${docker}"
+# Use first child of release commit as branch point
+baseline_docker_commit="$(git log --reverse --ancestry-path --pretty=%H "${baseline}..master" | sed -n '1p')"
+git checkout -b "${branch_name}" "${baseline_docker_commit}"
+git push -u origin "${branch_name}"
+popd
+
 remote_name="$(git remote -v | awk '$2 == "git@github.com:jenkinsci/jenkins.git" && $3 == "(push)" {print $1}')"
 cat <<EOF
 
