@@ -94,7 +94,7 @@ pipeline {
     GPG_PASSPHRASE            = credentials('release-gpg-passphrase-2026')
     // Using HTTPS with no credentials - https://github.com/jenkins-infra/helpdesk/issues/4909 - need a GH app if rate limited or need to write things to git
     PACKAGING_GIT_REPOSITORY  = 'https://github.com/jenkinsci/packaging.git'
-    PACKAGING_GIT_BRANCH      = 'master'
+    PACKAGING_GIT_BRANCH      = 'stable-2.555'
     SIGN_KEYSTORE_FILENAME    = 'jenkins.pfx'
     SIGN_STOREPASS            = credentials('signing-cert-pass-2023')
     WAR_FILENAME              = 'jenkins.war'
