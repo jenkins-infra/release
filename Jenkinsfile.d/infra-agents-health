@@ -1,3 +1,11 @@
+library(
+  identifier: 'pipeline-library@master',
+  retriever: modernSCM([
+    $class: 'GitSCMSource',
+    remote: 'https://github.com/jenkins-infra/pipeline-library.git',
+  ])
+)
+
 pipeline {
   agent none
 
@@ -109,6 +117,16 @@ pipeline {
             }
           }
         }
+      }
+    }
+    stage('Publish build status report') {
+      agent {
+        kubernetes {
+          yamlFile 'PodTemplates.d/release-linux.yaml'
+        }
+      }
+      steps {
+        publishBuildStatusReport()
       }
     }
   }
