@@ -95,7 +95,6 @@ pipeline {
     // Using HTTPS with no credentials - https://github.com/jenkins-infra/helpdesk/issues/4909 - need a GH app if rate limited or need to write things to git
     PACKAGING_GIT_REPOSITORY  = 'https://github.com/jenkinsci/packaging.git'
     PACKAGING_GIT_BRANCH      = 'master'
-    SIGN_KEYSTORE_FILENAME    = 'jenkins.pfx'
     SIGN_STOREPASS            = credentials('signing-cert-pass-2023')
     WAR_FILENAME              = 'jenkins.war'
     WAR                       = "$WORKSPACE/$WORKING_DIRECTORY/$WAR_FILENAME"
@@ -104,8 +103,6 @@ pipeline {
     MSI_FILENAME              = 'jenkins.msi'
     MSI                       = "$WORKSPACE/$WORKING_DIRECTORY/$MSI_FILENAME"
     WORKING_DIRECTORY         = "release"
-    PKCS12_FILE               = "$WORKSPACE/$WORKING_DIRECTORY/jenkins.pfx" // Created by SIGN_KEYSTORE
-    PKCS12_PASSWORD_FILE      = credentials('signing-cert-pass-2023')
     // Sanitize URL to avoid nested subdomains and other URL bad surprises: "feat/foo-stable:2.539" => "feat_foo-stable_2_539"
     BASE_BIN_DIR              = "${env.GET_JENKINS_IO_STAGING}/${env.BRANCH_NAME.replaceAll('\\.', '_').replaceAll('\\/', '_').replaceAll('\\:', '_')}"
     // Sanitize URL to avoid nested subdomains and other URL bad surprises: "feat/foo-stable:2.539" => "feat_foo-stable_2_539"
@@ -156,16 +153,6 @@ pipeline {
             }
 
             sh './utils/release.bash --configureGPG'
-          }
-        }
-        stage('Get Code Signing Certificate') {
-          steps {
-            sh '''
-              utils/release.bash --downloadAzureKeyvaultSecret
-              utils/release.bash --configureKeystore
-            '''
-
-            stash includes: SIGN_KEYSTORE_FILENAME, name: 'KEYSTORE'
           }
         }
         stage('Prepare package staging environment') {
@@ -242,39 +229,66 @@ pipeline {
                 }
               }
             }
-            stage('Windows') {
+            stage('MSI') {
               when {
                 environment name: 'WINDOWS_PACKAGING_ENABLED', value: 'true'
               }
               stages {
-                stage('Build') {
-                  // Windows requirement: Every steps need to be executed inside default jnlp
-                  // as the step 'container' is known to not be working
+                stage('Windows') {
                   agent {
                     kubernetes {
                       yamlFile 'PodTemplates.d/package-windows.yaml'
                     }
                   }
-                  steps {
-                    container('dotnet') {
-                      checkout scm
-                      dir (WORKING_DIRECTORY) {
-                        git branch: PACKAGING_GIT_BRANCH, url: PACKAGING_GIT_REPOSITORY
+                  stages {
+                    stage('Build MSI') {
+                      steps {
+                        container('build-dotnet') {
+                          checkout scm
+                          dir (WORKING_DIRECTORY) {
+                            git branch: PACKAGING_GIT_BRANCH, url: PACKAGING_GIT_REPOSITORY
 
-                        unstash 'GPG'
-                        unstash 'WAR'
-                        unstash 'KEYSTORE'
+                            unstash 'WAR'
 
-                        powershell '''
-                          Get-ChildItem env:
-                          $env:WAR=(Resolve-Path .\\jenkins.war).Path
-                          & .\\make.ps1
-                        '''
-                        // Don't archive the full path
-                        dir('msi\\build\\bin\\Release\\en-US') {
-                          archiveArtifacts '*.msi*'
+                            powershell '''
+                              Get-ChildItem env:
+                              $env:WAR=(Resolve-Path .\\jenkins.war).Path
+                              & .\\make.ps1
+                            '''
+                          }
                         }
+                      }
+                    }
+                    stage('Prepare Signing') {
+                      steps {
+                        container('sign-dotnet') {
+                          /***
+                          TODO: migrate to a prebuilt container image or VM to avoid installing on each run
+                          ***/
+                          powershell '''
+                          & .\\utils\\msi-setup-signing.ps1
+                          '''
+                        }
+                      }
+                    }
+                    stage('Sign MSI') {
+                      environment {
+                        // Using default Azure SDK variables, not expecting other Azure usage (az / azcopy/etc.) than signing for this stage (as these credentials are related to Linux Foundation tenant, not our tenant)
+                        AZURE_TENANT_ID                         = credentials('lf-msi-sign-azure-tenant-id')
+                        AZURE_CLIENT_ID                         = credentials('lf-msi-sign-azure-client-id')
+                        AZURE_CLIENT_SECRET                     = credentials('lf-msi-sign-azure-client-secret')
+                      }
+                      steps {
+                        container('sign-dotnet') {
+                          powershell '''
+                          & .\\utils\\msi-sign.ps1
+                          '''
 
+                          // Don't archive the full path
+                          dir('release\\msi\\build\\bin\\Release\\en-US') {
+                            archiveArtifacts '*.msi*'
+                          }
+                        }
                       }
                     }
                   }
