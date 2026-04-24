@@ -11,7 +11,7 @@ Invoke-WebRequest -Uri "https://download.microsoft.com/download/70ad2c3b-761f-4a
 Start-Process msiexec.exe -Wait -ArgumentList '/I ArtifactSigningClientTools.msi /quiet';
 Remove-Item .\ArtifactSigningClientTools.msi;
 
-# Download nuget package manage (required below)
+# Download nuget package manager (required below)
 Invoke-WebRequest -Uri https://dist.nuget.org/win-x86-commandline/latest/nuget.exe -OutFile .\nuget.exe
 
 # Download and install SignTool - https://learn.microsoft.com/en-us/azure/artifact-signing/how-to-signing-integrations#download-and-install-signtool
