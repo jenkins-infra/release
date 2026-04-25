@@ -95,7 +95,6 @@ pipeline {
     // Using HTTPS with no credentials - https://github.com/jenkins-infra/helpdesk/issues/4909 - need a GH app if rate limited or need to write things to git
     PACKAGING_GIT_REPOSITORY  = 'https://github.com/jenkinsci/packaging.git'
     PACKAGING_GIT_BRANCH      = 'master'
-    SIGN_STOREPASS            = credentials('signing-cert-pass-2023')
     WAR_FILENAME              = 'jenkins.war'
     WAR                       = "$WORKSPACE/$WORKING_DIRECTORY/$WAR_FILENAME"
     MAVEN_REPOSITORY_USERNAME = credentials('maven-repository-username')
