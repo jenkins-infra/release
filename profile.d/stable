@@ -11,7 +11,6 @@ GPG_VAULT_NAME="jenkins-release-pgp-2026"
 MAVEN_REPOSITORY_URL='https://repo.jenkins-ci.org'
 MAVEN_REPOSITORY_NAME=releases
 MAVEN_PUBLIC_JENKINS_REPOSITORY_MIRROR_URL='https://repo.jenkins-ci.org/public/'
-SIGN_ALIAS=jenkins
 
 # Used by jenkinsci/packaging
 RELEASELINE=-stable
