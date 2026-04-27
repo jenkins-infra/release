@@ -50,7 +50,6 @@ pipeline {
 
   environment {
     AZURE_VAULT_NAME              = 'prodreleasecore'
-    AZURE_VAULT_CERT              = 'prodreleasecore-2023'
     AZURE_VAULT_CLIENT_ID         = credentials('azure-vault-client-id')
     AZURE_VAULT_CLIENT_SECRET     = credentials('azure-vault-client-secret')
     AZURE_VAULT_TENANT_ID         = credentials('azure-vault-tenant-id')
@@ -58,7 +57,6 @@ pipeline {
     GPG_FILE                      = 'jenkins-release.gpg'
     MAVEN_REPOSITORY_USERNAME     = credentials('maven-repository-username')
     MAVEN_REPOSITORY_PASSWORD     = credentials('maven-repository-password')
-    SIGN_STOREPASS                = credentials('signing-cert-pass-2023')
   }
 
   stages {
@@ -93,14 +91,6 @@ pipeline {
         sh 'echo Validated'
       }
     }
-    stage('Get Code Signing Certificate') {
-      steps {
-        sh '''
-          utils/release.bash --downloadAzureKeyvaultSecret
-          utils/release.bash --configureKeystore
-        '''
-      }
-    }
     stage('Get GPG key') {
       steps {
         sh '''
@@ -110,7 +100,7 @@ pipeline {
     }
     stage('Prepare Release') {
       steps {
-        // Maven Release requires gpg key with password password and a certificate key with password
+        // Maven Release requires gpg key with password
         sh '''
           utils/release.bash --configureGPG
           utils/release.bash --configureGit
@@ -142,7 +132,6 @@ pipeline {
       steps {
         sh '''
           utils/release.bash --verifyGPGSignature
-          utils/release.bash --verifyCertificateSignature
         '''
       }
     }

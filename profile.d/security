@@ -13,7 +13,6 @@ GPG_KEYNAME="5E386EADB55F01504CAE8BCF7198F4B714ABFC68"
 GPG_VAULT_NAME="jenkins-release-pgp-2026"
 MAVEN_REPOSITORY_URL=https://repo.jenkins-ci.org
 MAVEN_PUBLIC_JENKINS_REPOSITORY_MIRROR_URL='https://repo.jenkins-ci.org/public/'
-SIGN_ALIAS=jenkins
 
 ### Git Staging Promotion Settings
 #
