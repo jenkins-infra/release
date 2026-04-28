@@ -96,16 +96,13 @@ pipeline {
           }
           steps {
             pwsh 'java -version'
-            container('dotnet') {
+            container('build-dotnet') {
                 powershell 'msbuild -version'
-            }
-
-            container('dotnet') {
-              checkout scm
-              // Ensure we can get the secondary git repository used for packaging
-              dir (WORKING_DIRECTORY) {
-                git branch: PACKAGING_GIT_BRANCH, url: PACKAGING_GIT_REPOSITORY
-              }
+                checkout scm
+                // Ensure we can get the secondary git repository used for packaging
+                dir (WORKING_DIRECTORY) {
+                  git branch: PACKAGING_GIT_BRANCH, url: PACKAGING_GIT_REPOSITORY
+                }
             }
           }
         }
