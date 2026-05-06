@@ -10,7 +10,6 @@ GPG_KEYNAME="5E386EADB55F01504CAE8BCF7198F4B714ABFC68"
 GPG_VAULT_NAME="jenkins-release-pgp-2026"
 MAVEN_REPOSITORY_URL='https://repo.jenkins-ci.org'
 MAVEN_REPOSITORY_NAME=snapshots
-SIGN_ALIAS=jenkins
 
 # Using JENKINS_VERSION set to latest, means that we won't try to parse every versions available from the repository
 # but instead looking at the value for metadata.versioning.latest from the maven-metadata.xml

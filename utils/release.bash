@@ -9,10 +9,6 @@ function requireGPGPassphrase() {
 	: "${GPG_PASSPHRASE:?GPG Passphrase Required}" # Password must be the same for gpg agent and gpg key
 }
 
-function requireKeystorePass() {
-	: "${SIGN_STOREPASS:?pass}"
-}
-
 function requireAzureKeyvaultCredentials() {
 	: "${AZURE_VAULT_CLIENT_ID:? Require AZURE_VAULT_CLIENT_ID}"
 	: "${AZURE_VAULT_CLIENT_SECRET:? Required AZURE_VAULT_CLIENT_SECRET}"
@@ -59,63 +55,11 @@ function configureGPG() {
 	fi
 }
 
-function configureKeystore() {
-	requireKeystorePass
-
-	if [[ ! -f $SIGN_CERTIFICATE ]]; then
-		echo "${SIGN_CERTIFICATE} not found"
-		exit 1
-	fi
-
-	case "${SIGN_CERTIFICATE}" in
-	*.pem)
-		openssl pkcs12 -export \
-			-legacy `# https://github.com/openssl/openssl/issues/11672` \
-			-out "${SIGN_KEYSTORE}" \
-			-in "${SIGN_CERTIFICATE}" \
-			-password "pass:${SIGN_STOREPASS}" \
-			-name "${SIGN_ALIAS}"
-		;;
-	*.pfx)
-		# pfx file download from azure key vault are not password protected, which is required for maven release plugin
-		# so we need to add a new password
-		openssl pkcs12 \
-			-in "${SIGN_CERTIFICATE}" \
-			-legacy `# https://github.com/openssl/openssl/issues/11672` \
-			-out tmpjenkins.pem \
-			-nodes \
-			-passin pass:""
-		openssl pkcs12 -export \
-			-legacy `# https://github.com/openssl/openssl/issues/11672` \
-			-out "${SIGN_KEYSTORE}" \
-			-in tmpjenkins.pem \
-			-password "pass:${SIGN_STOREPASS}" \
-			-name "${SIGN_ALIAS}"
-		rm tmpjenkins.pem
-		;;
-	*)
-		echo "certificate file extension not support for ${SIGN_CERTIFICATE}"
-		;;
-	esac
-}
-
 function azureAccountAuth() {
 	az login --service-principal \
 		-u "${AZURE_VAULT_CLIENT_ID}" \
 		-p "${AZURE_VAULT_CLIENT_SECRET}" \
 		-t "${AZURE_VAULT_TENANT_ID}"
-}
-
-# Download Certificate from Azure KeyVault
-function downloadAzureKeyvaultSecret() {
-	requireAzureKeyvaultCredentials
-	azureAccountAuth
-
-	az keyvault secret download \
-		--vault-name "${AZURE_VAULT_NAME}" \
-		--name "${AZURE_VAULT_CERT}" \
-		--encoding base64 \
-		--file "${SIGN_CERTIFICATE}"
 }
 
 # Once the exact Jenkins Version to get is determined, we retrieve the WAR and the signature file from Artifactory
@@ -149,7 +93,6 @@ function getGPGKeyFromAzure() {
 
 function generateSettingsXml() {
 	requireRepositoryPassword
-	requireKeystorePass
 	requireGPGPassphrase
 
 	cat <<EOT >settings-release.xml
@@ -166,12 +109,6 @@ function generateSettingsXml() {
       <id>automated-release</id>
       <!-- Following properties can't be defined with -D, as explained here https://issues.apache.org/jira/browse/MNG-4979 -->
       <properties>
-        <hudson.sign.keystore>${SIGN_KEYSTORE}</hudson.sign.keystore>
-        <hudson.sign.alias>${SIGN_ALIAS}</hudson.sign.alias>
-        <hudson.sign.storepass>${SIGN_STOREPASS}</hudson.sign.storepass>
-        <jarsigner.certs>true</jarsigner.certs>
-        <jarsigner.keypass>${SIGN_STOREPASS}</jarsigner.keypass>
-        <jarsigner.errorWhenNotSigned>true</jarsigner.errorWhenNotSigned>
         <gpg.keyname>${GPG_KEYNAME}</gpg.keyname>
         <gpg.passphrase>${GPG_PASSPHRASE}</gpg.passphrase>
       </properties>
@@ -346,7 +283,6 @@ function packaging() {
 
 function prepareRelease() {
 	requireGPGPassphrase
-	requireKeystorePass
 	generateSettingsXml
 
 	printf '\n Prepare Jenkins Release\n\n'
@@ -408,7 +344,6 @@ function pushCommits() {
 
 function stageRelease() {
 	requireGPGPassphrase
-	requireKeystorePass
 
 	printf '\n Stage Jenkins Release\n\n'
 	mvn -B -V \
@@ -428,24 +363,14 @@ function stageRelease() {
 
 function performRelease() {
 	requireGPGPassphrase
-	requireKeystorePass
 
 	printf '\n Perform Jenkins Release\n\n'
 	mvn -B -V -s settings-release.xml -ntp release:perform
 }
 
-function validateKeystore() {
-	requireKeystorePass
-	keytool -keystore "${SIGN_KEYSTORE}" -storepass "${SIGN_STOREPASS}" -list -alias "${SIGN_ALIAS}"
-}
-
 function verifyGPGSignature() {
 	gpg --verify "${JENKINS_ASC}" "${JENKINS_WAR}"
 	unzip -qc "${JENKINS_WAR}" META-INF/MANIFEST.MF | grep 'Jenkins-Version' | awk '{print $2}'
-}
-
-function verifyCertificateSignature() {
-	jarsigner -verbose -verify -certs -strict "${JENKINS_WAR}"
 }
 
 function showReleasePlan() {
@@ -601,11 +526,8 @@ function checkPackagingEnvironment() {
 function main() {
 	if [[ $# -eq 0 ]]; then
 		configureGPG
-		configureKeystore
 		configureGit
-		validateKeystore
 		verifyGPGSignature
-		verifyCertificateSignature
 		generateSettingsXml
 		prepareRelease
 		stageRelease
@@ -615,16 +537,12 @@ function main() {
 			--cleanRelease) echo "Clean Release" && generateSettingsXml && clean ;;
 			--cloneReleaseGitRepository) echo "Cloning Jenkins Repository" && cloneReleaseGitRepository ;;
 			--configureGPG) echo "ConfigureGPG" && configureGPG ;;
-			--configureKeystore) echo "Configure Keystore" && configureKeystore ;;
 			--configureGit) echo "Configure Git" && configureGit ;;
 			--generateSettingsXml) echo "Generate settings-release.xml" && generateSettingsXml ;;
-			--downloadAzureKeyvaultSecret) echo "Download Azure Key Vault Secret" && downloadAzureKeyvaultSecret ;;
 			--downloadJenkins) echo "Download Jenkins from maven repository" && downloadJenkinsWar ;;
 			--getGPGKeyFromAzure) echo "Download GPG Key from Azure" && getGPGKeyFromAzure ;;
 			--invalidateFastlyCache) echo "Invalidating Fastly cache" && invalidateFastlyCache ;;
-			--validateKeystore) echo "Validate Keystore" && validateKeystore ;;
 			--verifyGPGSignature) echo "Verify GPG Signature" && verifyGPGSignature ;;
-			--verifyCertificateSignature) echo "Verify certificate signature" && verifyCertificateSignature ;;
 			--performRelease) echo "Perform Release" && performRelease ;;
 			--prepareRelease) echo "Prepare Release" && generateSettingsXml && prepareRelease ;;
 			--pushCommits) echo "Push commits on ${RELEASE_GIT_BRANCH}" && pushCommits ;;
@@ -672,10 +590,6 @@ source "${ROOT_DIR}/profile.d/${RELEASE_PROFILE}"
 : "${JENKINS_VERSION:=latest}"
 : "${JENKINS_WAR:=$WORKSPACE/$WORKING_DIRECTORY/war/target/jenkins.war}"
 : "${JENKINS_ASC:=$WORKSPACE/$WORKING_DIRECTORY/war/target/jenkins.war.asc}"
-: "${SIGN_ALIAS:=jenkins}"
-: "${SIGN_KEYSTORE_FILENAME:=jenkins.pfx}"
-: "${SIGN_KEYSTORE:=${WORKSPACE}/${SIGN_KEYSTORE_FILENAME}}"
-: "${SIGN_CERTIFICATE:=$SIGN_KEYSTORE_FILENAME}"
 : "${MAVEN_REPOSITORY_USERNAME:=jenkins-bot}"
 : "${MAVEN_REPOSITORY_URL:=https://repo.jenkins-ci.org}"
 : "${MAVEN_REPOSITORY_NAME:=releases}"
