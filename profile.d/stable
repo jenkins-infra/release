@@ -14,4 +14,4 @@ MAVEN_PUBLIC_JENKINS_REPOSITORY_MIRROR_URL='https://repo.jenkins-ci.org/public/'
 
 # Used by jenkinsci/packaging
 RELEASELINE=-stable
-JENKINS_VERSION=2.555.1
+JENKINS_VERSION=2.555.2
