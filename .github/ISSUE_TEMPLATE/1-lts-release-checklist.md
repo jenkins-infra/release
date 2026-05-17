@@ -32,7 +32,7 @@ This role should rotate between LTS releases
   - [ ] [jenkins-infra/release](https://github.com/jenkins-infra/release)
 
 - [ ] Check with the Jenkins Infrastructure team for backports on repositories [jenkinsci/packaging](https://github.com/jenkinsci/packaging), [jenkinsci/docker](https://github.com/jenkinsci/docker) and [jenkins-infra/release](https://github.com/jenkins-infra/release) as per https://github.com/jenkins-infra/release/blob/master/docs/releases.md#open-a-backporting-pr.
-  - A message one or two weeks before in the Matrix channel `#jenkins-infra` mentioning this issue and this item is enough: they will own the backports
+  - A message one or two weeks before the final LTS release in the Matrix channel `#jenkins-infra` mentioning this issue and this item is enough: they will own the backports
 
 - [ ] Create a pull request to update [bom](https://github.com/jenkinsci/bom) to the weekly version that will be the base of the release line (and strike this out for new point release).
       Assure that the [bom-weekly version number](https://github.com/jenkinsci/bom/blob/master/sample-plugin/pom.xml#L17) is already testing the base of the release line or a version newer than the base of the release line.
