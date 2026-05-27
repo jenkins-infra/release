@@ -34,7 +34,7 @@ spec:
         runAsGroup: 1000
   restartPolicy: "Never"
   nodeSelector:
-    kubernetes.azure.com/agentpool: releasepool
+    kubernetes.azure.com/agentpool: releacilinux
     kubernetes.io/os: linux
   tolerations:
     - key: "os"
