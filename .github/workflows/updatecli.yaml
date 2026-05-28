@@ -16,11 +16,11 @@ jobs:
       - name: Setup updatecli
         uses: updatecli/updatecli-action@e71be7554f3f940bc439cf720b3e4e379823c562 # v3.2.0
       - name: Diff
-        run: updatecli diff --config ./updatecli/updatecli.d --values ./updatecli/values.github-action.yaml
+        run: updatecli pipeline diff --config ./updatecli/updatecli.d --values ./updatecli/values.github-action.yaml
         env:
           UPDATECLI_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Apply
         if: github.ref == 'refs/heads/master'
-        run: updatecli apply --config ./updatecli/updatecli.d --values ./updatecli/values.github-action.yaml
+        run: updatecli pipeline apply --config ./updatecli/updatecli.d --values ./updatecli/values.github-action.yaml
         env:
           UPDATECLI_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
