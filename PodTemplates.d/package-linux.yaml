@@ -54,7 +54,7 @@ spec:
       persistentVolumeClaim:
         claimName: data-storage-jenkins-io
   nodeSelector:
-    kubernetes.azure.com/agentpool: releasepool
+    kubernetes.azure.com/agentpool: releacilinux
     kubernetes.io/os: linux
   tolerations:
     - key: "os"
