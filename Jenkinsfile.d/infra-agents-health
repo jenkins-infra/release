@@ -9,6 +9,10 @@ library(
 pipeline {
   agent none
 
+  triggers {
+    cron('0 2 * * *')
+  }
+
   options {
     disableConcurrentBuilds()
   }
