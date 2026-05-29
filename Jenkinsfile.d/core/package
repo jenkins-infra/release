@@ -161,14 +161,13 @@ pipeline {
             '''
           }
         }
-        stage('Download WAR archive to package') {
+        stage('Download WAR to package') {
           steps {
             sh '''
               ./utils/release.bash --downloadJenkins
             '''
             dir (WORKING_DIRECTORY) {
               stash includes: WAR_FILENAME, name: "WAR"
-              archiveArtifacts artifacts: "*.war"
             }
           }
         }
@@ -193,9 +192,6 @@ pipeline {
                     sh '''
                       ./utils/release.bash --packaging deb
                     '''
-                    dir (WORKING_DIRECTORY) {
-                      archiveArtifacts artifacts: "target/debian/*.deb"
-                    }
                   }
                 }
                 stage('Publish') {
@@ -214,9 +210,6 @@ pipeline {
                     sh '''
                       ./utils/release.bash --packaging rpm
                     '''
-                    dir (WORKING_DIRECTORY){
-                      archiveArtifacts artifacts: "target/rpm/*.rpm"
-                    }
                   }
                 }
                 stage('Publish'){
@@ -283,9 +276,9 @@ pipeline {
                           & .\\utils\\msi-sign.ps1
                           '''
 
-                          // Don't archive the full path
+                          // Don't stash the full path
                           dir('release\\msi\\build\\bin\\Release\\en-US') {
-                            archiveArtifacts '*.msi*'
+                            stash includes: '*.msi*' , name: 'MSI'
                           }
                         }
                       }
@@ -294,7 +287,7 @@ pipeline {
                 }
                 stage('Publish') {
                   steps {
-                    unarchive mapping: ['*.msi*': WORKING_DIRECTORY]
+                    unstash 'MSI'
                     sh '''
                       ./utils/release.bash --packaging msi.publish
                     '''
