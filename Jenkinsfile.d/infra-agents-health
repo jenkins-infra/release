@@ -28,6 +28,7 @@ pipeline {
     PACKAGING_GIT_REPOSITORY  = 'https://github.com/jenkinsci/packaging.git'
     PACKAGING_GIT_BRANCH      = 'master'
     WORKING_DIRECTORY         = "release"
+    FASTLY_API_TOKEN          = credentials('fastly-api-token')
   }
 
   stages {
@@ -61,6 +62,16 @@ pipeline {
             sh 'ls -la /var/www/pkg.jenkins.io.production/'
             sh 'ls -la /var/www/get.jenkins.io.staging/'
             sh 'ls -la /var/www/get.jenkins.io.production/'
+
+            // Ensure Fastly purge token is working on pkg.jenkins.io index page
+            sh '''
+            curl --fail --location \
+              -X POST \
+              -H "Fastly-Key: ${FASTLY_API_TOKEN}" \
+              -H "Accept: application/json" \
+              -H "Fastly-Soft-Purge:1" \
+              "https://api.fastly.com/purge/pkg.jenkins.io"
+            '''
 
             // Ensure we can SSH-connect to required remote servers
             sshagent(credentials: [
