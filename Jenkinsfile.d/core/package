@@ -287,7 +287,9 @@ pipeline {
                 }
                 stage('Publish') {
                   steps {
-                    unstash 'MSI'
+                    dir (WORKING_DIRECTORY) {
+                      unstash 'MSI'
+                    }
                     sh '''
                       ./utils/release.bash --packaging msi.publish
                     '''
