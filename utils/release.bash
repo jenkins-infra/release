@@ -9,12 +9,6 @@ function requireGPGPassphrase() {
 	: "${GPG_PASSPHRASE:?GPG Passphrase Required}" # Password must be the same for gpg agent and gpg key
 }
 
-function requireAzureKeyvaultCredentials() {
-	: "${AZURE_VAULT_CLIENT_ID:? Require AZURE_VAULT_CLIENT_ID}"
-	: "${AZURE_VAULT_CLIENT_SECRET:? Required AZURE_VAULT_CLIENT_SECRET}"
-	: "${AZURE_VAULT_TENANT_ID:? Required AZURE_VAULT_TENANT_ID}"
-}
-
 function clean() {
 	mvn -B -V -s settings-release.xml -ntp release:clean
 }
@@ -56,10 +50,7 @@ function configureGPG() {
 }
 
 function azureAccountAuth() {
-	az login --service-principal \
-		-u "${AZURE_VAULT_CLIENT_ID}" \
-		-p "${AZURE_VAULT_CLIENT_SECRET}" \
-		-t "${AZURE_VAULT_TENANT_ID}"
+	az login --federated-token "$(cat "$AZURE_FEDERATED_TOKEN_FILE")" --service-principal -u "$AZURE_CLIENT_ID" -t "$AZURE_TENANT_ID"
 }
 
 # Once the exact Jenkins Version to get is determined, we retrieve the WAR and the signature file from Artifactory
@@ -81,7 +72,6 @@ function downloadJenkinsWar() {
 }
 
 function getGPGKeyFromAzure() {
-	requireAzureKeyvaultCredentials
 	azureAccountAuth
 
 	az keyvault secret download \

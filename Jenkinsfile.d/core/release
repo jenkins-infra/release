@@ -50,9 +50,6 @@ pipeline {
 
   environment {
     AZURE_VAULT_NAME              = 'prodreleasecore'
-    AZURE_VAULT_CLIENT_ID         = credentials('azure-vault-client-id')
-    AZURE_VAULT_CLIENT_SECRET     = credentials('azure-vault-client-secret')
-    AZURE_VAULT_TENANT_ID         = credentials('azure-vault-tenant-id')
     GPG_PASSPHRASE                = credentials('release-gpg-passphrase-2026')
     GPG_FILE                      = 'jenkins-release.gpg'
     MAVEN_REPOSITORY_USERNAME     = credentials('maven-repository-username')
