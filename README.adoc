@@ -238,7 +238,8 @@ Once the job is done, every package will be published and then mirror synchroniz
 Ensure that packages are correctly published on pkg.jenkins.io and correctly signed.
 
 ==== Stage
-Staging packages is not yet fully supported, more information on link:https://issues.jenkins-ci.org/browse/INFRA-1363[INFRA-1363] and link:https://issues.jenkins-ci.org/browse/INFRA-2608[INFRA-2608]
+Packages can be staged privately.
+More information is available in link:https://github.com/jenkins-infra/helpdesk/issues/1110[INFRA-1363] and link:https://github.com/jenkins-infra/helpdesk/issues/2193[INFRA-2608]
 
 == Profile
 The release profile is used to identify the kind of release we are going to do. They are mainly influenced by following elements:
@@ -413,5 +414,5 @@ mvn -B -DstagingRepository=releases::https://repo.jenkins-ci.org/releases -s set
 * https://pkg.jenkins.io[pkg.jenkins.io], service to download Jenkins packages
 * https://repo.jenkins-ci.org[repo.jenkins-ci.org], Jenkins Maven repository
 * https://mirrors.jenkins.io[mirrors.jenkins.io]
-* https://issues.jenkins-ci.org/browse/INFRA-910[INFRA-910] - EPIC for the new Jenkins Core Release Environment
+* https://github.com/jenkins-infra/helpdesk/issues/663[INFRA-910] - EPIC for the Jenkins Core Release Environment
 * https://github.com/jenkins-infra/docker-packaging[docker-packaging], defines the docker image used to execute packaging scripts
