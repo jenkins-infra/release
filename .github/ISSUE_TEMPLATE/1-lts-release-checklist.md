@@ -48,7 +48,7 @@ This role should rotate between LTS releases
 - [ ] Send a backporting announcement email to the [jenkinsci-dev](https://groups.google.com/g/jenkinsci-dev) mailing list, using the [default](https://groups.google.com/g/jenkinsci-dev/c/sZY2WXoWLWM) template.
 Remember to exchange the LTS version, release date and issue URLs.
 
-- [ ] Update issue labels for [lts-candidate issues](https://issues.jenkins.io/issues/?filter=12146), either add `2.387.2-fixed` and remove `lts-candidate` or add `2.387.2-rejected`, and retain `lts-candidate`.
+- [ ] Update issue labels for [lts-candidate issues](https://github.com/jenkinsci/jenkins/issues?q=is%3Aissue%20state%3Aclosed%20label%3Alts-candidate), either add `2.387.2-fixed` and remove `lts-candidate` or add `2.387.2-rejected`, and retain `lts-candidate`.
 
 - [ ] Backport changes, run the [list-issue-commits script](https://github.com/jenkins-infra/release/blob/master/tools/list-issue-commits.sh) to locate commits of interest, some manual work is required to locate them if the issue ID wasn't present at merge time, backport with `git cherry-pick -x $commit`.
 
