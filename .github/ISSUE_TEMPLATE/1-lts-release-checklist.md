@@ -8,6 +8,10 @@ about: Track work required for a new LTS release
 
 More information about the release process is available on the [release guide](https://github.com/jenkins-infra/release/blob/master/docs/releases.md).
 
+Release date: [PUT RELEASE DATE HERE]
+
+Previous release checklist: [PUT PREVIOUS RELEASE CHECKLIST ISSUE LINK HERE]
+
 ## Release Lead
 
 <!--
