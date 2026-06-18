@@ -41,19 +41,19 @@ This role should rotate between LTS releases
 - [ ] Create a pull request to update [bom](https://github.com/jenkinsci/bom) to the weekly version that will be the base of the release line (and strike this out for new point release).
       Assure that the [bom-weekly version number](https://github.com/jenkinsci/bom/blob/master/sample-plugin/pom.xml#L17) is already testing the base of the release line or a version newer than the base of the release line.
 
-- [ ] Review [recent security advisories](https://www.jenkins.io/security/advisories/) for fixes in Jenkins weeklies after the LTS baseline, and ensure there are Jira issues for their backport.
+- [ ] Review [recent security advisories](https://www.jenkins.io/security/advisories/) for fixes in Jenkins weeklies after the LTS baseline, and ensure there are issues for their backport.
 
-- [ ] Review Jira and GitHub pull requests for additional LTS candidates, adding the `lts-candidate` label, and ensure that all tickets are resolved in Jira.
+- [ ] Review GitHub issues and pull requests for additional LTS candidates, adding the `lts-candidate` label.  Ensure that all issues are resolved.
 
 - [ ] Send a backporting announcement email to the [jenkinsci-dev](https://groups.google.com/g/jenkinsci-dev) mailing list, using the [default](https://groups.google.com/g/jenkinsci-dev/c/sZY2WXoWLWM) template.
-Remember to exchange the LTS version, release date and Jira URLs.
+Remember to exchange the LTS version, release date and issue URLs.
 
-- [ ] Update Jira labels for [lts-candidate issues](https://issues.jenkins.io/issues/?filter=12146), either add `2.387.2-fixed` and remove `lts-candidate` or add `2.387.2-rejected`, and retain `lts-candidate`.
+- [ ] Update issue labels for [lts-candidate issues](https://issues.jenkins.io/issues/?filter=12146), either add `2.387.2-fixed` and remove `lts-candidate` or add `2.387.2-rejected`, and retain `lts-candidate`.
 
-- [ ] Backport changes, run the [list-issue-commits script](https://github.com/jenkins-infra/release/blob/master/tools/list-issue-commits.sh) to locate commits via Jira ID, some manual work is required to locate them if the issue ID wasn't present at merge time, backport with `git cherry-pick -x $commit`.
+- [ ] Backport changes, run the [list-issue-commits script](https://github.com/jenkins-infra/release/blob/master/tools/list-issue-commits.sh) to locate commits of interest, some manual work is required to locate them if the issue ID wasn't present at merge time, backport with `git cherry-pick -x $commit`.
 
 - [ ] Open backporting PR with `into-lts` label and summary of changes in description from [lts-candidate-stats script](https://github.com/jenkins-infra/release/blob/master/tools/lts-candidate-stats.sh) and:
-  - [ ] the selected [Jira lts-candidates](https://issues.jenkins-ci.org/issues/?filter=12146).
+  - [ ] the selected [lts-candidate issues](https://github.com/jenkinsci/jenkins/issues?q=is%3Aissue%20state%3Aclosed%20label%3Alts-candidate) and [lts-candidate pull requests](https://github.com/jenkinsci/jenkins/pulls?q=is%3Apr+label%3Alts-candidate+is%3Aclosed)
   - By the Jenkins Infrastructure team:
     - [ ] possible LTS candidates in the [release](https://github.com/jenkins-infra/release/issues?q=is%3Aclosed+label%3Alts-candidate+) repository.
     - [ ] possible LTS candidates in the [packaging](https://github.com/jenkinsci/packaging/issues?q=is%3Aclosed+label%3Alts-candidate) repository.
@@ -115,8 +115,6 @@ The [documentation](https://github.com/jenkins-infra/release/blob/master/docs/re
 
 - [ ] Confirm the [Red Hat installer acceptance test](https://ci.jenkins.io/job/Infra/job/acceptance-tests/job/install-lts-redhat-rpm/) is passing.
   For good measures, check the console log to confirm that the correct release package was used (e.g. search for `2.387`. If not, launch tests again).
-
-- [ ] Adjust state and `Released As` of [Jira issues](https://issues.jenkins.io/) fixed in the release (see the [changelog](https://www.jenkins.io/changelog-stable) for issue links).
 
 - [ ] Create pull request to update the `jenkins.version` in the most recent release profile in [plugin BOM](https://github.com/jenkinsci/bom) to the newly released version.
   Refer to [first step before the release](https://github.com/jenkinsci/bom/pull/3374) and [second step after the release](https://github.com/jenkinsci/bom/pull/3447) for examples
