@@ -48,12 +48,12 @@ This role should rotate between LTS releases
 - [ ] Send a backporting announcement email to the [jenkinsci-dev](https://groups.google.com/g/jenkinsci-dev) mailing list, using the [default](https://groups.google.com/g/jenkinsci-dev/c/sZY2WXoWLWM) template.
 Remember to exchange the LTS version, release date and issue URLs.
 
-- [ ] Update issue labels for [lts-candidate issues](https://github.com/jenkinsci/jenkins/issues?q=is%3Aissue%20state%3Aclosed%20label%3Alts-candidate), either add `2.387.2-fixed` and remove `lts-candidate` or add `2.387.2-rejected`, and retain `lts-candidate`.
+- [ ] Update labels for [lts-candidates](https://github.com/jenkinsci/jenkins/issues?q=state%3Aclosed%20label%3Alts-candidate), either add `2.387.2-fixed` and remove `lts-candidate` or add `2.387.2-rejected`, and retain `lts-candidate`.
 
 - [ ] Backport changes, run the [list-issue-commits script](https://github.com/jenkins-infra/release/blob/master/tools/list-issue-commits.sh) to locate commits of interest, some manual work is required to locate them if the issue ID wasn't present at merge time, backport with `git cherry-pick -x $commit`.
 
 - [ ] Open backporting PR with `into-lts` label and summary of changes in description from [lts-candidate-stats script](https://github.com/jenkins-infra/release/blob/master/tools/lts-candidate-stats.sh) and:
-  - [ ] the selected [lts-candidate issues](https://github.com/jenkinsci/jenkins/issues?q=is%3Aissue%20state%3Aclosed%20label%3Alts-candidate) and [lts-candidate pull requests](https://github.com/jenkinsci/jenkins/pulls?q=is%3Apr+label%3Alts-candidate+is%3Aclosed)
+  - [ ] the selected [lts-candidates](https://github.com/jenkinsci/jenkins/issues?q=state%3Aclosed%20label%3Alts-candidate)
   - By the Jenkins Infrastructure team:
     - [ ] possible LTS candidates in the [release](https://github.com/jenkins-infra/release/issues?q=is%3Aclosed+label%3Alts-candidate+) repository.
     - [ ] possible LTS candidates in the [packaging](https://github.com/jenkinsci/packaging/issues?q=is%3Aclosed+label%3Alts-candidate) repository.
