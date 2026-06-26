@@ -8,7 +8,7 @@ metadata:
 spec:
   serviceAccountName: release-ci-jenkins-io-agents
   containers:
-  - image: jenkins/inbound-agent:3355.v388858a_47b_33-23-jdk25-nanoserver-ltsc2022
+  - image: jenkins/inbound-agent:3383.vc8881d4b_0e76-1-jdk25-nanoserver-ltsc2022
     imagePullPolicy: "IfNotPresent"
     name: "jnlp"
     env:
