@@ -94,6 +94,8 @@ The [documentation](https://github.com/jenkins-infra/release/blob/master/docs/re
 
 - [ ] Announce the start of the LTS release process in the [#jenkins-release:matrix.org](https://matrix.to/#/#jenkins-release:matrix.org) channel.
 
+- [ ] Trigger https://release.ci.jenkins.io/job/infra-agents-health/job/master to check that agents can be provisioned without issue and notify the Jenkins Infrastructure team if it's not passing
+
 - [ ] If this is the **first** release of a new LTS line (otherwise you can ignore this bullet), we have two pipelines which will fail on their first run on the `stable-xxx` branches. You have to run them both, only once for their first build (so they can parse their parameters) and cancel them after a few seconds (the button "Build" of the branch page should then change to "Build with Parameters" after reloading the page):
   - [ ] "Child" pipeline [https://release.ci.jenkins.io/job/core/job/release/](https://release.ci.jenkins.io/job/core/job/release/) on its `stable-xxx` branch.
   - [ ] "Child" pipeline [https://release.ci.jenkins.io/job/core/job/package/](https://release.ci.jenkins.io/job/core/job/package/) on its `stable-xxx` branch.
