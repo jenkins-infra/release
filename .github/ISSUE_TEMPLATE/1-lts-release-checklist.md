@@ -27,9 +27,9 @@ This role should rotate between LTS releases
 
 - [ ] LTS baseline discussed and selected in the [Jenkins developers mailing list](https://groups.google.com/g/jenkinsci-dev).
     If the last release of the preceding LTS line is a security release, consider making the matching weekly release the [new LTS baseline](https://groups.google.com/g/jenkinsci-dev/c/ca7Lp0x6Kqs/m/QwHj66hZAgAJ).
-    For example, 2.462.3 LTS and 2.479 were security releases and it is simpler to use 2.479 as baseline than 2.477.
+    For example, 2.568.3 LTS and 2.580 were security releases and it is simpler to use 2.580 as baseline than 2.576.
 
-- [ ] Create or update the release branches in all the repositories below, e.g. `stable-2.387` with the [init-lts-line](https://github.com/jenkins-infra/release/blob/master/tools/init-lts-line) script or carry out the equivalent steps therein. For more info, refer to [stable](https://github.com/jenkins-infra/release#stable).
+- [ ] Create or update the release branches in all the repositories below, e.g. `stable-2.580` with the [init-lts-line](https://github.com/jenkins-infra/release/blob/master/tools/init-lts-line) script or carry out the equivalent steps therein. For more info, refer to [stable](https://github.com/jenkins-infra/release#stable).
   - [ ] [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins)
   - [ ] [jenkinsci/packaging](https://github.com/jenkinsci/packaging)
   - [ ] [jenkinsci/docker](https://github.com/jenkinsci/docker)
@@ -48,7 +48,7 @@ This role should rotate between LTS releases
 - [ ] Send a backporting announcement email to the [jenkinsci-dev](https://groups.google.com/g/jenkinsci-dev) mailing list, using the [default](https://groups.google.com/g/jenkinsci-dev/c/sZY2WXoWLWM) template.
 Remember to exchange the LTS version, release date and issue URLs.
 
-- [ ] Update labels for [lts-candidates](https://github.com/jenkinsci/jenkins/issues?q=state%3Aclosed%20label%3Alts-candidate), either add `2.387.2-fixed` and remove `lts-candidate` or add `2.387.2-rejected`, and retain `lts-candidate`.
+- [ ] Update labels for [lts-candidates](https://github.com/jenkinsci/jenkins/issues?q=state%3Aclosed%20label%3Alts-candidate), either add `2.580.1-fixed` and remove `lts-candidate` or add `2.580.1-rejected`, and retain `lts-candidate`.
 
 - [ ] Backport changes, run the [list-issue-commits script](https://github.com/jenkins-infra/release/blob/master/tools/list-issue-commits.sh) to locate commits of interest, some manual work is required to locate them if the issue ID wasn't present at merge time, backport with `git cherry-pick -x $commit`.
 
@@ -70,9 +70,9 @@ The [documentation](https://github.com/jenkins-infra/release/blob/master/docs/re
 
 - [ ] Merge backporting PR in [`jenkinci/jenkins`](https://github.com/jenkinsci/jenkins) using a merge commit (and do not squash).
 
-- [ ] Retrieve the URL for the RC from the commit status (Jenkins Incrementals Publisher / Incrementals) of the last build on the stable branch (requires a passing build). Visit the `jenkins-war` URL and copy the URL of the war file, which would be something like https://repo.jenkins-ci.org/incrementals/org/jenkins-ci/main/jenkins-war/2.387.1-rc32701.b_06d9cef554c/jenkins-war-2.387.1-rc32701.b_06d9cef554c.war. If the incrementals are broken you can deploy a build from your own machine with `mvn -e clean deploy -DskipTests=true`.
+- [ ] Retrieve the URL for the RC from the commit status (Jenkins Incrementals Publisher / Incrementals) of the last build on the stable branch (requires a passing build). Visit the `jenkins-war` URL and copy the URL of the war file, which would be something like https://repo.jenkins-ci.org/incrementals/org/jenkins-ci/main/jenkins-war/2.580.1-rc32701.b_06d9cef554c/jenkins-war-2.580.1-rc32701.b_06d9cef554c.war. If the incrementals are broken you can deploy a build from your own machine with `mvn -e clean deploy -DskipTests=true`.
 
-- [ ] Publish a pre-release [Github release](https://github.com/jenkinsci/jenkins/releases), e.g. [sample](https://github.com/jenkinsci/jenkins/releases/tag/jenkins-2.387.1-rc) currently we don't have a changelog for RCs.
+- [ ] Publish a pre-release [Github release](https://github.com/jenkinsci/jenkins/releases), e.g. [sample](https://github.com/jenkinsci/jenkins/releases/tag/jenkins-2.580.1-rc) currently we don't have a changelog for RCs.
 
 - [ ] Confirm the automatic announcement has been sent to the [jenkinsci-dev](https://groups.google.com/g/jenkinsci-dev) mailing list and [community forums](https://community.jenkins.io/c/blog/23). If the automatic announcement is not sent, compose and send the announcement yourself.
 
@@ -108,15 +108,15 @@ The [documentation](https://github.com/jenkins-infra/release/blob/master/docs/re
 
 - [ ] Check [LTS changelog](https://www.jenkins.io/changelog-stable/) is visible on the downloads site.
 
-- [ ] Publish [GitHub release](https://github.com/jenkinsci/jenkins/releases) pointing to LTS changelog, [sample](https://github.com/jenkinsci/jenkins/releases/tag/jenkins-2.387.1).
+- [ ] Publish [GitHub release](https://github.com/jenkinsci/jenkins/releases) pointing to LTS changelog, [sample](https://github.com/jenkinsci/jenkins/releases/tag/jenkins-2.580.1).
 
 - [ ] Confirm that all Packages are available on the [Datadog page](https://p.datadoghq.com/sb/0Igb9a-e6849e5e019250ef5aaea3589297fe8b).
 
 - [ ] Confirm the [Debian installer acceptance test](https://ci.jenkins.io/job/Infra/job/acceptance-tests/job/install-lts-debian-package/) is passing.
-  For good measures, check the console log to confirm that the correct release package was used (e.g. search for `2.387`. If not, launch tests again).
+  For good measures, check the console log to confirm that the correct release package was used (e.g. search for `2.580`. If not, launch tests again).
 
 - [ ] Confirm the [Red Hat installer acceptance test](https://ci.jenkins.io/job/Infra/job/acceptance-tests/job/install-lts-redhat-rpm/) is passing.
-  For good measures, check the console log to confirm that the correct release package was used (e.g. search for `2.387`. If not, launch tests again).
+  For good measures, check the console log to confirm that the correct release package was used (e.g. search for `2.580`. If not, launch tests again).
 
 - [ ] Create pull request to update the `jenkins.version` in the most recent release profile in [plugin BOM](https://github.com/jenkinsci/bom) to the newly released version.
   Refer to [first step before the release](https://github.com/jenkinsci/bom/pull/3374) and [second step after the release](https://github.com/jenkinsci/bom/pull/3447) for examples
