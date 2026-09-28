@@ -118,6 +118,24 @@ pipeline {
             }
           }
         }
+        stage('Test Windows Agent `package-windows2025`') {
+          agent {
+            kubernetes {
+              yamlFile 'PodTemplates.d/package-windows2025.yaml'
+            }
+          }
+          steps {
+            pwsh 'java -version'
+            container('build-dotnet') {
+                powershell 'msbuild -version'
+                checkout scm
+                // Ensure we can get the secondary git repository used for packaging
+                dir (WORKING_DIRECTORY) {
+                  git branch: PACKAGING_GIT_BRANCH, url: PACKAGING_GIT_REPOSITORY
+                }
+            }
+          }
+        }
       }
     }
     stage('Publish build status report') {
