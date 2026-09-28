@@ -118,7 +118,7 @@ pipeline {
             }
           }
         }
-        stage('Test Windows Agent `package-windows2022`') {
+        stage('Test Windows Agent `package-windows2025`') {
           agent {
             kubernetes {
               yamlFile 'PodTemplates.d/package-windows2025.yaml'
