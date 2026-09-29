@@ -8,7 +8,7 @@ metadata:
 spec:
   serviceAccountName: release-ci-jenkins-io-agents
   containers:
-  - image: jenkins/inbound-agent:3386.v353e57a_1b_ea_0-2-jdk25-nanoserver-ltsc2022
+  - image: jenkins/inbound-agent:3391.va_37fa_a_305d6d-3-jdk25-nanoserver-ltsc2025
     imagePullPolicy: "IfNotPresent"
     name: "jnlp"
     env:
@@ -28,7 +28,7 @@ spec:
       - Start-Sleep -s 2147483 # We must be sure that the process used by the container doesn't stop before the Jenkins job and second is not greater than 2147483
     command:
       - "powershell.exe"
-    image: "mcr.microsoft.com/dotnet/framework/sdk:3.5-windowsservercore-ltsc2022"
+    image: "mcr.microsoft.com/dotnet/framework/sdk:3.5-windowsservercore-ltsc2025"
     imagePullPolicy: "IfNotPresent"
     name: "build-dotnet"
     resources:
@@ -46,7 +46,7 @@ spec:
       - Start-Sleep -s 2147483 # We must be sure that the process used by the container doesn't stop before the Jenkins job and second is not greater than 2147483
     command:
       - "powershell.exe"
-    image: "mcr.microsoft.com/dotnet/runtime:8.0-windowsservercore-ltsc2022"
+    image: "mcr.microsoft.com/dotnet/runtime:8.0-windowsservercore-ltsc2025"
     imagePullPolicy: "IfNotPresent"
     name: "sign-dotnet"
     resources:
@@ -60,7 +60,7 @@ spec:
       privileged: false
     tty: false
   nodeSelector:
-    kubernetes.azure.com/agentpool: w2022
+    kubernetes.azure.com/agentpool: w2025
     kubernetes.io/os: windows
   tolerations:
     - key: "os"
@@ -69,7 +69,7 @@ spec:
       effect: "NoSchedule"
     - key: "version"
       operator: "Equal"
-      value: "windows2022"
+      value: "windows2025"
       effect: "NoSchedule"
     - key: "jenkins"
       operator: "Equal"
