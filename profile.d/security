@@ -25,3 +25,8 @@ RELEASE_GIT_PRODUCTION_BRANCH=master
 #         as retrieved from ./utils/getJenkinsVersion.py
 
 MAVEN_REPOSITORY_PRODUCTION_NAME=releases
+
+RELEASE_GIT_BRANCH=security-stable-2.580
+MAVEN_REPOSITORY_NAME=carpentras
+JENKINS_VERSION=2.580.2
+RELEASELINE=-stable
